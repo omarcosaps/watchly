@@ -32,14 +32,14 @@ export const TitleCard = ({ item, distinguishOwn = false }: TitleCardProps) => {
               alt=""
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+              className="object-cover transition-transform duration-still ease group-hover:scale-[1.025] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
             />
           ) : (
             <div className="flex h-full items-center justify-center px-3 text-center text-sm text-mist">
               Sem pôster
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:opacity-0" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-ui group-hover:opacity-100 motion-reduce:opacity-0" />
           <OfferStamps offers={item.offers} />
         </div>
         <div className="mt-3">

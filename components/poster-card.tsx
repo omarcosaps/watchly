@@ -25,7 +25,7 @@ export const PosterCard = ({ item }: PosterCardProps) => {
             alt=""
             fill
             sizes="248px"
-            className="object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+            className="object-cover transition-transform duration-still ease group-hover:scale-[1.025] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
           />
         ) : (
           <div className="flex h-full items-center justify-center px-4 text-center text-sm text-mist">
@@ -57,7 +57,7 @@ export const PosterCard = ({ item }: PosterCardProps) => {
           />
           <Link
             href={href}
-            className="cta-ember inline-flex h-11 flex-1 items-center justify-center rounded-full text-sm font-semibold transition-colors duration-200 hover:bg-ember-glow"
+            className="cta-ember inline-flex h-11 flex-1 items-center justify-center rounded-full text-sm font-semibold hover:bg-ember-glow"
           >
             Ver
           </Link>

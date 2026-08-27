@@ -45,7 +45,7 @@ export const CatalogFilters = ({ genres, providers, onClose }: CatalogFiltersPro
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-mist hover:bg-white/8 hover:text-paper"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-mist press-pill hover:bg-white/8 hover:text-paper"
             aria-label="Fechar filtros"
           >
             <CloseIcon className="h-4 w-4" />
@@ -100,7 +100,7 @@ export const CatalogFilters = ({ genres, providers, onClose }: CatalogFiltersPro
             })),
           ]}
         />
-        <label className="flex h-11 items-center gap-2 rounded-full bg-white/6 px-4 text-sm text-mist ring-1 ring-white/8">
+        <label className="focus-pill press-pill flex h-11 items-center gap-2 rounded-full bg-white/6 px-4 text-sm text-mist ring-1 ring-white/8">
           <span className="sr-only">Ano</span>
           <input
             type="number"
@@ -111,7 +111,7 @@ export const CatalogFilters = ({ genres, providers, onClose }: CatalogFiltersPro
             onChange={(event) => handleChange("year", event.target.value)}
             placeholder="Ano"
             aria-label="Ano"
-            className="w-16 bg-transparent text-sm text-paper placeholder:text-mist"
+            className="w-16 bg-transparent text-sm text-paper outline-none placeholder:text-mist"
           />
         </label>
         <FilterSelect
@@ -153,13 +153,13 @@ const FilterSelect = ({
   options: { value: string; label: string }[]
 }) => {
   return (
-    <label htmlFor={id} className="flex h-11 items-center gap-2 rounded-full bg-white/6 px-4 text-sm text-mist ring-1 ring-white/8">
+    <label htmlFor={id} className="focus-pill press-pill flex h-11 items-center gap-2 rounded-full bg-white/6 px-4 text-sm text-mist ring-1 ring-white/8">
       <span className="sr-only">{label}</span>
       <select
         id={id}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="max-w-40 bg-transparent text-sm text-paper"
+        className="max-w-40 bg-transparent text-sm text-paper outline-none"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value} className="bg-panel text-paper">

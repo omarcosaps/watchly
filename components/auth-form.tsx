@@ -64,7 +64,7 @@ export const AuthForm = ({
               type={field.type}
               autoComplete={field.autoComplete}
               required={field.required !== false}
-              className="h-12 rounded-full border border-white/8 bg-white/5 px-4 text-paper"
+              className="focus-pill h-12 rounded-full border border-white/8 bg-white/5 px-4 text-paper"
             />
           </label>
         ))}
@@ -80,7 +80,7 @@ export const AuthForm = ({
         ) : null}
         <button
           type="submit"
-          className="cta-ember mt-2 h-12 rounded-full font-semibold transition-colors duration-200 hover:bg-ember-glow"
+          className="cta-ember mt-2 h-12 rounded-full font-semibold hover:bg-ember-glow"
         >
           {submitLabel}
         </button>
