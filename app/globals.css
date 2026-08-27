@@ -49,7 +49,6 @@ body {
 @utility cta-ember {
   background-color: #e50914;
   color: #fff;
-  box-shadow: 0 10px 28px rgb(229 9 20 / 0.38);
 }
 
 @utility cta-ember-hover {

@@ -65,7 +65,7 @@ export const WatchlistToggle = ({
         )}
       >
         {saved ? <CheckIcon /> : <PlusIcon />}
-        {saved ? "Na watchlist" : "+ Watchlist"}
+        {saved ? "Na watchlist" : "Watchlist"}
       </button>
     )
   }
