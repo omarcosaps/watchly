@@ -2,7 +2,6 @@
 
 import { useEffect } from "react"
 
-import { AppSidebar } from "@/components/app-sidebar"
 import { AppShellProvider, useAppShell } from "@/components/app-shell-context"
 import { AppTopbar } from "@/components/app-topbar"
 import { Attribution } from "@/components/attribution"
@@ -16,18 +15,17 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
 }
 
 const AppShellFrame = ({ children }: { children: React.ReactNode }) => {
-  const { navOpen, setNavOpen, setFiltersOpen } = useAppShell()
+  const { setFiltersOpen } = useAppShell()
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return
-      setNavOpen(false)
       setFiltersOpen(false)
     }
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [setFiltersOpen, setNavOpen])
+  }, [setFiltersOpen])
 
   return (
     <div className="min-h-dvh bg-void md:p-3 lg:p-4">
@@ -38,15 +36,6 @@ const AppShellFrame = ({ children }: { children: React.ReactNode }) => {
         Ir para o conteúdo
       </a>
       <div className="relative flex h-dvh overflow-hidden bg-stage md:h-[calc(100dvh-1.5rem)] md:rounded-[32px] md:shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_40px_80px_rgba(0,0,0,0.55)] lg:h-[calc(100dvh-2rem)]">
-        {navOpen ? (
-          <button
-            type="button"
-            className="absolute inset-0 z-30 bg-black/55 lg:hidden"
-            aria-label="Fechar menu"
-            onClick={() => setNavOpen(false)}
-          />
-        ) : null}
-        <AppSidebar />
         <div className="flex min-w-0 flex-1 flex-col">
           <AppTopbar />
           <div className="hide-scrollbar min-h-0 flex-1 overflow-y-auto">
