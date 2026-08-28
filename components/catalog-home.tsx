@@ -146,28 +146,28 @@ export const CatalogHome = () => {
   }
 
   return (
-    <div className="flex flex-col gap-8 xl:flex-row">
-      <div className="min-w-0 flex-1">
-        <div
-          id="filtros-catalogo"
-          className={cn(
-            "grid transition-[grid-template-rows,opacity,margin] duration-ui ease",
-            filtersOpen
-              ? "mb-6 grid-rows-[1fr] opacity-100"
-              : "pointer-events-none mb-0 grid-rows-[0fr] opacity-0",
-          )}
-          aria-hidden={!filtersOpen}
-          inert={!filtersOpen ? true : undefined}
-        >
-          <div className="min-h-0 overflow-hidden">
-            <CatalogFilters
-              genres={genres}
-              providers={ownProviders}
-              onClose={() => setFiltersOpen(false)}
-            />
-          </div>
+    <div>
+      <div
+        id="filtros-catalogo"
+        className={cn(
+          "grid transition-[grid-template-rows,opacity,margin] duration-ui ease",
+          filtersOpen
+            ? "mb-6 grid-rows-[1fr] opacity-100"
+            : "pointer-events-none mb-0 grid-rows-[0fr] opacity-0",
+        )}
+        aria-hidden={!filtersOpen}
+        inert={!filtersOpen ? true : undefined}
+      >
+        <div className="min-h-0 overflow-hidden">
+          <CatalogFilters
+            genres={genres}
+            providers={ownProviders}
+            onClose={() => setFiltersOpen(false)}
+          />
         </div>
+      </div>
 
+      <div className="flex flex-col gap-8">
         {loading ? <HomeSkeleton /> : null}
 
         {!loading && error ? (
@@ -203,50 +203,57 @@ export const CatalogHome = () => {
 
         {!loading && featured.length > 0 ? <HeroCarousel items={featured} /> : null}
 
-        {!loading && popular.length > 0 ? (
-          <section className="mt-8">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-paper">Popular no Watchly</h2>
-              <p className="hidden items-center gap-1 text-xs text-mist sm:flex">
-                Deslize
-                <ChevronIcon className="h-3.5 w-3.5" />
-              </p>
-            </div>
-            <div className="hide-scrollbar -mx-1 flex gap-4 overflow-x-auto px-1 pb-2">
-              {popular.map((item) => (
-                <PosterCard key={`${item.mediaType}-${item.tmdbId}`} item={item} />
-              ))}
-            </div>
-          </section>
-        ) : null}
-
-        {!loading && gridItems.length > 0 ? (
-          <section className="mt-10">
-            <h2 className="mb-5 text-lg font-semibold text-paper">Mais títulos</h2>
-            <CatalogGrid items={gridItems} />
-            {page < totalPages ? (
-              <button
-                type="button"
-                onClick={handleLoadMore}
-                disabled={loadingMore}
-                className="glass press-pill mx-auto mt-10 flex h-12 w-fit items-center rounded-full px-6 text-sm text-paper disabled:opacity-40"
-              >
-                {loadingMore ? "Carregando…" : "Carregar mais"}
-              </button>
+        {!loading && items.length > 0 ? (
+          <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_19.5rem]">
+            {popular.length > 0 ? (
+              <section className="min-w-0">
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-lg font-semibold text-paper">Popular no Watchly</h2>
+                  <p className="hidden items-center gap-1 text-xs text-mist sm:flex">
+                    Deslize
+                    <ChevronIcon className="h-3.5 w-3.5" />
+                  </p>
+                </div>
+                <div className="hide-scrollbar -mx-1 flex gap-4 overflow-x-auto px-1 pb-2">
+                  {popular.map((item) => (
+                    <PosterCard key={`${item.mediaType}-${item.tmdbId}`} item={item} />
+                  ))}
+                </div>
+              </section>
             ) : null}
-          </section>
+
+            <div className="xl:col-start-2 xl:row-start-1 xl:row-span-2">
+              <HomeAside items={items} genres={genres} />
+            </div>
+
+            {gridItems.length > 0 ? (
+              <section className="min-w-0">
+                <h2 className="mb-5 text-lg font-semibold text-paper">Mais títulos</h2>
+                <CatalogGrid items={gridItems} />
+                {page < totalPages ? (
+                  <button
+                    type="button"
+                    onClick={handleLoadMore}
+                    disabled={loadingMore}
+                    className="glass press-pill mx-auto mt-10 flex h-12 w-fit items-center rounded-full px-6 text-sm text-paper disabled:opacity-40"
+                  >
+                    {loadingMore ? "Carregando…" : "Carregar mais"}
+                  </button>
+                ) : null}
+              </section>
+            ) : null}
+          </div>
         ) : null}
       </div>
-      {!loading && items.length > 0 ? <HomeAside items={items} genres={genres} /> : null}
     </div>
   )
 }
 
 const HomeSkeleton = () => {
   return (
-    <div aria-hidden>
-      <div className="min-h-[22rem] rounded-[28px] bg-panel md:min-h-[28rem]" />
-      <div className="mt-8 flex gap-4">
+    <div aria-hidden className="flex flex-col gap-8">
+      <div className="min-h-[22rem] w-full rounded-[28px] bg-panel md:min-h-[28rem] lg:min-h-[32rem]" />
+      <div className="hide-scrollbar -mx-1 flex gap-4 overflow-x-hidden px-1">
         {Array.from({ length: 4 }).map((_, index) => (
           <div key={index} className="aspect-[2/3] w-[13.5rem] shrink-0 rounded-[22px] bg-panel sm:w-[15.5rem]" />
         ))}
