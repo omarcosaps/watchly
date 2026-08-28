@@ -3,8 +3,6 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react"
 
 type AppShellContextValue = {
-  navOpen: boolean
-  setNavOpen: (open: boolean) => void
   filtersOpen: boolean
   setFiltersOpen: (open: boolean) => void
 }
@@ -20,12 +18,11 @@ export const useAppShell = () => {
 }
 
 export const AppShellProvider = ({ children }: { children: ReactNode }) => {
-  const [navOpen, setNavOpen] = useState(false)
   const [filtersOpen, setFiltersOpen] = useState(false)
 
   const value = useMemo(
-    () => ({ navOpen, setNavOpen, filtersOpen, setFiltersOpen }),
-    [filtersOpen, navOpen],
+    () => ({ filtersOpen, setFiltersOpen }),
+    [filtersOpen],
   )
 
   return <AppShellContext.Provider value={value}>{children}</AppShellContext.Provider>
