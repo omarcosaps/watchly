@@ -122,7 +122,7 @@ const TopbarContent = () => {
 
 const TopbarFrame = ({ children }: { children?: React.ReactNode }) => {
   return (
-    <header className="sticky top-0 z-20 flex items-center gap-3 bg-stage/90 px-4 py-3 backdrop-blur-xl sm:px-6 sm:gap-4 lg:px-7">
+    <header className="sticky top-0 z-20 flex items-center gap-3 bg-void/90 px-4 py-3 backdrop-blur-xl sm:px-6 sm:gap-4 lg:px-7">
       {children ?? <div className="h-11 flex-1" />}
     </header>
   )
