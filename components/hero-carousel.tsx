@@ -6,6 +6,7 @@ import { useState } from "react"
 
 import { ChevronIcon } from "@/components/icons"
 import { WatchlistToggle } from "@/components/watchlist-toggle"
+import { cn } from "@/lib/cn"
 import type { CatalogItem } from "@/lib/catalog/types"
 import { mediaLabel, tipoFromMedia } from "@/lib/media"
 import { atmosphereUrl } from "@/lib/tmdb/image"
@@ -44,7 +45,7 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
             priority
             loading="eager"
             sizes="(max-width: 1280px) 100vw, 70vw"
-            className="object-cover"
+            className="still-layer object-cover"
           />
         ) : (
           <div className="absolute inset-0 bg-panel" />
@@ -73,7 +74,10 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
         ) : null}
 
         <div className="relative flex min-h-[22rem] flex-col justify-end gap-8 p-6 md:min-h-[28rem] md:p-10 lg:min-h-[32rem]">
-          <div className="max-w-3xl">
+          <div
+            key={`${current.mediaType}-${current.tmdbId}`}
+            className="still-copy max-w-3xl"
+          >
             <p className="text-sm text-paper/70">
               {mediaLabel(current.mediaType)}
               {current.year ? ` · ${current.year}` : ""}
@@ -101,11 +105,12 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
                     onClick={() => setIndex(slideIndex)}
                     aria-label={`Mostrar ${slide.title}`}
                     aria-current={slideIndex === index}
-                    className={
+                    className={cn(
+                      "h-2 rounded-full transition-[width,background-color] duration-ui ease",
                       slideIndex === index
-                        ? "h-2 w-6 rounded-full bg-ember"
-                        : "h-2 w-2 rounded-full bg-white/35"
-                    }
+                        ? "w-6 bg-ember"
+                        : "w-2 bg-white/35",
+                    )}
                   />
                 ))}
               </div>
@@ -114,7 +119,7 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
             )}
             <Link
               href={href}
-              className="cta-ember inline-flex h-12 items-center justify-center rounded-full px-7 text-sm font-semibold transition-colors duration-200 hover:bg-ember-glow"
+              className="cta-ember inline-flex h-12 items-center justify-center rounded-full px-7 text-sm font-semibold hover:bg-ember-glow"
             >
               Ver título
             </Link>

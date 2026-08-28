@@ -16,6 +16,7 @@ import { fetchCatalog, fetchMeta, fetchProviders } from "@/lib/api"
 import { dedupeItems } from "@/lib/catalog/merge"
 import type { CatalogItem, MergedGenre, WatchProvider } from "@/lib/catalog/types"
 import { ChevronIcon } from "@/components/icons"
+import { cn } from "@/lib/cn"
 
 const catalogParams = (
   searchParams: URLSearchParams,
@@ -147,15 +148,25 @@ export const CatalogHome = () => {
   return (
     <div className="flex flex-col gap-8 xl:flex-row">
       <div className="min-w-0 flex-1">
-        {filtersOpen ? (
-          <div id="filtros-catalogo" className="mb-6">
+        <div
+          id="filtros-catalogo"
+          className={cn(
+            "grid transition-[grid-template-rows,opacity,margin] duration-ui ease",
+            filtersOpen
+              ? "mb-6 grid-rows-[1fr] opacity-100"
+              : "pointer-events-none mb-0 grid-rows-[0fr] opacity-0",
+          )}
+          aria-hidden={!filtersOpen}
+          inert={!filtersOpen ? true : undefined}
+        >
+          <div className="min-h-0 overflow-hidden">
             <CatalogFilters
               genres={genres}
               providers={ownProviders}
               onClose={() => setFiltersOpen(false)}
             />
           </div>
-        ) : null}
+        </div>
 
         {loading ? <HomeSkeleton /> : null}
 
@@ -218,7 +229,7 @@ export const CatalogHome = () => {
                 type="button"
                 onClick={handleLoadMore}
                 disabled={loadingMore}
-                className="glass mx-auto mt-10 flex h-12 w-fit items-center rounded-full px-6 text-sm text-paper disabled:opacity-40"
+                className="glass press-pill mx-auto mt-10 flex h-12 w-fit items-center rounded-full px-6 text-sm text-paper disabled:opacity-40"
               >
                 {loadingMore ? "Carregando…" : "Carregar mais"}
               </button>

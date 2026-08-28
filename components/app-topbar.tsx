@@ -81,7 +81,7 @@ const TopbarContent = () => {
       {preferences ? (
         <form
           onSubmit={handleSearch}
-          className="flex min-w-0 flex-1 items-center rounded-full bg-white/6 px-3 ring-1 ring-white/8"
+          className="focus-pill flex min-w-0 flex-1 items-center rounded-full bg-white/6 px-3 ring-1 ring-white/8"
           role="search"
         >
           <SearchIcon className="h-4 w-4 shrink-0 text-mist" />
@@ -95,7 +95,7 @@ const TopbarContent = () => {
             defaultValue={searchQuery}
             key={searchQuery}
             placeholder="Buscar um título"
-            className="h-11 w-full bg-transparent px-3 text-sm text-paper placeholder:text-mist/80"
+            className="h-11 w-full bg-transparent px-3 text-sm text-paper outline-none placeholder:text-mist/80"
           />
           {pathname === "/" ? (
             <button
@@ -104,7 +104,7 @@ const TopbarContent = () => {
               aria-expanded={filtersOpen}
               aria-controls="filtros-catalogo"
               className={cn(
-                "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-mist transition-colors duration-200 hover:bg-white/10 hover:text-paper",
+                "press-pill inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-mist hover:bg-white/10 hover:text-paper",
                 filtersOpen && "bg-white/10 text-paper",
               )}
               aria-label="Filtros"

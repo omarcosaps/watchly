@@ -13,6 +13,9 @@
   --color-mist: #9a9aa3;
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-instrument), ui-serif, Georgia, serif;
+  --duration-press: 160ms;
+  --duration-ui: 220ms;
+  --duration-still: 400ms;
 }
 
 html {
@@ -25,9 +28,26 @@ body {
   font-family: var(--font-sans);
 }
 
-:focus-visible {
+:focus-visible:not(input):not(select):not(textarea) {
   outline: 2px solid rgb(229 9 20 / 0.7);
   outline-offset: 3px;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+}
+
+.focus-pill {
+  outline: none;
+  transition: background-color 220ms ease, box-shadow 220ms ease, transform 160ms ease;
+}
+
+.focus-pill:focus,
+.focus-pill:has(:is(input, select, textarea):focus) {
+  background-color: rgb(255 255 255 / 0.1);
+  box-shadow: 0 0 0 2px var(--color-paper);
 }
 
 @utility glass {
@@ -49,6 +69,19 @@ body {
 @utility cta-ember {
   background-color: #e50914;
   color: #fff;
+  transition: background-color 220ms ease, transform 160ms ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+@utility press-pill {
+  transition: color 220ms ease, background-color 220ms ease, box-shadow 220ms ease, transform 160ms ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
 }
 
 @utility cta-ember-hover {
@@ -92,12 +125,31 @@ body {
   }
 
   to {
-    opacity: 0.55;
+    opacity: 1;
   }
 }
 
-.still-layer {
+@keyframes stamp {
+  0% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(1.08);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.still-layer,
+.still-copy {
   animation: still-fade 400ms ease both;
+}
+
+.stamp-icon {
+  animation: stamp 200ms ease;
 }
 
 @media (prefers-reduced-motion: reduce) {

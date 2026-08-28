@@ -93,7 +93,7 @@ export const PreferencesForm = ({ submitLabel, redirectTo = "/" }: PreferencesFo
         <select
           value={country}
           onChange={(event) => setCountry(event.target.value)}
-          className="glass h-12 rounded-full px-4 text-paper"
+          className="focus-pill press-pill glass h-12 rounded-full px-4 text-paper"
         >
           {countries.length === 0 ? <option value="BR">Brasil</option> : null}
           {countries.map((item) => (
