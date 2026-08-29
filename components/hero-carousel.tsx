@@ -88,14 +88,22 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
           </div>
 
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <WatchlistToggle
-              tmdbId={current.tmdbId}
-              mediaType={current.mediaType}
-              title={current.title}
-              posterPath={current.posterPath}
-              year={current.year}
-              variant="pill"
-            />
+            <div className="flex flex-wrap items-center gap-3">
+              <WatchlistToggle
+                tmdbId={current.tmdbId}
+                mediaType={current.mediaType}
+                title={current.title}
+                posterPath={current.posterPath}
+                year={current.year}
+                variant="pill"
+              />
+              <Link
+                href={href}
+                className="cta-ember inline-flex h-12 items-center justify-center rounded-full px-7 text-sm font-semibold hover:bg-ember-glow"
+              >
+                Ver título
+              </Link>
+            </div>
             {slides.length > 1 ? (
               <div className="flex justify-center gap-2" aria-label="Slides em destaque">
                 {slides.map((slide, slideIndex) => (
@@ -114,15 +122,7 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
                   />
                 ))}
               </div>
-            ) : (
-              <span />
-            )}
-            <Link
-              href={href}
-              className="cta-ember inline-flex h-12 items-center justify-center rounded-full px-7 text-sm font-semibold hover:bg-ember-glow"
-            >
-              Ver título
-            </Link>
+            ) : null}
           </div>
         </div>
       </div>

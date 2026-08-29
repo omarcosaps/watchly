@@ -16,7 +16,7 @@ export const Wordmark = ({ href = "/", className, showText = true }: WordmarkPro
       className={cn("flex items-center gap-[12px] text-paper", className)}
       aria-label="Watchly, início"
     >
-      <WatchlyMark className="h-8 w-8" />
+      <WatchlyMark className="h-7 w-7" />
       {showText ? (
         <span className="hidden text-lg font-semibold tracking-tight sm:inline">Watchly</span>
       ) : null}
