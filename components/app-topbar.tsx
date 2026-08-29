@@ -51,6 +51,11 @@ const TopbarContent = () => {
         <NavLink href={homeHref} active={homeActive}>
           Início
         </NavLink>
+        {preferences ? (
+          <NavLink href="/watchlist" active={pathname === "/watchlist"}>
+            Watchlist
+          </NavLink>
+        ) : null}
       </nav>
 
       {preferences ? (
@@ -93,26 +98,17 @@ const TopbarContent = () => {
       )}
 
       {preferences ? (
-        <>
-          <NavLink
-            href="/watchlist"
-            active={pathname === "/watchlist"}
-            className="hidden sm:inline-flex"
-          >
-            Watchlist
-          </NavLink>
-          <Link
-            href="/watchlist"
-            aria-label="Watchlist"
-            aria-current={pathname === "/watchlist" ? "page" : undefined}
-            className={cn(
-              "press-pill inline-flex h-10 w-10 items-center justify-center rounded-full sm:hidden",
-              pathname === "/watchlist" ? "text-ember" : "text-mist hover:text-paper",
-            )}
-          >
-            <BookmarkIcon className="h-5 w-5" />
-          </Link>
-        </>
+        <Link
+          href="/watchlist"
+          aria-label="Watchlist"
+          aria-current={pathname === "/watchlist" ? "page" : undefined}
+          className={cn(
+            "press-pill inline-flex h-10 w-10 items-center justify-center rounded-full sm:hidden",
+            pathname === "/watchlist" ? "text-ember" : "text-mist hover:text-paper",
+          )}
+        >
+          <BookmarkIcon className="h-5 w-5" />
+        </Link>
       ) : null}
 
       <ProfileMenu displayName={displayName} showPreferences={Boolean(preferences)} />
