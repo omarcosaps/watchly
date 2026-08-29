@@ -96,7 +96,7 @@ const SearchResults = () => {
       ) : null}
       {items.length > 0 ? (
         <>
-          <CatalogGrid items={items} distinguishOwn />
+          <CatalogGrid items={items} showOffServiceHint />
           {page < totalPages ? (
             <button
               type="button"
