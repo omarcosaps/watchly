@@ -2,7 +2,7 @@ type IconProps = {
   className?: string
 }
 
-export const WatchlyMark = ({ className = "h-8 w-8" }: IconProps) => {
+export const WatchlyMark = ({ className = "h-7 w-7" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
