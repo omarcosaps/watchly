@@ -1,15 +1,18 @@
 import "server-only"
 
 import { extractOffers } from "@/lib/catalog/offers"
+import { pickYoutubeTrailer, pickYoutubeTrailerKey } from "@/lib/catalog/trailer"
 import type { TitleDetails } from "@/lib/catalog/types"
 import { yearFromDate } from "@/lib/catalog/types"
 import type { MediaType } from "@/lib/media"
 import {
   getMovieCredits,
   getMovieDetails,
+  getMovieVideos,
   getMovieWatchProviders,
   getTvCredits,
   getTvDetails,
+  getTvVideos,
   getTvWatchProviders,
 } from "@/lib/tmdb/queries"
 
@@ -20,10 +23,11 @@ export const getTitleDetails = async (input: {
   providerIds: number[]
 }): Promise<TitleDetails> => {
   if (input.mediaType === "movie") {
-    const [details, credits, providers] = await Promise.all([
+    const [details, credits, providers, videos] = await Promise.all([
       getMovieDetails(input.tmdbId),
       getMovieCredits(input.tmdbId),
       getMovieWatchProviders(input.tmdbId),
+      getMovieVideos(input.tmdbId),
     ])
 
     const offers = extractOffers(providers.results[input.region], input.providerIds, false)
@@ -49,13 +53,16 @@ export const getTitleDetails = async (input: {
       })),
       offers,
       availableInRegion: offers.length > 0,
+      trailerUrl: pickYoutubeTrailer(videos.results),
+      trailerKey: pickYoutubeTrailerKey(videos.results),
     }
   }
 
-  const [details, credits, providers] = await Promise.all([
+  const [details, credits, providers, videos] = await Promise.all([
     getTvDetails(input.tmdbId),
     getTvCredits(input.tmdbId),
     getTvWatchProviders(input.tmdbId),
+    getTvVideos(input.tmdbId),
   ])
 
   const offers = extractOffers(providers.results[input.region], input.providerIds, false)
@@ -81,5 +88,7 @@ export const getTitleDetails = async (input: {
     })),
     offers,
     availableInRegion: offers.length > 0,
+    trailerUrl: pickYoutubeTrailer(videos.results),
+    trailerKey: pickYoutubeTrailerKey(videos.results),
   }
 }

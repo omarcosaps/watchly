@@ -209,3 +209,17 @@ export const StarIcon = ({
     </svg>
   )
 }
+
+export const PlayIcon = ({ className = "h-4 w-4" }: IconProps) => {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path
+        d="M8 6.8v10.4L18 12 8 6.8z"
+        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}

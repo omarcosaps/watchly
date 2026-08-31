@@ -5,8 +5,10 @@ import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
 import { useAccount } from "@/components/account-provider"
+import { PlayIcon } from "@/components/icons"
 import { RatingStars } from "@/components/rating-stars"
 import { StatusPanel } from "@/components/status-panel"
+import { TrailerDialog } from "@/components/trailer-dialog"
 import { WatchlistToggle } from "@/components/watchlist-toggle"
 import { fetchTitle } from "@/lib/api"
 import { MONETIZATION_LABEL, type Offer, type TitleDetails } from "@/lib/catalog/types"
@@ -19,7 +21,11 @@ export default function TitlePage() {
   const { preferences } = useAccount()
   const [details, setDetails] = useState<TitleDetails | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [trailerOpen, setTrailerOpen] = useState(false)
   const mediaType = mediaFromTipo(params.tipo)
+
+  const handleOpenTrailer = () => setTrailerOpen(true)
+  const handleCloseTrailer = () => setTrailerOpen(false)
 
   useEffect(() => {
     let cancelled = false
@@ -30,7 +36,10 @@ export default function TitlePage() {
 
       try {
         const data = await fetchTitle(preferences, params.tipo, params.id)
-        if (!cancelled) setDetails(data)
+        if (!cancelled) {
+          setDetails(data)
+          setTrailerOpen(false)
+        }
       } catch (loadError) {
         if (!cancelled) {
           setDetails(null)
@@ -108,7 +117,17 @@ export default function TitlePage() {
                   {details.genres.length > 0 ? ` · ${details.genres.join(", ")}` : ""}
                 </p>
               </div>
-              <div className="mt-6">
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                {details.trailerKey ? (
+                  <button
+                    type="button"
+                    onClick={handleOpenTrailer}
+                    className="cta-ember inline-flex h-12 items-center justify-center gap-2 rounded-full px-7 text-sm font-semibold hover:bg-ember-glow"
+                  >
+                    <PlayIcon className="h-4 w-4" />
+                    Reproduzir trailer
+                  </button>
+                ) : null}
                 <WatchlistToggle
                   tmdbId={details.tmdbId}
                   mediaType={details.mediaType}
@@ -182,6 +201,14 @@ export default function TitlePage() {
             })}
           </ul>
         </section>
+      ) : null}
+      {details.trailerKey ? (
+        <TrailerDialog
+          title={details.title}
+          youtubeKey={details.trailerKey}
+          open={trailerOpen}
+          onClose={handleCloseTrailer}
+        />
       ) : null}
     </article>
   )
