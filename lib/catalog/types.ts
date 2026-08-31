@@ -69,6 +69,8 @@ export type TitleDetails = {
   credits: Credit[]
   offers: Offer[]
   availableInRegion: boolean
+  trailerUrl: string | null
+  trailerKey: string | null
 }
 
 export const MONETIZATION_LABEL: Record<MonetizationType, string> = {

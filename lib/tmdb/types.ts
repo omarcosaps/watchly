@@ -113,3 +113,15 @@ export type TmdbTvDetails = Omit<TmdbTvListItem, "genre_ids"> & {
 export type TmdbCredits = {
   cast: TmdbCastMember[]
 }
+
+export type TmdbVideo = {
+  key: string
+  site: string
+  type: string
+  official: boolean
+}
+
+export type TmdbVideosResponse = {
+  id: number
+  results: TmdbVideo[]
+}

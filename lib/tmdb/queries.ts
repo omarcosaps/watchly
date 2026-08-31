@@ -12,6 +12,7 @@ import type {
   TmdbProvider,
   TmdbTvDetails,
   TmdbTvListItem,
+  TmdbVideosResponse,
   TmdbWatchProvidersResponse,
 } from "@/lib/tmdb/types"
 
@@ -116,4 +117,16 @@ export const getTvWatchProviders = (id: number) => {
     {},
     CACHE.watchProviders,
   )
+}
+
+const videoQuery = {
+  include_video_language: "pt-BR,en,null",
+}
+
+export const getMovieVideos = (id: number) => {
+  return tmdbFetch<TmdbVideosResponse>(`/movie/${id}/videos`, videoQuery, CACHE.details)
+}
+
+export const getTvVideos = (id: number) => {
+  return tmdbFetch<TmdbVideosResponse>(`/tv/${id}/videos`, videoQuery, CACHE.details)
 }

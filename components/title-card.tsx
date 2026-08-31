@@ -83,7 +83,7 @@ const RatingStamp = ({ value }: { value: number }) => {
 
   return (
     <span className="absolute top-2 right-2 inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[11px] font-medium text-paper backdrop-blur-md">
-      <StarIcon className="h-3 w-3" filled />
+      <StarIcon className="h-3 w-3 text-gold" filled />
       <span className="sr-only">Nota </span>
       {value.toFixed(1)}
     </span>
