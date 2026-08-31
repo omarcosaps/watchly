@@ -4,7 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { useState } from "react"
 
-import { ChevronIcon } from "@/components/icons"
+import { ChevronIcon, PlayIcon } from "@/components/icons"
 import { WatchlistToggle } from "@/components/watchlist-toggle"
 import { cn } from "@/lib/cn"
 import type { CatalogItem } from "@/lib/catalog/types"
@@ -89,6 +89,13 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
 
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap items-center gap-3">
+              <Link
+                href={href}
+                className="cta-primary inline-flex h-12 items-center justify-center gap-2 rounded-full px-7 text-sm font-semibold"
+              >
+                <PlayIcon className="h-4 w-4" />
+                Ver detalhes
+              </Link>
               <WatchlistToggle
                 tmdbId={current.tmdbId}
                 mediaType={current.mediaType}
@@ -97,12 +104,6 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
                 year={current.year}
                 variant="pill"
               />
-              <Link
-                href={href}
-                className="cta-ember inline-flex h-12 items-center justify-center rounded-full px-7 text-sm font-semibold hover:bg-ember-glow"
-              >
-                Ver título
-              </Link>
             </div>
             {slides.length > 1 ? (
               <div className="flex justify-center gap-2" aria-label="Slides em destaque">

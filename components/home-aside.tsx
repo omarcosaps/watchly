@@ -55,13 +55,13 @@ export const HomeAside = ({ items, genres }: HomeAsideProps) => {
                         <button
                           type="button"
                           onClick={() => removeFromWatchlist(item.mediaType, item.tmdbId)}
-                          className="h-8 rounded-full bg-white/8 px-3 text-xs text-paper"
+                          className="cta-ghost h-8 rounded-full px-3 text-xs font-semibold"
                         >
                           Tirar
                         </button>
                         <Link
                           href={href}
-                          className="cta-ember inline-flex h-8 items-center rounded-full px-3 text-xs font-semibold"
+                          className="cta-primary inline-flex h-8 items-center rounded-full px-3 text-xs font-semibold"
                         >
                           Ver
                         </Link>

@@ -102,7 +102,7 @@ const SearchResults = () => {
               type="button"
               onClick={handleLoadMore}
               disabled={loading}
-              className="glass mx-auto h-12 w-fit rounded-full px-6 text-sm text-paper disabled:opacity-40"
+              className="cta-ghost mx-auto flex h-12 w-fit items-center rounded-full px-6 text-sm font-semibold disabled:opacity-40"
             >
               {loading ? "Carregando…" : "Carregar mais"}
             </button>
