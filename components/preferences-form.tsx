@@ -123,7 +123,7 @@ export const PreferencesForm = ({ submitLabel, redirectTo = "/" }: PreferencesFo
       <button
         type="submit"
         disabled={selectedIds.length < 1 || loading}
-        className="h-12 w-fit rounded-full px-6 font-semibold disabled:opacity-40 cta-ember hover:bg-ember-glow"
+        className="cta-primary h-12 w-fit rounded-full px-6 font-semibold disabled:opacity-40"
       >
         {submitLabel}
       </button>

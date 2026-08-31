@@ -122,7 +122,7 @@ export default function TitlePage() {
                   <button
                     type="button"
                     onClick={handleOpenTrailer}
-                    className="cta-ember inline-flex h-12 items-center justify-center gap-2 rounded-full px-7 text-sm font-semibold hover:bg-ember-glow"
+                    className="cta-primary inline-flex h-12 items-center justify-center gap-2 rounded-full px-7 text-sm font-semibold"
                   >
                     <PlayIcon className="h-4 w-4" />
                     Reproduzir trailer

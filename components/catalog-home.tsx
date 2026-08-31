@@ -175,7 +175,7 @@ export const CatalogHome = () => {
               <button
                 type="button"
                 onClick={handleRetry}
-                className="cta-ember inline-flex h-11 items-center rounded-full px-5 text-sm font-semibold"
+                className="cta-primary inline-flex h-11 items-center rounded-full px-5 text-sm font-semibold"
               >
                 Tentar de novo
               </button>
@@ -190,7 +190,7 @@ export const CatalogHome = () => {
             action={
               <Link
                 href="/"
-                className="cta-ember inline-flex h-11 items-center rounded-full px-5 text-sm font-semibold"
+                className="cta-primary inline-flex h-11 items-center rounded-full px-5 text-sm font-semibold"
               >
                 Limpar filtros
               </Link>
@@ -210,7 +210,7 @@ export const CatalogHome = () => {
                   onClick={handleLoadMore}
                   disabled={loadingMore}
                   className={cn(
-                    "glass press-pill mx-auto flex h-12 w-fit items-center rounded-full px-6 text-sm text-paper disabled:opacity-40",
+                    "cta-ghost press-pill mx-auto flex h-12 w-fit items-center rounded-full px-6 text-sm font-semibold disabled:opacity-40",
                     gridItems.length > 0 && "mt-10",
                   )}
                 >

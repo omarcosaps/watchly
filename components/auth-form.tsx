@@ -80,7 +80,7 @@ export const AuthForm = ({
         ) : null}
         <button
           type="submit"
-          className="cta-ember mt-2 h-12 rounded-full font-semibold hover:bg-ember-glow"
+          className="cta-primary mt-2 h-12 rounded-full font-semibold"
         >
           {submitLabel}
         </button>

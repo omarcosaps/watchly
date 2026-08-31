@@ -62,17 +62,16 @@ export const WatchlistToggle = ({
         type="button"
         onClick={handleClick}
         aria-pressed={saved}
-        aria-label={saved ? "Remover da watchlist" : "Guardar na watchlist"}
+        aria-label={saved ? "Remover da minha lista" : "Adicionar à minha lista"}
         className={cn(
-          "press-pill inline-flex h-12 items-center gap-2 rounded-full px-5 text-sm font-medium text-paper",
-          saved ? "glass-strong" : "glass",
+          "cta-ghost press-pill inline-flex h-12 items-center gap-2 rounded-full px-5 text-sm font-semibold",
           className,
         )}
       >
         <span key={stampTick} className={stampClass}>
           {saved ? <CheckIcon /> : <PlusIcon />}
         </span>
-        {saved ? "Na watchlist" : "Watchlist"}
+        {saved ? "Na minha lista" : "Adicionar à minha lista"}
       </button>
     )
   }

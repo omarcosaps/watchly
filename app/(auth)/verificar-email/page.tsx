@@ -29,7 +29,7 @@ export default function VerificarEmailPage() {
       <button
         type="button"
         onClick={handleConfirm}
-        className="mt-8 h-12 w-full rounded-full bg-paper font-medium text-void"
+        className="cta-primary mt-8 h-12 w-full rounded-full font-semibold"
       >
         Já confirmei o email
       </button>
