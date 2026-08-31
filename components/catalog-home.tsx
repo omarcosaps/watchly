@@ -7,15 +7,13 @@ import { useEffect, useMemo, useState } from "react"
 import { useAccount } from "@/components/account-provider"
 import { useAppShell } from "@/components/app-shell-context"
 import { CatalogFilters } from "@/components/catalog-filters"
-import { CatalogGrid } from "@/components/catalog-grid"
+import { CatalogGrid, CatalogSkeleton } from "@/components/catalog-grid"
 import { HeroCarousel } from "@/components/hero-carousel"
 import { HomeAside } from "@/components/home-aside"
-import { PosterCard } from "@/components/poster-card"
 import { StatusPanel } from "@/components/status-panel"
 import { fetchCatalog, fetchMeta, fetchProviders } from "@/lib/api"
 import { dedupeItems } from "@/lib/catalog/merge"
 import type { CatalogItem, MergedGenre, WatchProvider } from "@/lib/catalog/types"
-import { ChevronIcon } from "@/components/icons"
 import { cn } from "@/lib/cn"
 
 const catalogParams = (
@@ -64,8 +62,7 @@ export const CatalogHome = () => {
   }, [preferences?.providerIds, providers])
 
   const featured = items.slice(0, 5)
-  const popular = items.slice(0, 8)
-  const gridItems = items.slice(8)
+  const gridItems = items.slice(5)
 
   useEffect(() => {
     let cancelled = false
@@ -205,43 +202,23 @@ export const CatalogHome = () => {
 
         {!loading && items.length > 0 ? (
           <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_19.5rem]">
-            {popular.length > 0 ? (
-              <section className="min-w-0">
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-paper">Popular no Watchly</h2>
-                  <p className="hidden items-center gap-1 text-xs text-mist sm:flex">
-                    Deslize
-                    <ChevronIcon className="h-3.5 w-3.5" />
-                  </p>
-                </div>
-                <div className="hide-scrollbar -mx-1 flex gap-4 overflow-x-auto px-1 pb-2">
-                  {popular.map((item) => (
-                    <PosterCard key={`${item.mediaType}-${item.tmdbId}`} item={item} />
-                  ))}
-                </div>
-              </section>
-            ) : null}
-
-            <div className="xl:col-start-2 xl:row-start-1 xl:row-span-2">
-              <HomeAside items={items} genres={genres} />
+            <div className="min-w-0">
+              {gridItems.length > 0 ? <CatalogGrid items={gridItems} /> : null}
+              {page < totalPages ? (
+                <button
+                  type="button"
+                  onClick={handleLoadMore}
+                  disabled={loadingMore}
+                  className={cn(
+                    "glass press-pill mx-auto flex h-12 w-fit items-center rounded-full px-6 text-sm text-paper disabled:opacity-40",
+                    gridItems.length > 0 && "mt-10",
+                  )}
+                >
+                  {loadingMore ? "Carregando…" : "Carregar mais"}
+                </button>
+              ) : null}
             </div>
-
-            {gridItems.length > 0 ? (
-              <section className="min-w-0">
-                <h2 className="mb-5 text-lg font-semibold text-paper">Mais títulos</h2>
-                <CatalogGrid items={gridItems} />
-                {page < totalPages ? (
-                  <button
-                    type="button"
-                    onClick={handleLoadMore}
-                    disabled={loadingMore}
-                    className="glass press-pill mx-auto mt-10 flex h-12 w-fit items-center rounded-full px-6 text-sm text-paper disabled:opacity-40"
-                  >
-                    {loadingMore ? "Carregando…" : "Carregar mais"}
-                  </button>
-                ) : null}
-              </section>
-            ) : null}
+            <HomeAside items={items} genres={genres} />
           </div>
         ) : null}
       </div>
@@ -253,11 +230,7 @@ const HomeSkeleton = () => {
   return (
     <div aria-hidden className="flex flex-col gap-8">
       <div className="min-h-[22rem] w-full rounded-[28px] bg-panel md:min-h-[28rem] lg:min-h-[32rem]" />
-      <div className="hide-scrollbar -mx-1 flex gap-4 overflow-x-hidden px-1">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <div key={index} className="aspect-[2/3] w-[13.5rem] shrink-0 rounded-[22px] bg-panel sm:w-[15.5rem]" />
-        ))}
-      </div>
+      <CatalogSkeleton />
     </div>
   )
 }
