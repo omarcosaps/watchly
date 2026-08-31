@@ -12,7 +12,7 @@ export const OfferStamps = ({ offers }: OfferStampsProps) => {
   if (types.length === 0) return null
 
   return (
-    <ul className="pointer-events-none absolute bottom-2 left-2 flex flex-wrap gap-1">
+    <ul className="pointer-events-none absolute top-2 left-2 right-14 flex flex-wrap gap-1">
       {types.map((type: MonetizationType) => (
         <li
           key={type}

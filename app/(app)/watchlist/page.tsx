@@ -112,7 +112,7 @@ export default function WatchlistPage() {
       </div>
       {error ? <p className="text-paper" role="alert">{error}</p> : null}
       {loading && items.length === 0 ? <p className="text-mist">Carregando disponibilidade…</p> : null}
-      <CatalogGrid items={visible} />
+      <CatalogGrid items={visible} showOffServiceHint />
     </div>
   )
 }
