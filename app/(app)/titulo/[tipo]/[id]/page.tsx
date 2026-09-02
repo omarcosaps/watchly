@@ -10,6 +10,7 @@ import { RatingStars } from "@/components/rating-stars"
 import { StatusPanel } from "@/components/status-panel"
 import { TrailerDialog } from "@/components/trailer-dialog"
 import { WatchlistToggle } from "@/components/watchlist-toggle"
+import { WatchStatusToggle } from "@/components/watch-status-toggle"
 import { fetchTitle } from "@/lib/api"
 import { MONETIZATION_LABEL, type Offer, type TitleDetails } from "@/lib/catalog/types"
 import { mediaFromTipo, mediaLabel } from "@/lib/media"
@@ -134,6 +135,11 @@ export default function TitlePage() {
                   title={details.title}
                   posterPath={details.posterPath}
                   year={details.year}
+                  variant="pill"
+                />
+                <WatchStatusToggle
+                  mediaType={details.mediaType}
+                  tmdbId={details.tmdbId}
                   variant="pill"
                 />
               </div>

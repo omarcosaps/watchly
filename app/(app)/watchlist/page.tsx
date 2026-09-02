@@ -3,9 +3,10 @@
 import { CatalogGrid } from "@/components/catalog-grid"
 import { StatusPanel } from "@/components/status-panel"
 import { useAccount } from "@/components/account-provider"
+import { WatchStatusToggle } from "@/components/watch-status-toggle"
 import { fetchJson, preferenceQuery } from "@/lib/api"
 import type { CatalogItem } from "@/lib/catalog/types"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 const toCatalogItem = (
   saved: {
@@ -37,13 +38,22 @@ export default function WatchlistPage() {
   const [items, setItems] = useState<CatalogItem[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const watchlistIdentity = watchlist
+    .map((item) => `${item.mediaType}:${item.tmdbId}`)
+    .join("|")
+  const lastHydrateKey = useRef("")
 
   useEffect(() => {
+    if (!preferences) return
+
+    const hydrateKey = `${preferenceQuery(preferences)}:${watchlistIdentity}`
+    if (lastHydrateKey.current === hydrateKey) return
+
     let cancelled = false
 
     const load = async () => {
-      if (!preferences) return
       if (watchlist.length === 0) {
+        lastHydrateKey.current = hydrateKey
         setItems([])
         return
       }
@@ -76,7 +86,10 @@ export default function WatchlistPage() {
           }),
         )
 
-        if (!cancelled) setItems(hydrated)
+        if (!cancelled) {
+          lastHydrateKey.current = hydrateKey
+          setItems(hydrated)
+        }
       } catch (loadError) {
         if (!cancelled) {
           setItems(watchlist.map((saved) => toCatalogItem(saved)))
@@ -91,7 +104,7 @@ export default function WatchlistPage() {
     return () => {
       cancelled = true
     }
-  }, [preferences, watchlist])
+  }, [preferences, watchlist, watchlistIdentity])
 
   const visible = items.length > 0 ? items : watchlist.map((saved) => toCatalogItem(saved))
 
@@ -112,7 +125,13 @@ export default function WatchlistPage() {
       </div>
       {error ? <p className="text-paper" role="alert">{error}</p> : null}
       {loading && items.length === 0 ? <p className="text-mist">Carregando disponibilidade…</p> : null}
-      <CatalogGrid items={visible} showOffServiceHint />
+      <CatalogGrid
+        items={visible}
+        showOffServiceHint
+        posterStamp={(item) => (
+          <WatchStatusToggle mediaType={item.mediaType} tmdbId={item.tmdbId} />
+        )}
+      />
     </div>
   )
 }

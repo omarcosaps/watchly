@@ -15,9 +15,10 @@ export const isSaved = (mediaType: MediaType, tmdbId: number) => {
   return listWatchlist().some((item) => item.mediaType === mediaType && item.tmdbId === tmdbId)
 }
 
-export const addToWatchlist = (item: Omit<WatchlistItem, "createdAt">) => {
+export const addToWatchlist = (item: Omit<WatchlistItem, "createdAt" | "watched">) => {
   const nextItem: WatchlistItem = {
     ...item,
+    watched: false,
     createdAt: new Date().toISOString(),
   }
 
@@ -46,4 +47,32 @@ export const removeFromWatchlist = (mediaType: MediaType, tmdbId: number) => {
       return itemKey(item.mediaType, item.tmdbId) !== itemKey(mediaType, tmdbId)
     }),
   }))
+}
+
+export const setWatchlistWatched = (
+  mediaType: MediaType,
+  tmdbId: number,
+  watched: boolean,
+) => {
+  mutateAccount((current) => {
+    const exists = current.watchlist.some((item) => {
+      return itemKey(item.mediaType, item.tmdbId) === itemKey(mediaType, tmdbId)
+    })
+
+    if (!exists) return current
+
+    return {
+      ...current,
+      watchlist: current.watchlist.map((item) => {
+        if (itemKey(item.mediaType, item.tmdbId) !== itemKey(mediaType, tmdbId)) {
+          return item
+        }
+
+        return {
+          ...item,
+          watched,
+        }
+      }),
+    }
+  })
 }
