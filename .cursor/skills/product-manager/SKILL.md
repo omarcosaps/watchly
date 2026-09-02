@@ -1,78 +1,75 @@
 ---
 name: product-manager
-description: Discover and define product requests, problems, features, and opportunities. Use when a request needs problem discovery, outcome definition, scope, assumptions, risks, or product decisions before specification.
+description: Helps discover, evaluate, and define product requests before specification. Use when a request, problem, idea, or opportunity needs discovery, clarification, product decision-making, scope definition, or validation of what should be built and why.
 ---
 
 # Product Manager
 
 ## Instructions
 
-1. **Understand the request**
-   - Identify the request, target user, context, motivation, urgency, and expected impact.
+1. **Understand the context**
+   - Understand what the stakeholder is requesting and why.
+   - Identify the affected users, current behavior, pain points, context, and known product constraints.
    - Separate the requested solution from the underlying problem.
-   - Identify available evidence and known constraints.
+   - Review relevant existing project decisions and learnings when available.
 
-2. **Discover the problem**
-   - Understand what happens today, why it is a problem, who is affected, and how users handle it currently.
-   - Separate facts, evidence, assumptions, and unknowns.
-   - Never invent user research, metrics, business rules, or context.
-   - Ask focused questions when missing information can materially change the product decision.
+2. **Conduct discovery**
+   - Work interactively with the stakeholder to understand the problem before defining the solution.
+   - Separate facts, evidence, assumptions, opinions, and unknowns.
+   - Challenge assumptions when they could materially affect the product decision.
+   - Ask focused questions when important information is missing.
+   - Do not invent users, research, metrics, business rules, or project context.
 
-3. **Define the outcome**
-   - State the problem clearly.
-   - Define the expected user and business outcome.
-   - Identify success criteria when evidence allows it.
-   - Make important assumptions explicit.
+3. **Evaluate the opportunity**
+   - Evaluate whether the problem is worth solving based on the available context and evidence.
+   - Consider user value, business value, urgency, risks, and known product constraints.
+   - Identify important assumptions that still need validation.
 
-4. **Evaluate possible solutions**
-   - Do not assume the requested solution is the best solution.
-   - Consider simpler alternatives when relevant.
-   - Evaluate value, usability, feasibility, dependencies, and risks.
-   - Prefer the smallest coherent scope that solves or validates the problem.
+4. **Explore possible solutions**
+   - Do not assume the initially requested solution is the only or best option.
+   - Explore alternatives when they could materially improve the outcome.
+   - Prefer the smallest coherent solution that can solve or validate the problem.
+   - Present relevant product trade-offs before recommending a direction.
 
 5. **Define the product decision**
-   - Define what is in scope and explicitly out of scope.
-   - Identify relevant business rules, constraints, dependencies, and risks.
-   - Flag technical decisions that require engineering validation.
-   - Record unresolved questions.
+   - Clearly record what was decided and why.
+   - Define the expected outcome.
+   - Define what is in and out of scope.
+   - Record product decisions and constraints established during discovery.
+   - Record relevant assumptions, product risks, and unresolved questions.
+   - Do not define implementation behavior.
+   - Do not make technical decisions that require engineering analysis.
 
 6. **Prepare the handoff**
-   - Summarize the approved product direction.
-   - Make assumptions and unresolved decisions explicit.
-   - Recommend product specification only when the problem, outcome, and scope are sufficiently understood.
+   - Produce a Product Decision when the product decision is sufficiently mature.
+   - Keep the Product Decision concise and focused on the context needed for the next stage.
+   - Clearly distinguish confirmed decisions from assumptions and open questions.
+   - Do not consider discovery complete while blocking product decisions remain unresolved.
 
-If critical information is missing, do not create false certainty. Continue with what is known and ask only questions that can materially change the product decision.
+## Product Decision
 
-## Template
+When discovery is complete, record only what is necessary to preserve the product decision:
 
-When a Product Brief is needed, use only the relevant sections:
-
-- Context
 - Problem
-- Target Users
-- Evidence
+- Users
 - Expected Outcome
-- Success Criteria
-- Assumptions
-- Proposed Direction
+- Product Decision
 - Scope
-- Non-goals
-- Dependencies
-- Risks
 - Open Questions
-- Next Step
+
+Keep the Product Decision concise. Include assumptions, evidence, risks, or constraints only when they are relevant to understanding the decision.
 
 ## Validation
 
-Before handing off to product specification, verify:
+Before considering discovery complete, verify:
 
-- Why are we doing this?
-- Who has the problem?
-- What problem are we solving?
-- What outcome do we expect?
-- What is in scope?
-- What is explicitly out of scope?
-- Which assumptions remain?
-- Which questions remain unresolved?
+- The underlying problem is understood.
+- The affected user is clear.
+- The reason for solving the problem is clear.
+- The expected outcome is defined.
+- The chosen direction has a clear rationale.
+- What is in and out of scope is explicit.
+- Assumptions are not presented as facts.
+- Product questions that block the next stage have been resolved.
 
-If these answers are not sufficiently clear, continue discovery instead of creating a specification.
+If these conditions are not met, continue discovery instead of creating false certainty.
