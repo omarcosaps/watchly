@@ -24,6 +24,7 @@ import {
   addToWatchlist,
   isSaved,
   removeFromWatchlist,
+  setWatchlistWatched,
 } from "@/lib/account/watchlist"
 import type { MediaType } from "@/lib/media"
 
@@ -65,6 +66,7 @@ type AccountContextValue = {
   applyCountryChange: typeof applyCountryChange
   addToWatchlist: typeof addToWatchlist
   removeFromWatchlist: typeof removeFromWatchlist
+  setWatchlistWatched: typeof setWatchlistWatched
   isSaved: (mediaType: MediaType, tmdbId: number) => boolean
 }
 
@@ -105,6 +107,7 @@ export const AccountProvider = ({ children }: { children: ReactNode }) => {
       applyCountryChange: wrap(applyCountryChange),
       addToWatchlist: wrap(addToWatchlist),
       removeFromWatchlist: wrap(removeFromWatchlist),
+      setWatchlistWatched: wrap(setWatchlistWatched),
       isSaved,
     }
   }, [account.preferences, account.session, account.watchlist, ready, wrap])

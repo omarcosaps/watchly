@@ -16,6 +16,13 @@ export const emptyAccount = (): StoredAccount => {
   }
 }
 
+const normalizeWatchlistItem = (item: WatchlistItem): WatchlistItem => {
+  return {
+    ...item,
+    watched: item.watched === true,
+  }
+}
+
 export const readAccount = (): StoredAccount => {
   if (typeof window === "undefined") return emptyAccount()
 
@@ -27,7 +34,9 @@ export const readAccount = (): StoredAccount => {
     return {
       session: parsed.session ?? null,
       preferences: parsed.preferences ?? null,
-      watchlist: Array.isArray(parsed.watchlist) ? parsed.watchlist : [],
+      watchlist: Array.isArray(parsed.watchlist)
+        ? parsed.watchlist.map(normalizeWatchlistItem)
+        : [],
     }
   } catch {
     return emptyAccount()

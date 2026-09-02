@@ -1,3 +1,5 @@
+import type { ReactNode } from "react"
+
 import Image from "next/image"
 import Link from "next/link"
 
@@ -12,9 +14,14 @@ import { posterUrl } from "@/lib/tmdb/image"
 type TitleCardProps = {
   item: CatalogItem
   showOffServiceHint?: boolean
+  posterStamp?: ReactNode
 }
 
-export const TitleCard = ({ item, showOffServiceHint = false }: TitleCardProps) => {
+export const TitleCard = ({
+  item,
+  showOffServiceHint = false,
+  posterStamp,
+}: TitleCardProps) => {
   const href = `/titulo/${tipoFromMedia(item.mediaType)}/${item.tmdbId}`
   const src = posterUrl(item.posterPath)
   const meta = item.year
@@ -55,10 +62,15 @@ export const TitleCard = ({ item, showOffServiceHint = false }: TitleCardProps) 
         </div>
       </Link>
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 aspect-[2/3] p-2">
-        <div className="flex h-full items-end justify-end">
+        <div className="flex h-full items-end justify-between gap-2">
+          {posterStamp ? (
+            <div className="pointer-events-auto min-w-0">{posterStamp}</div>
+          ) : (
+            <span />
+          )}
           <div
             className={cn(
-              "pointer-events-auto opacity-100 transition-opacity duration-ui motion-reduce:transition-none",
+              "pointer-events-auto shrink-0 opacity-100 transition-opacity duration-ui motion-reduce:transition-none",
               "[@media(hover:hover)]:pointer-events-none [@media(hover:hover)]:opacity-0",
               "[@media(hover:hover)]:group-hover:pointer-events-auto [@media(hover:hover)]:group-hover:opacity-100",
               "[@media(hover:hover)]:group-focus-within:pointer-events-auto [@media(hover:hover)]:group-focus-within:opacity-100",
@@ -82,7 +94,7 @@ const RatingStamp = ({ value }: { value: number }) => {
   if (value <= 0) return null
 
   return (
-    <span className="absolute top-2 right-2 inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[11px] font-medium text-paper backdrop-blur-md">
+    <span className="absolute top-2 right-2 z-[1] inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[11px] font-medium text-paper backdrop-blur-md">
       <StarIcon className="h-3 w-3 text-gold" filled />
       <span className="sr-only">Nota </span>
       {value.toFixed(1)}

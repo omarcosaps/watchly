@@ -17,6 +17,7 @@ export type WatchlistItem = {
   posterPath: string | null
   year: number | null
   createdAt: string
+  watched: boolean
 }
 
 export type AccountErrorCode =

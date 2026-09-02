@@ -1,6 +1,6 @@
 # PRD — Watchly
 
-Última atualização: 24 de agosto de 2026
+Última atualização: 1 de setembro de 2026
 
 Este arquivo é a fonte da verdade de produto. Atualizar aqui quando uma decisão mudar. Plano técnico e implementação não substituem este documento.
 
@@ -18,6 +18,7 @@ Em poucos minutos, a pessoa autenticada consegue:
 2. distinguir incluso na assinatura, gratuito, aluguel e compra
 3. escolher um filme ou série para assistir agora
 4. guardar títulos numa watchlist da conta
+5. na Watchlist e no detalhe (se o título estiver guardado), ver e registrar se cada título já foi assistido
 
 ## Usuário
 
@@ -40,6 +41,7 @@ Uso não comercial. A TMDB em modo developer basta neste recorte.
 - Ordenação: popularidade (padrão), nota, data
 - Página de detalhe com onde e como assistir
 - Watchlist por conta (adicionar, remover, listar)
+- Status visual na Watchlist e no detalhe (só se o título estiver na lista): “Ainda não assistir” ou “Já assistir”
 - Troca de país e de provedores depois do onboarding, sem apagar a watchlist
 - Atribuição visível a TMDB e JustWatch
 
@@ -56,6 +58,12 @@ Uso não comercial. A TMDB em modo developer basta neste recorte.
 - Histórico de “entrou / saiu do catálogo”
 - Conteúdo adulto ligado por padrão
 - Compartilhar watchlist com outras pessoas
+- Listas personalizadas além da Watchlist da conta
+- Histórico separado de títulos assistidos
+- Progresso por temporada ou episódio
+- Status de assistido na home, na busca ou no atalho da Watchlist
+- Filtro, ordenação ou contagem por status de assistido
+- Data em que assistiu ou nota depois de assistir
 
 ## Fluxos
 
@@ -77,13 +85,19 @@ Visitas seguintes, com sessão e preferências salvas, caem direto na home.
 
 Home com grade única. Cada card mostra poster, título, tipo (filme/série) e selos de como assistir nos provedores da conta.
 
-A pessoa filtra, ordena ou busca, abre o detalhe, lê a sinopse e vê onde assistir. Pode salvar na watchlist. O play continua no app do streaming.
+A pessoa filtra, ordena ou busca, abre o detalhe, lê a sinopse e vê onde assistir. Pode salvar na watchlist. Se o título estiver na Watchlist, o detalhe também mostra o status “Ainda não assistir” ou “Já assistir”. O play continua no app do streaming.
 
 ### Watchlist
 
-Adicionar e remover a partir do card ou do detalhe. Lista da conta, filmes e séries juntos, mais recente no topo. Cada item mostra disponibilidade no país atual.
+Adicionar e remover a partir do card ou do detalhe. Uma lista por conta, filmes e séries juntos, mais recente no topo. Cada item mostra disponibilidade no país atual.
 
-O título permanece salvo mesmo se sair dos streamings ou se a pessoa trocar provedores.
+Na página da Watchlist e no detalhe (somente se o título estiver guardado), cada título tem um status visual: “Ainda não assistir” (padrão ao guardar) ou “Já assistir”. O status é só registro visual. Marcar não remove, não arquiva e não muda a ordem. A pessoa pode voltar de um status para o outro.
+
+No detalhe, fora da Watchlist o status não aparece. Tirar da lista esconde o status; guardar de novo volta para “Ainda não assistir”.
+
+O status não aparece na home, na busca nem no atalho da Watchlist.
+
+O título permanece salvo mesmo se sair dos streamings ou se a pessoa trocar provedores. Se for removido e guardado de novo, o status volta para “Ainda não assistir”.
 
 ### Troca de contexto
 
@@ -105,6 +119,7 @@ Alterar país ou provedores atualiza as preferências da conta. A watchlist não
 12. Logos e nomes de streamings só a partir dos assets da TMDB.
 13. Conteúdo adulto desligado. Sem controle no MVP para ligar.
 14. Listagem é paginada ou contínua. Não existe carregar o catálogo inteiro de uma vez.
+15. Cada item da Watchlist tem status “Ainda não assistir” ou “Já assistir”. O padrão ao guardar é “Ainda não assistir”. O status não tira o título da lista. É exibido e alterado na Watchlist e no detalhe, neste último só se o título estiver na lista. Remover e guardar de novo volta o status para “Ainda não assistir”.
 
 ## Dependências
 
