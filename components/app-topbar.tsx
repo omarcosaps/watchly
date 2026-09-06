@@ -8,7 +8,6 @@ import { useAccount } from "@/components/account-provider"
 import { useAppShell } from "@/components/app-shell-context"
 import {
   BookmarkIcon,
-  ChevronIcon,
   FilterIcon,
   LogoutIcon,
   SearchIcon,
@@ -198,32 +197,23 @@ const ProfileMenu = ({
     <div className="relative shrink-0" ref={rootRef}>
       <button
         type="button"
-        className="press-pill flex items-center gap-2 rounded-full"
+        className="press-pill flex h-10 w-10 items-center justify-center rounded-full"
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls="menu-perfil"
         aria-label="Menu da conta"
         onClick={() => setOpen((current) => !current)}
       >
-        <span className="hidden max-w-32 truncate text-sm font-medium text-paper sm:block">
-          {displayName}
-        </span>
         <span className="flex h-10 w-10 items-center justify-center rounded-full bg-ember text-sm font-semibold text-white">
           {initial}
         </span>
-        <ChevronIcon
-          className={cn(
-            "hidden h-4 w-4 text-mist transition-transform duration-ui sm:block",
-            open && "rotate-90",
-          )}
-        />
       </button>
       {open ? (
         <div
           id="menu-perfil"
           role="menu"
           aria-label="Conta"
-          className="glass absolute top-full right-0 z-30 mt-2 min-w-48 rounded-2xl p-1.5"
+          className="glass-stage absolute top-full right-0 z-30 mt-2 min-w-48 rounded-2xl p-1.5"
         >
           {showPreferences ? (
             <Link
@@ -231,10 +221,8 @@ const ProfileMenu = ({
               role="menuitem"
               onClick={() => setOpen(false)}
               className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors duration-ui",
-                pathname === "/preferencias"
-                  ? "bg-white/8 text-paper"
-                  : "text-mist hover:bg-white/6 hover:text-paper",
+                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-paper transition-colors duration-ui hover:bg-white/8",
+                pathname === "/preferencias" && "bg-white/8",
               )}
             >
               <SlidersIcon className="h-4 w-4" />
@@ -245,7 +233,7 @@ const ProfileMenu = ({
             type="button"
             role="menuitem"
             onClick={handleSignOut}
-            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-mist transition-colors duration-ui hover:bg-white/6 hover:text-paper"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-paper transition-colors duration-ui hover:bg-white/8"
           >
             <LogoutIcon className="h-4 w-4" />
             Sair
