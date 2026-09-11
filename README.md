@@ -13,7 +13,7 @@ Este produto usa a API do [TMDB](https://www.themoviedb.org/), mas não é endos
 - TypeScript
 - Tailwind CSS 4
 
-A conta e a watchlist ainda são locais (mock). Persistência no Supabase entra numa fase seguinte.
+A conta, as preferências e a watchlist ficam neste navegador (mock local). Não há persistência em servidor.
 
 ## Como rodar
 
@@ -48,6 +48,10 @@ Abra [http://localhost:3000](http://localhost:3000).
 | `npm test`     | Testes (Vitest)        |
 | `npm run lint` | ESLint                 |
 
-## Produto
+## Documentation
 
-A fonte da verdade de produto está em [`docs/prd.md`](docs/prd.md).
+- Product requirements: `docs/PRD.md`
+- System design: `docs/SSD.md`
+- Feature specs: `docs/features/`
+- Architecture decisions: `docs/decisions/`
+- Changelog: `docs/CHANGELOG.md`
