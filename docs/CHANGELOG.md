@@ -10,6 +10,8 @@
 ### Changed
 
 - O Hero da Home resume a sinopse para no máximo 3 linhas; o detalhe mantém o texto completo.
+- Onboarding e Perfil usam os mesmos streamings principais e o mesmo formato de pills em grade 2×4.
+- Onboarding alinhado à referência: bloco de 720px, país em outline, oito streamings principais em grade 2×4 e Continuar ao lado do hint.
 - UI alinhada ao HTML de referência e ao Style Guide: tokens `#0b0c10` / `#f2f3f5`, nav pill flutuante, hero full-bleed, filtros abaixo do hero, cards sem stamps, watchlist em lista, detalhe com overlap, auth com card de 404px e onboarding sem chrome.
 - UI alinhada ao protótipo: nav, hero, filtros, detalhe, Minha lista, Perfil e rótulos **Ainda não assistido** / **Já assistido**.
 - `GET /api/catalog` deixa de exigir provedores; a Home lista o que tem oferta no país.
