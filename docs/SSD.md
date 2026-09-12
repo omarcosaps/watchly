@@ -70,7 +70,7 @@ lib/
   media.ts                   filme/serie ↔ movie/tv
 ```
 
-Grupos de rota: `app/(browse)` público com nav pill flutuante; `app/(app)` autenticado (watchlist, perfil) com o mesmo chrome; `app/(setup)` autenticado sem nav (onboarding), com atribuição; `app/(auth)` para visitante, sem wordmark no header. A home e o detalhe ocupam a largura toda (hero/backdrop edge-to-edge); as demais telas do shell usam padding-top ~110px. Sem hero (erro ou lista vazia), a Home aplica o mesmo offset para não ficar sob a pill. Não existe `middleware.ts`. `/verificar-email` redireciona para `/login`. Logout volta para `/`.
+Grupos de rota: `app/(browse)` público com nav pill flutuante; `app/(app)` autenticado (watchlist, perfil) com o mesmo chrome; `app/(setup)` autenticado sem nav (onboarding), com atribuição; `app/(auth)` para visitante, sem wordmark no header. A home e o detalhe ocupam a largura toda (hero/backdrop edge-to-edge); as demais telas do shell usam padding-top ~110px. O Hero mede o parágrafo da sinopse no client e escolhe um candidato extrativo que caiba em 3 linhas. Sem hero (erro ou lista vazia), a Home aplica o mesmo offset para não ficar sob a pill. Não existe `middleware.ts`. `/verificar-email` redireciona para `/login`. Logout volta para `/`.
 
 Tokens visuais em `app/globals.css`: fundo `#0b0c10`, texto `#f2f3f5`, positivo/alerta em oklch, sem ember como accent. Nav: pill fixa centrada, `rgba(16,17,23,.7)` + blur 20. Auth: card 404px com gradiente `#191c22 → #101216` e atmosphere azul. Toast de watchlist é efêmero no client.
 
@@ -101,6 +101,7 @@ Cadastro exige origem de aquisição. Sessão só tem status `authenticated`.
 - `discover-query.ts` — query TMDB com região, providers (`|` = OR), monetização, adulto desligado
 - `hydrate.ts` — uma chamada de watch/providers por item visível
 - `merge.ts` — junta filme e série, deduplica, ordena
+- `hero-synopsis.ts` — candidatos extrativos da sinopse e escolha do texto que cabe em 3 linhas no Hero
 
 Discover sem `with_watch_providers` quando a lista está vazia; hidratação com `onlyOwn=false`. Visitante: `region=BR`. Filtro de provedor opcional na UI. Faixas de ano via `yearRange`.
 
