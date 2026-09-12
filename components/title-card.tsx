@@ -1,11 +1,6 @@
-import type { ReactNode } from "react"
-
 import Image from "next/image"
 import Link from "next/link"
 
-import { StarIcon } from "@/components/icons"
-import { OfferStamps } from "@/components/offer-stamps"
-import { WatchlistToggle } from "@/components/watchlist-toggle"
 import { cn } from "@/lib/cn"
 import type { CatalogItem } from "@/lib/catalog/types"
 import { mediaLabel, tipoFromMedia } from "@/lib/media"
@@ -14,85 +9,71 @@ import { posterUrl } from "@/lib/tmdb/image"
 type TitleCardProps = {
   item: CatalogItem
   showOffServiceHint?: boolean
-  posterStamp?: ReactNode
+  muted?: boolean
 }
 
 export const TitleCard = ({
   item,
   showOffServiceHint = false,
-  posterStamp,
+  muted = false,
 }: TitleCardProps) => {
   const href = `/titulo/${tipoFromMedia(item.mediaType)}/${item.tmdbId}`
   const src = posterUrl(item.posterPath)
   const meta = item.year
     ? `${item.year} · ${mediaLabel(item.mediaType)}`
     : mediaLabel(item.mediaType)
+  const providers = showOffServiceHint && !item.onOwnServices
+    ? "Fora dos seus serviços"
+    : item.offers
+        .filter((offer) => (showOffServiceHint ? offer.isOwn : true))
+        .map((offer) => offer.providerName)
+        .filter((name, index, names) => names.indexOf(name) === index)
+        .slice(0, 3)
+        .join(" · ")
 
   return (
-    <article className="group relative">
+    <article
+      className={cn(
+        "transition-transform duration-[180ms] ease hover:-translate-y-1",
+        muted && "opacity-75 hover:opacity-100",
+      )}
+    >
       <Link
         href={href}
-        className="block focus-visible:outline-offset-4"
+        className="block"
         aria-label={`${item.title}, ${mediaLabel(item.mediaType)}`}
       >
-        <div className="relative aspect-[2/3] overflow-hidden rounded-[18px] bg-panel shadow-[0_12px_28px_rgb(0_0_0/0.28)]">
+        <div className="relative aspect-[2/3] overflow-hidden rounded-xl border border-white/7 bg-[#15161c]">
           {src ? (
             <Image
               src={src}
               alt=""
               fill
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-              className="object-cover transition-transform duration-still ease group-hover:scale-[1.025] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 176px"
+              className="object-cover"
             />
           ) : (
-            <div className="flex h-full items-center justify-center px-3 text-center text-sm text-mist">
-              Sem pôster
-            </div>
+            <>
+              <div className="hatch absolute inset-0" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center px-3.5 text-center">
+                <div className="text-[17px] font-extrabold leading-[1.15] tracking-[-0.02em] text-shadow-[0_1px_12px_rgba(0,0,0,0.4)]">
+                  {item.title}
+                </div>
+                <div className="mt-2 font-mono text-[10px] tracking-[0.12em] text-white/55">
+                  {mediaLabel(item.mediaType).toUpperCase()}
+                  {item.year ? ` · ${item.year}` : ""}
+                </div>
+              </div>
+            </>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-ui group-hover:opacity-100 motion-reduce:opacity-0" />
-          <OfferStamps offers={item.offers} />
           <RatingStamp value={item.voteAverage} />
         </div>
-        <div className="mt-3">
-          <h2 className="line-clamp-2 text-sm font-semibold leading-snug text-paper">{item.title}</h2>
-          <p className="mt-1 text-xs text-mist">{meta}</p>
-          <p className="mt-1 line-clamp-1 text-xs text-mist">
-            {showOffServiceHint && !item.onOwnServices
-              ? "Fora dos seus serviços"
-              : item.offers
-                  .filter((offer) => (showOffServiceHint ? offer.isOwn : true))
-                  .map((offer) => offer.providerName)
-                  .filter((name, index, names) => names.indexOf(name) === index)
-                  .slice(0, 3)
-                  .join(" · ")}
-          </p>
-        </div>
+        <h2 className="mt-[9px] truncate text-[13.5px] font-semibold">{item.title}</h2>
+        <p className="mt-0.5 text-[11.5px] text-mute">{meta}</p>
+        {providers ? (
+          <p className="mt-0.5 truncate text-[11px] text-white/60">{providers}</p>
+        ) : null}
       </Link>
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 aspect-[2/3] p-2">
-        <div className="flex h-full items-end justify-between gap-2">
-          {posterStamp ? (
-            <div className="pointer-events-auto min-w-0">{posterStamp}</div>
-          ) : (
-            <span />
-          )}
-          <div
-            className={cn(
-              "pointer-events-auto shrink-0 opacity-100 transition-opacity duration-ui motion-reduce:transition-none",
-              "[@media(hover:hover)]:pointer-events-none [@media(hover:hover)]:opacity-0",
-              "[@media(hover:hover)]:group-hover:pointer-events-auto [@media(hover:hover)]:group-hover:opacity-100",
-              "[@media(hover:hover)]:group-focus-within:pointer-events-auto [@media(hover:hover)]:group-focus-within:opacity-100",
-            )}
-          >
-            <WatchlistToggle
-              tmdbId={item.tmdbId}
-              mediaType={item.mediaType}
-              title={item.title}
-              posterPath={item.posterPath}
-              year={item.year}
-            />
-          </div>
-        </div>
-      </div>
     </article>
   )
 }
@@ -101,10 +82,8 @@ const RatingStamp = ({ value }: { value: number }) => {
   if (value <= 0) return null
 
   return (
-    <span className="absolute top-2 right-2 z-[1] inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[11px] font-medium text-paper backdrop-blur-md">
-      <StarIcon className="h-3 w-3 text-gold" filled />
-      <span className="sr-only">Nota </span>
-      {value.toFixed(1)}
+    <span className="absolute top-2 right-2 z-[1] rounded-[5px] bg-black/45 px-[7px] py-1 text-[10.5px] font-bold text-white/85">
+      ★ {value.toFixed(1)}
     </span>
   )
 }

@@ -1,6 +1,6 @@
 # PRD — Watchly
 
-Última atualização: 11 de setembro de 2026
+Última atualização: 12 de setembro de 2026
 
 Este arquivo é a fonte da verdade funcional do produto. Ele representa o **comportamento de produto aprovado e desejado**, ainda não totalmente implementado. Atualizar aqui quando o comportamento, o escopo ou uma regra de negócio mudar. A arquitetura vive em `docs/SSD.md`. Mudanças individuais ficam em `docs/features/`.
 
@@ -172,7 +172,7 @@ A pessoa informa o e-mail e pede um link para criar uma senha nova.
 
 O app responde de forma neutra, sem revelar se a conta existe: se existir uma conta para aquele e-mail, um link de redefinição é enviado.
 
-A pessoa define a nova senha a partir do link e volta ao login. Quem lembrou a senha pode voltar ao login sem concluir o fluxo.
+A pessoa define a nova senha a partir do link e volta ao login. Quem já tem o link pode ir direto a `/atualizar-senha`. Quem lembrou a senha pode voltar ao login sem concluir o fluxo.
 
 ### Onboarding
 
@@ -195,7 +195,7 @@ O visitante vê disponibilidade no Brasil. Quem está autenticado vê disponibil
 
 Hero: carrossel com até 5 títulos da listagem filtrada, avançando a cada 7 segundos. Kicker **Novo filme** / **Filme** / **Nova série** / **Série** (ano ≥ 2024 usa “Novo/Nova”). CTAs: **Ver Detalhes** e adicionar/remover da lista (**Adicionar à minha lista** / **Na minha lista**).
 
-A navegação traz **Início**, **Filmes** e **Séries**. Filmes e Séries aplicam o filtro de tipo na Home.
+A navegação é uma pill flutuante: **Watchly**, **Início**, **Filmes**, **Séries**, **Watchlist**, busca e, se autenticada, o atalho de perfil (avatar + nome) para `/preferencias`. Filmes e Séries aplicam o filtro de tipo na Home. Logout fica só no Perfil.
 
 Filtros:
 

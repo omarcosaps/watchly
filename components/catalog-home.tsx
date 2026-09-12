@@ -1,7 +1,6 @@
 "use client"
 
 import { useSearchParams } from "next/navigation"
-import Link from "next/link"
 import { useEffect, useMemo, useState } from "react"
 
 import { useAccount } from "@/components/account-provider"
@@ -55,17 +54,19 @@ export const CatalogHome = () => {
   const queryKey = searchParams.toString()
   const region = catalogPreferences.country
   const providerKey = catalogPreferences.providerIds.join(",")
+  const featured = items.slice(0, 5)
 
   const ownProviders = useMemo(() => {
     const allowed = new Set(catalogPreferences.providerIds)
     return providers.filter((provider) => allowed.has(provider.id))
   }, [catalogPreferences.providerIds, providers])
 
-  const featured = items.slice(0, 5)
-  const gridItems = items.slice(5)
-
   useEffect(() => {
     let cancelled = false
+    const catalogQuery = {
+      country: region,
+      providerIds: providerKey.split(",").filter(Boolean).map(Number),
+    }
 
     const load = async () => {
       setLoading(true)
@@ -82,8 +83,8 @@ export const CatalogHome = () => {
         setProviders(providerData.providers)
 
         const data = await fetchCatalog(
-          catalogPreferences,
-          catalogParams(searchParams, meta.genres, 1),
+          catalogQuery,
+          catalogParams(new URLSearchParams(queryKey), meta.genres, 1),
         )
         if (cancelled) return
 
@@ -104,7 +105,7 @@ export const CatalogHome = () => {
     return () => {
       cancelled = true
     }
-  }, [catalogPreferences, providerKey, queryKey, region, searchParams])
+  }, [providerKey, queryKey, region])
 
   const handleLoadMore = async () => {
     setLoadingMore(true)
@@ -139,81 +140,68 @@ export const CatalogHome = () => {
     }
   }
 
+  const showHero = !loading && featured.length > 0
+  const needsNavOffset = !loading && featured.length === 0
+
   return (
-    <div className="flex flex-col gap-8">
-      <CatalogFilters
-        genres={genres}
-        providers={ownProviders}
-        showProviderFilter={hasOwnServices}
-      />
-
-      {loading ? <HomeSkeleton /> : null}
-
-      {!loading && error ? (
-        <StatusPanel
-          title="O catálogo não carregou"
-          message={error}
-          action={
-            <button
-              type="button"
-              onClick={handleRetry}
-              className="cta-primary inline-flex h-11 items-center rounded-full px-5 text-sm font-semibold"
-            >
-              Tentar de novo
-            </button>
-          }
+    <div className={cn(needsNavOffset && "pt-[110px]")}>
+      {loading ? <div className="h-[64vh] min-h-[520px] bg-white/4" aria-hidden /> : null}
+      {showHero ? (
+        <HeroCarousel
+          key={featured.map((item) => `${item.mediaType}-${item.tmdbId}`).join("|")}
+          items={featured}
         />
       ) : null}
 
-      {!loading && !error && items.length === 0 ? (
-        <StatusPanel
-          title="Nada por aqui com esses filtros"
-          message="Tente afrouxar algum deles."
-          action={
-            <Link
-              href="/"
-              className="cta-primary inline-flex h-11 items-center rounded-full px-5 text-sm font-semibold"
-            >
-              Limpar filtros
-            </Link>
-          }
+      <div className="mx-auto max-w-[1280px] px-5 pt-[26px] pb-[60px] sm:px-12">
+        <CatalogFilters
+          genres={genres}
+          providers={ownProviders}
+          showProviderFilter={hasOwnServices}
+          resultCount={loading ? undefined : items.length}
         />
-      ) : null}
+        {loading ? <CatalogSkeleton /> : null}
 
-      {!loading && featured.length > 0 ? <HeroCarousel items={featured} /> : null}
+        {!loading && error ? (
+          <StatusPanel
+            title="O catálogo não carregou"
+            message={error}
+            action={
+              <button
+                type="button"
+                onClick={handleRetry}
+                className="cta-primary inline-flex items-center rounded-full px-[22px] py-3 text-sm font-bold"
+              >
+                Tentar de novo
+              </button>
+            }
+          />
+        ) : null}
 
-      {!loading && items.length > 0 ? (
-        <div>
-          <p className="mb-5 text-sm text-mist">
-            {items.length} {items.length === 1 ? "título" : "títulos"}
+        {!loading && !error && items.length === 0 ? (
+          <p className="py-[70px] text-center text-[14.5px] text-white/50">
+            Nada por aqui com esses filtros. Tente afrouxar algum deles.
           </p>
-          {gridItems.length > 0 ? (
-            <CatalogGrid items={gridItems} showOffServiceHint={hasOwnServices} />
-          ) : null}
-          {page < totalPages ? (
-            <button
-              type="button"
-              onClick={handleLoadMore}
-              disabled={loadingMore}
-              className={cn(
-                "cta-ghost press-pill mx-auto flex h-12 w-fit items-center rounded-full px-6 text-sm font-semibold disabled:opacity-40",
-                gridItems.length > 0 && "mt-10",
-              )}
-            >
-              {loadingMore ? "Carregando…" : "Carregar mais"}
-            </button>
-          ) : null}
-        </div>
-      ) : null}
-    </div>
-  )
-}
+        ) : null}
 
-const HomeSkeleton = () => {
-  return (
-    <div aria-hidden className="flex flex-col gap-8">
-      <div className="min-h-[22rem] w-full rounded-[28px] bg-panel md:min-h-[28rem] lg:min-h-[32rem]" />
-      <CatalogSkeleton />
+        {!loading && items.length > 0 ? (
+          <div>
+            <CatalogGrid items={items} showOffServiceHint={hasOwnServices} />
+            {page < totalPages ? (
+              <button
+                type="button"
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                className={cn(
+                  "cta-secondary mx-auto mt-10 flex w-fit items-center rounded-full px-6 py-3 text-sm font-semibold disabled:opacity-40",
+                )}
+              >
+                {loadingMore ? "Carregando…" : "Carregar mais"}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
     </div>
   )
 }

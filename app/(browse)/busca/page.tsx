@@ -81,54 +81,60 @@ const SearchResults = () => {
     return items.filter((item) => !item.onOwnServices)
   }, [hasOwnServices, items])
 
-  if (!query) {
-    return (
-      <div className="mx-auto max-w-2xl">
-        <SearchBox defaultValue="" />
-        <p className="mt-8 text-sm text-mist">Digite um título para buscar no catálogo.</p>
-      </div>
-    )
-  }
-
   return (
-    <div className="flex flex-col gap-10">
+    <div className="mx-auto max-w-[1280px]">
       <SearchBox defaultValue={query} />
-      {loading && items.length === 0 ? <CatalogSkeleton /> : null}
+      {!query ? (
+        <p className="py-20 text-center text-[14.5px] text-white/40">
+          Digite um título para buscar no catálogo.
+        </p>
+      ) : null}
+      {query && loading && items.length === 0 ? <div className="mt-[34px]"><CatalogSkeleton /></div> : null}
       {error ? <StatusPanel title="A busca falhou" message={error} /> : null}
-      {!loading && !error && items.length === 0 ? (
-        <p className="text-sm text-mist">Nenhum título encontrado para essa busca.</p>
+      {query && !loading && !error && items.length === 0 ? (
+        <p className="mt-[34px] text-[13.5px] text-mute">Nenhum título encontrado para essa busca.</p>
       ) : null}
       {items.length > 0 && !hasOwnServices ? (
-        <section>
-          <h2 className="mb-5 text-lg font-semibold">Resultados ({items.length})</h2>
+        <section className="mt-[34px]">
+          <h2 className="mb-4 text-xl font-extrabold tracking-[-0.02em]">
+            Resultados{" "}
+            <span className="text-sm font-semibold text-white/40">{items.length}</span>
+          </h2>
           <CatalogGrid items={items} />
         </section>
       ) : null}
-      {ownItems.length > 0 ? (
-        <section>
-          <h2 className="mb-5 text-lg font-semibold">
-            Nos seus streamings ({ownItems.length})
-          </h2>
-          <CatalogGrid items={ownItems} />
-        </section>
-      ) : null}
-      {hasOwnServices && items.length > 0 && otherItems.length === 0 ? (
-        <p className="text-sm text-mist">Nada fora dos seus serviços para essa busca.</p>
-      ) : null}
-      {otherItems.length > 0 ? (
-        <section>
-          <h2 className="mb-5 text-lg font-semibold">
-            Fora dos seus streamings ({otherItems.length})
-          </h2>
-          <CatalogGrid items={otherItems} showOffServiceHint />
-        </section>
+      {items.length > 0 && hasOwnServices ? (
+        <>
+          <section className="mt-[34px]">
+            <h2 className="mb-4 text-xl font-extrabold tracking-[-0.02em]">
+              Nos seus streamings{" "}
+              <span className="text-sm font-semibold text-white/40">{ownItems.length}</span>
+            </h2>
+            {ownItems.length === 0 ? (
+              <p className="text-[13.5px] text-mute">Nenhum título encontrado para essa busca.</p>
+            ) : (
+              <CatalogGrid items={ownItems} />
+            )}
+          </section>
+          <section className="mt-[38px]">
+            <h2 className="mb-4 text-xl font-extrabold tracking-[-0.02em]">
+              Fora dos seus streamings{" "}
+              <span className="text-sm font-semibold text-white/40">{otherItems.length}</span>
+            </h2>
+            {otherItems.length === 0 ? (
+              <p className="text-[13.5px] text-mute">Nada fora dos seus serviços para essa busca.</p>
+            ) : (
+              <CatalogGrid items={otherItems} showOffServiceHint muted />
+            )}
+          </section>
+        </>
       ) : null}
       {page < totalPages ? (
         <button
           type="button"
           onClick={handleLoadMore}
           disabled={loading}
-          className="cta-ghost mx-auto flex h-12 w-fit items-center rounded-full px-6 text-sm font-semibold disabled:opacity-40"
+          className="cta-secondary mx-auto mt-10 flex w-fit items-center rounded-full px-6 py-3 text-sm font-semibold disabled:opacity-40"
         >
           {loading ? "Carregando…" : "Carregar mais"}
         </button>
@@ -139,7 +145,7 @@ const SearchResults = () => {
 
 const SearchBox = ({ defaultValue }: { defaultValue: string }) => {
   return (
-    <form action="/busca" className="focus-pill flex h-12 items-center rounded-full bg-white/6 px-4 ring-1 ring-white/8">
+    <form action="/busca">
       <label htmlFor="busca-titulo" className="sr-only">
         Buscar filmes e séries por título
       </label>
@@ -149,7 +155,8 @@ const SearchBox = ({ defaultValue }: { defaultValue: string }) => {
         type="search"
         defaultValue={defaultValue}
         placeholder="Buscar filmes e séries por título…"
-        className="h-full w-full bg-transparent text-sm text-paper outline-none placeholder:text-mist"
+        autoFocus
+        className="field-search"
       />
     </form>
   )

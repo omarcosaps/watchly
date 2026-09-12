@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0b0c10;color:#f2f3f5;font-family:'Geist',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#c9d4e3;text-decoration:none}a:hover{color:#ffffff;text-decoration:underline}
+select,input,button{font-family:inherit}
+button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid rgba(255,255,255,.6);outline-offset:2px}
+select{appearance:none;-webkit-appearance:none;background:rgba(255,255,255,.07);border:1px solid transparent;border-radius:999px;padding:8px 30px 8px 14px;color:#f2f3f5;font-size:13px;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23aab' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+select:hover{background-color:rgba(255,255,255,.12)}
+option{background:#15161c;color:#f2f3f5}
+</style>
+</helmet>
+<div style="max-width:1280px;margin:0 auto;padding:64px 48px 100px;box-sizing:border-box">
+
+  <div style="max-width:720px;margin-bottom:60px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.45)">Watchly · Fase 1</div>
+    <h1 style="font-family:'Geist',sans-serif;font-weight:900;font-size:44px;letter-spacing:-0.035em;line-height:1;margin:12px 0 14px">Style Guide</h1>
+    <p style="font-size:16px;line-height:1.6;color:rgba(255,255,255,.6);margin:0;text-wrap:pretty">Os padrões efetivamente implementados no produto, depois da revisão geral de design. Esta página é a referência para as próximas evoluções.</p>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:66px">
+
+    <section>
+      <h2 style="font-family:'Geist',sans-serif;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);margin:0 0 20px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08)">Superfícies</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px">
+        <sc-for list="{{ surfaces }}" as="c" hint-placeholder-count="7">
+          <div>
+            <div style="height:88px;border-radius:14px;background:{{ c.bg }};border:1px solid {{ c.border }}"></div>
+            <div style="font-size:13.5px;font-weight:600;margin-top:11px">{{ c.name }}</div>
+            <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:rgba(255,255,255,.45);margin-top:4px">{{ c.val }}</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.45);margin-top:4px;line-height:1.4">{{ c.use }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section>
+      <h2 style="font-family:'Geist',sans-serif;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);margin:0 0 20px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08)">Texto</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px">
+        <sc-for list="{{ inks }}" as="c" hint-placeholder-count="6">
+          <div style="background:rgba(255,255,255,.03);border-radius:14px;padding:16px">
+            <div style="font-size:19px;font-weight:600;color:{{ c.val }}">Aa</div>
+            <div style="font-size:13px;font-weight:600;margin-top:12px">{{ c.name }}</div>
+            <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:rgba(255,255,255,.45);margin-top:4px">{{ c.val }}</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.45);margin-top:4px;line-height:1.4">{{ c.use }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section>
+      <h2 style="font-family:'Geist',sans-serif;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);margin:0 0 20px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08)">Tipografia · Geist</h2>
+      <div style="display:flex;flex-direction:column;gap:24px">
+        <sc-for list="{{ typeScale }}" as="t" hint-placeholder-count="8">
+          <div style="display:flex;align-items:baseline;gap:28px;flex-wrap:wrap">
+            <div style="width:220px;flex:none">
+              <div style="font-size:12.5px;font-weight:600">{{ t.name }}</div>
+              <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:rgba(255,255,255,.45);margin-top:3px">{{ t.spec }}</div>
+              <div style="font-size:11.5px;color:rgba(255,255,255,.4);margin-top:3px">{{ t.use }}</div>
+            </div>
+            <div style="flex:1;min-width:0;font-size:{{ t.size }}px;font-weight:{{ t.weight }};letter-spacing:{{ t.ls }};text-transform:{{ t.tt }};line-height:1.15;color:{{ t.color }}">{{ t.sample }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section>
+      <h2 style="font-family:'Geist',sans-serif;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);margin:0 0 20px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08)">Botões</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:30px;align-items:flex-start">
+        <div>
+          <div style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:11px">Primário lg · 14/26 · 15px</div>
+          <button style="background:#ffffff;color:#0b0c10;border:none;border-radius:999px;padding:14px 26px;font-weight:700;font-size:15px;cursor:pointer;transition:background .15s ease" style-hover="background:#e6e8ec">▶&nbsp; Ver Detalhes</button>
+        </div>
+        <div>
+          <div style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:11px">Primário md · 12/22 · 14px</div>
+          <button style="background:#ffffff;color:#0b0c10;border:none;border-radius:999px;padding:12px 22px;font-weight:700;font-size:14px;cursor:pointer;transition:background .15s ease" style-hover="background:#e6e8ec">Salvar preferências</button>
+        </div>
+        <div>
+          <div style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:11px">Contorno lg · sobre imagem</div>
+          <button style="background:transparent;color:#f2f3f5;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:14px 24px;font-weight:600;font-size:15px;cursor:pointer;transition:border-color .15s ease, background .15s ease" style-hover="border-color:rgba(255,255,255,.7);background:rgba(255,255,255,.07)">Adicionar à minha lista</button>
+        </div>
+        <div>
+          <div style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:11px">Secundário · superfície</div>
+          <button style="background:rgba(255,255,255,.1);color:#f2f3f5;border:none;border-radius:999px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s ease" style-hover="background:rgba(255,255,255,.18)">← Voltar</button>
+        </div>
+        <div>
+          <div style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:11px">Destrutivo · hover vermelho</div>
+          <button style="background:rgba(255,255,255,.06);border:none;color:rgba(255,255,255,.75);border-radius:999px;padding:12px 22px;font-weight:600;font-size:14px;cursor:pointer;transition:background .15s ease, color .15s ease" style-hover="background:oklch(0.5 0.14 25 / .3);color:#ffffff">Sair da conta</button>
+        </div>
+        <div>
+          <div style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:11px">Desabilitado · opacidade .55</div>
+          <button style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.4);border:none;border-radius:999px;padding:14px 26px;font-weight:700;font-size:15px;cursor:not-allowed;opacity:.55">Continuar</button>
+        </div>
+        <div>
+          <div style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:11px">Link de menu</div>
+          <div style="display:flex;align-items:center;gap:16px;padding-top:8px">
+            <span style="font-size:13.5px;font-weight:700;color:#ffffff">Ativo</span>
+            <span style="font-size:13.5px;font-weight:500;color:rgba(255,255,255,.6);cursor:pointer" style-hover="color:#ffffff">Inativo</span>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:13px;line-height:1.6;color:rgba(255,255,255,.5);margin:24px 0 0;max-width:680px;text-wrap:pretty">Elemento ativo nunca reage ao hover e usa <code style="font-family:ui-monospace,Menlo,monospace;font-size:12px">cursor:default</code>. Hover em link de menu só clareia o texto para branco, sem fundo. Todo controle tem foco visível: contorno branco de 2px com 2px de offset.</p>
+    </section>
+
+    <section>
+      <h2 style="font-family:'Geist',sans-serif;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);margin:0 0 20px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08)">Campos e seletores</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px;max-width:840px">
+        <label style="display:flex;flex-direction:column;gap:8px">
+          <span style="font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.45)">Campo de formulário</span>
+          <input type="text" value="voce@email.com" onChange="{{ noop }}" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:13px;padding:13px 15px;color:#f2f3f5;font-size:14.5px;outline:none" style-focus="border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.06)">
+        </label>
+        <label style="display:flex;flex-direction:column;gap:8px">
+          <span style="font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.45)">Select de formulário</span>
+          <select value="a" onChange="{{ noop }}" style="width:100%;box-sizing:border-box;background-color:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:13px;padding:13px 40px 13px 15px;font-size:14.5px;background-position:right 15px center">
+            <option value="a">Redes sociais</option>
+            <option value="b">Indicação de um amigo</option>
+          </select>
+        </label>
+        <label style="display:flex;flex-direction:column;gap:8px">
+          <span style="font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.45)">Filtro em pílula</span>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;padding-top:2px">
+            <select value="all" onChange="{{ noop }}">
+              <option value="all">Filmes e séries</option>
+              <option value="m">Filmes</option>
+            </select>
+            <select value="pop" onChange="{{ noop }}">
+              <option value="pop">Popularidade</option>
+              <option value="nota">Nota</option>
+            </select>
+          </div>
+        </label>
+      </div>
+      <div style="margin-top:22px;max-width:560px">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:8px">Busca</div>
+        <input type="text" placeholder="Buscar filmes e séries por título…" value="" onChange="{{ noop }}" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:13px;padding:16px 20px;color:#f2f3f5;font-size:16px;outline:none" style-focus="border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.06)">
+      </div>
+    </section>
+
+    <section>
+      <h2 style="font-family:'Geist',sans-serif;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);margin:0 0 20px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08)">Seletor de status</h2>
+      <div style="display:inline-flex;align-items:center;gap:2px;padding:3px;border-radius:999px;background:rgba(255,255,255,.05)">
+        <sc-for list="{{ statusChips }}" as="st" hint-placeholder-count="2">
+          <button onClick="{{ st.on }}" style="display:flex;align-items:center;gap:6px;border:none;background:{{ st.bg }};color:{{ st.c }};border-radius:999px;padding:8px 15px;font-size:13px;font-weight:{{ st.w }};cursor:{{ st.cur }};transition:background .18s ease, color .18s ease">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;opacity:{{ st.check }};transition:opacity .18s ease"><path d="M5 13l4.5 4.5L19 7"></path></svg>
+            <span>{{ st.l }}</span>
+          </button>
+        </sc-for>
+      </div>
+      <p style="font-size:13px;line-height:1.6;color:rgba(255,255,255,.5);margin:20px 0 0;max-width:680px;text-wrap:pretty">Dois estados, mesmo componente na Minha lista (12px) e no detalhe (13px). Aparece só quando o título está guardado. Trilho <code style="font-family:ui-monospace,Menlo,monospace;font-size:12px">rgba(255,255,255,.05)</code>, pílula ativa <code style="font-family:ui-monospace,Menlo,monospace;font-size:12px">.13</code> com check.</p>
+    </section>
+
+    <section>
+      <h2 style="font-family:'Geist',sans-serif;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);margin:0 0 20px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08)">Seletor de streaming e país</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
+        <sc-for list="{{ countryChips }}" as="c" hint-placeholder-count="3">
+          <button onClick="{{ c.on }}" style="border:1px solid {{ c.border }};border-radius:999px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;background:{{ c.bg }};color:{{ c.c }};transition:background .15s ease, border-color .15s ease, color .15s ease">{{ c.name }}</button>
+        </sc-for>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(156px,1fr));gap:12px;max-width:840px">
+        <sc-for list="{{ provChips }}" as="p" hint-placeholder-count="6">
+          <button onClick="{{ p.on }}" style="position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px;border-radius:14px;padding:16px 12px;cursor:pointer;background:{{ p.bg }};border:1px solid {{ p.border }};color:{{ p.c }};transition:background .15s ease, border-color .15s ease, color .15s ease">
+            <span style="font-size:14px;font-weight:600">{{ p.name }}</span>
+            <span style="position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:999px;background:#f2f3f5;color:#0b0c10;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;opacity:{{ p.check }}">✓</span>
+          </button>
+        </sc-for>
+      </div>
+    </section>
+
+    <section>
+      <h2 style="font-family:'Geist',sans-serif;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);margin:0 0 20px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08)">Card de título</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:20px 16px;max-width:800px">
+        <sc-for list="{{ demoCards }}" as="t" hint-placeholder-count="4">
+          <div style="cursor:pointer;transition:transform .18s ease" style-hover="transform:translateY(-4px)">
+            <div style="position:relative;aspect-ratio:2/3;border-radius:12px;overflow:hidden;background:{{ t.bg }};border:1px solid rgba(255,255,255,.07)">
+              <div style="position:absolute;inset:0;background:repeating-linear-gradient(115deg, rgba(255,255,255,.04) 0 2px, transparent 2px 9px)"></div>
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;text-align:center">
+                <div style="font-family:'Geist',sans-serif;font-weight:800;font-size:17px;line-height:1.15;letter-spacing:-0.02em">{{ t.title }}</div>
+                <div style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:rgba(255,255,255,.55);margin-top:8px;letter-spacing:.12em">{{ t.tag }}</div>
+              </div>
+              <span style="position:absolute;top:8px;right:8px;font-size:10.5px;font-weight:700;padding:4px 7px;border-radius:5px;background:rgba(0,0,0,.45);color:rgba(255,255,255,.85)">★ {{ t.rating }}</span>
+            </div>
+            <div style="margin-top:9px;font-size:13.5px;font-weight:600">{{ t.title }}</div>
+            <div style="font-size:11.5px;color:rgba(255,255,255,.45);margin-top:2px">{{ t.meta }}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px">{{ t.prov }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section>
+      <h2 style="font-family:'Geist',sans-serif;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);margin:0 0 20px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08)">Listas</h2>
+      <div style="display:flex;flex-direction:column;gap:8px;max-width:620px">
+        <sc-for list="{{ offerRows }}" as="o" hint-placeholder-count="2">
+          <div style="display:flex;align-items:center;gap:12px;background:{{ o.bg }};border:none;border-radius:12px;padding:12px 16px;opacity:{{ o.op }}">
+            <span style="width:34px;height:34px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;text-align:center;padding:3px;box-sizing:border-box;background:#0f1116;font-size:{{ o.s }}px;font-weight:{{ o.w }};letter-spacing:{{ o.ls }};text-transform:{{ o.u }};line-height:1.05;color:{{ o.mc }}">{{ o.mark }}</span>
+            <span style="font-size:14px;font-weight:600;flex:1">{{ o.name }}</span>
+            <span style="font-size:12px;color:rgba(255,255,255,.55)">{{ o.price }}</span>
+            <span style="font-size:11px;font-weight:700;padding:4px 9px;border-radius:5px;background:{{ o.kindBg }};color:{{ o.kindC }}">{{ o.kind }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <p style="font-size:13px;line-height:1.6;color:rgba(255,255,255,.5);margin:18px 0 0;max-width:680px;text-wrap:pretty">Itens de lista não têm borda: só fundo, raio 12–14 e hover que clareia a superfície. Linha nos seus serviços usa <code style="font-family:ui-monospace,Menlo,monospace;font-size:12px">.06</code>; fora deles, <code style="font-family:ui-monospace,Menlo,monospace;font-size:12px">.03</code> com opacidade .8.</p>
+    </section>
+
+    <section>
+      <h2 style="font-family:'Geist',sans-serif;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);margin:0 0 20px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08)">Feedback</h2>
+      <div style="display:flex;flex-direction:column;gap:14px;max-width:620px">
+        <div style="display:flex;gap:11px;align-items:flex-start;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);border-left:2px solid rgba(255,255,255,.55);border-radius:4px 12px 12px 4px;padding:13px 15px">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.72)" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="display:block;flex:none;margin-top:2px"><rect x="4" y="10.5" width="16" height="10.5" rx="3"></rect><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"></path></svg>
+          <div style="font-size:13.5px;line-height:1.55;color:rgba(255,255,255,.88)">Aviso de ação protegida, na tela de autenticação.</div>
+        </div>
+        <div style="font-size:13.5px;line-height:1.5;color:oklch(0.82 0.13 160)">Mensagem de sucesso · oklch(0.82 0.13 160)</div>
+        <div style="font-size:13.5px;line-height:1.5;color:oklch(0.75 0.16 25)">Mensagem de erro · oklch(0.75 0.16 25)</div>
+        <div style="align-self:flex-start;background:rgba(28,30,38,.92);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:11px 22px;font-size:13.5px;font-weight:600;box-shadow:0 12px 40px rgba(0,0,0,.5)">Adicionado a minha lista</div>
+      </div>
+    </section>
+
+    <section>
+      <h2 style="font-family:'Geist',sans-serif;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);margin:0 0 20px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08)">Layout, raios e movimento</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:16px">
+        <sc-for list="{{ specs }}" as="sp" hint-placeholder-count="8">
+          <div style="background:rgba(255,255,255,.03);border-radius:14px;padding:18px">
+            <div style="font-size:13.5px;font-weight:600">{{ sp.name }}</div>
+            <div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#f2f3f5;margin-top:8px;line-height:1.5">{{ sp.val }}</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.45);margin-top:6px;line-height:1.45">{{ sp.use }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+  </div>
+
+  <div style="margin-top:76px;padding-top:24px;border-top:1px solid rgba(255,255,255,.07);font-size:11.5px;color:rgba(255,255,255,.35)">
+    Dados de títulos: <a href="https://www.themoviedb.org" target="_blank" rel="noreferrer">TMDB</a> · Dados de disponibilidade: <a href="https://www.justwatch.com" target="_blank" rel="noreferrer">JustWatch</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1280}}">
+class Component extends DCLogic {
+  state = {status:'nao', country:'BR', provs:['netflix','max']};
+  STATUS=[{v:'nao',l:'Ainda não assistido'},{v:'sim',l:'Já assistido'}];
+
+  renderVals(){
+    const s=this.state;
+    const poster=h=>{const h2=(h+45)%360;return 'linear-gradient(155deg, oklch(0.44 0.1 '+h+') 0%, oklch(0.23 0.08 '+h2+') 55%, oklch(0.13 0.04 '+h2+') 100%)';};
+
+    const demoCards=[
+      ['Estação Zero','SÉRIE · 2024','2024 · Série · Ficção científica','8.4',260,'Max'],
+      ['Órbita','FILME · 2025','2025 · Filme · Ficção científica','8.7',230,'Apple TV+'],
+      ['Aurora Boreal','FILME · 2017','2017 · Filme · Romance','6.5',280,'Prime Video'],
+      ['Fronteira Líquida','FILME · 2022','2022 · Filme · Ação','6.9',115,'Fora dos seus serviços']
+    ].map(c=>({key:c[0], title:c[0], tag:c[1], meta:c[2], rating:c[3], bg:poster(c[4]), prov:c[5]}));
+
+    const offerRows=[
+      {key:'a', name:'Prime Video', mark:'prime video', mc:'oklch(0.78 0.13 225)', w:700, ls:'-0.02em', s:7.5, u:'none',
+       bg:'rgba(255,255,255,.06)', op:1, price:'R$ 34,90', kind:'Compra', kindBg:'oklch(0.74 0.13 310)', kindC:'#0b0c10'},
+      {key:'b', name:'Apple TV+', mark:'Apple TV+', mc:'oklch(0.92 0.005 260)', w:700, ls:'-0.02em', s:7.5, u:'none',
+       bg:'rgba(255,255,255,.03)', op:.8, price:'', kind:'Incluso', kindBg:'rgba(255,255,255,.14)', kindC:'rgba(255,255,255,.85)'}
+    ];
+
+    const sel='#f2f3f5', selC='#0b0c10';
+    const countryChips=[['BR','Brasil'],['US','Estados Unidos'],['PT','Portugal']].map(c=>{
+      const on=s.country===c[0];
+      return {key:c[0], name:c[1], on:()=>this.setState({country:c[0]}),
+        bg:on?sel:'rgba(255,255,255,.06)', c:on?selC:'rgba(255,255,255,.8)',
+        border:on?sel:'rgba(255,255,255,.14)'};
+    });
+    const provChips=[['netflix','Netflix'],['prime','Prime Video'],['max','Max'],['disney','Disney+'],['globoplay','Globoplay'],['appletv','Apple TV+']].map(p=>{
+      const on=s.provs.includes(p[0]);
+      return {key:p[0], name:p[1], check:on?1:0,
+        bg:on?'rgba(255,255,255,.12)':'rgba(255,255,255,.04)',
+        border:on?'rgba(255,255,255,.55)':'rgba(255,255,255,.1)',
+        c:on?'#ffffff':'rgba(255,255,255,.78)',
+        on:()=>this.setState({provs: on? s.provs.filter(x=>x!==p[0]) : s.provs.concat(p[0])})};
+    });
+
+    return {
+      noop:()=>{},
+      surfaces:[
+        {key:'a', name:'Fundo do app', val:'#0b0c10', bg:'#0b0c10', border:'rgba(255,255,255,.12)', use:'Base de todas as telas'},
+        {key:'b', name:'Fundo da autenticação', val:'#0c0d10 + halos', bg:'radial-gradient(200px 160px at 10% 0%, oklch(0.34 0.075 250 / .85), transparent 62%), #0c0d10', border:'rgba(255,255,255,.12)', use:'Auth, com halos radiais'},
+        {key:'c', name:'Card de auth', val:'#191c22 → #101216', bg:'linear-gradient(158deg, #191c22 0%, #14161b 52%, #101216 100%)', border:'rgba(255,255,255,.06)', use:'Cartão de login e cadastro'},
+        {key:'d', name:'Superfície 1', val:'rgba(255,255,255,.03–.04)', bg:'rgba(255,255,255,.04)', border:'transparent', use:'Campos, itens de lista, blocos'},
+        {key:'e', name:'Superfície 2', val:'rgba(255,255,255,.06)', bg:'rgba(255,255,255,.06)', border:'transparent', use:'Ofertas nos seus serviços'},
+        {key:'f', name:'Superfície 3', val:'rgba(255,255,255,.10)', bg:'rgba(255,255,255,.10)', border:'transparent', use:'Botão secundário, hover'},
+        {key:'g', name:'Pílula do menu', val:'rgba(16,17,23,.7) + blur 20', bg:'rgba(16,17,23,.7)', border:'rgba(255,255,255,.09)', use:'Navegação flutuante'}
+      ],
+      inks:[
+        {key:'1', name:'Forte', val:'#ffffff', use:'Ativo, hover, ênfase'},
+        {key:'2', name:'Primário', val:'#f2f3f5', use:'Títulos e corpo'},
+        {key:'3', name:'Secundário', val:'rgba(255,255,255,.6)', use:'Apoio, links inativos'},
+        {key:'4', name:'Terciário', val:'rgba(255,255,255,.45)', use:'Labels e metadados'},
+        {key:'5', name:'Positivo', val:'oklch(0.82 0.13 160)', use:'Disponível, sucesso'},
+        {key:'6', name:'Alerta', val:'oklch(0.75 0.16 25)', use:'Erro, sem oferta'}
+      ],
+      typeScale:[
+        {key:'t1', name:'Hero', spec:'clamp(38–60) / 800 / -0.035em', use:'Destaque da home', size:56, weight:800, ls:'-0.035em', tt:'none', color:'#f2f3f5', sample:'Estação Zero'},
+        {key:'t2', name:'Título do título', spec:'42 / 900 / -0.03em', use:'Detalhe', size:42, weight:900, ls:'-0.03em', tt:'none', color:'#f2f3f5', sample:'A Odisseia'},
+        {key:'t3', name:'Título de página', spec:'34 / 900 / -0.03em', use:'Minha lista, Perfil, Onboarding', size:34, weight:900, ls:'-0.03em', tt:'none', color:'#f2f3f5', sample:'Minha lista'},
+        {key:'t4', name:'Título de auth', spec:'30 / 900 / -0.035em', use:'Login e cadastro', size:30, weight:900, ls:'-0.035em', tt:'none', color:'#f2f3f5', sample:'Login'},
+        {key:'t5', name:'Seção', spec:'20 / 800 / -0.02em', use:'Onde assistir, Elenco, Busca', size:20, weight:800, ls:'-0.02em', tt:'none', color:'#f2f3f5', sample:'Onde assistir · Brasil'},
+        {key:'t6', name:'Corpo', spec:'15–16 / 400 / 1.55–1.6', use:'Sinopse e textos', size:15, weight:400, ls:'0', tt:'none', color:'rgba(255,255,255,.85)', sample:'Depois da guerra de Troia, Ulisses tenta voltar para casa.'},
+        {key:'t7', name:'Meta', spec:'13–14 / 500', use:'Ficha técnica e apoio', size:14, weight:500, ls:'0', tt:'none', color:'rgba(255,255,255,.6)', sample:'Filme · 2026 · Aventura, Drama · ★ 7.9'},
+        {key:'t8', name:'Label', spec:'11 / 700 / .09em / caixa alta', use:'Rótulo de grupo e de campo', size:11, weight:700, ls:'.09em', tt:'uppercase', color:'rgba(255,255,255,.45)', sample:'Onde conheceu o Watchly'}
+      ],
+      demoCards, offerRows, countryChips, provChips,
+      statusChips:this.STATUS.map(st=>{
+        const on=s.status===st.v;
+        return {key:st.v, l:st.l, on:()=>this.setState({status:st.v}),
+          bg:on?'rgba(255,255,255,.13)':'transparent',
+          c:on?'#ffffff':'rgba(255,255,255,.5)',
+          w:on?600:500, cur:on?'default':'pointer', check:on?1:0};
+      }),
+      specs:[
+        {key:'s1', name:'Container amplo', val:'max-width 1280 · padding 0 48', use:'Home, hero e busca'},
+        {key:'s2', name:'Container de detalhe', val:'max-width 1080 · coluna 600', use:'Detalhe do título'},
+        {key:'s3', name:'Container de página', val:'max-width 880 · padding 110 48 70', use:'Minha lista e Perfil'},
+        {key:'s4', name:'Grade de pôsteres', val:'minmax(176px,1fr) · gap 20/16', use:'Catálogo; 148px no modo denso'},
+        {key:'s5', name:'Raios', val:'5 · 10 · 12 · 13 · 14 · 22 · 999', use:'Selo · miniatura · pôster · campo · card · auth · pílula'},
+        {key:'s6', name:'Proporções', val:'2/3 pôster · 1/1.28 elenco', use:'Imagens do catálogo'},
+        {key:'s7', name:'Sombras', val:'0 10 40 / 0 20 60 / 0 28 70', use:'Menu · pôster do detalhe · card de auth'},
+        {key:'s8', name:'Movimento', val:'.15s cor · .18s status e card · 1s hero', use:'Hover, seleção e crossfade'}
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

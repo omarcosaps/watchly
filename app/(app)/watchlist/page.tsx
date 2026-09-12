@@ -1,15 +1,17 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
+import { useEffect, useRef, useState } from "react"
 
-import { CatalogGrid } from "@/components/catalog-grid"
-import { StatusPanel } from "@/components/status-panel"
 import { useAccount } from "@/components/account-provider"
+import { useToast } from "@/components/toast-provider"
 import { WatchStatusToggle } from "@/components/watch-status-toggle"
 import { PRODUCT_COUNTRIES } from "@/lib/account/types"
 import { fetchJson, preferenceQuery } from "@/lib/api"
 import type { CatalogItem } from "@/lib/catalog/types"
-import { useEffect, useRef, useState } from "react"
+import { mediaLabel, tipoFromMedia } from "@/lib/media"
+import { posterUrl } from "@/lib/tmdb/image"
 
 const toCatalogItem = (
   saved: {
@@ -37,7 +39,8 @@ const toCatalogItem = (
 }
 
 export default function WatchlistPage() {
-  const { watchlist, preferences } = useAccount()
+  const { watchlist, preferences, removeFromWatchlist } = useAccount()
+  const { showToast } = useToast()
   const [items, setItems] = useState<CatalogItem[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -115,45 +118,117 @@ export default function WatchlistPage() {
 
   const visible = items.length > 0 ? items : watchlist.map((saved) => toCatalogItem(saved))
 
+  const handleRemove = (item: CatalogItem) => {
+    removeFromWatchlist(item.mediaType, item.tmdbId)
+    showToast(`Removido da minha lista: ${item.title}`)
+  }
+
   if (watchlist.length === 0) {
     return (
-      <StatusPanel
-        title="Sua lista está vazia."
-        message="Guarde filmes e séries para acompanhar o que você quer assistir."
-        action={
+      <div className="mx-auto max-w-[880px]">
+        <h1 className="mb-1 text-[34px] font-black tracking-[-0.03em]">Minha lista</h1>
+        <div className="py-[60px] text-center text-[14.5px] text-white/50">
+          <p className="mb-4">Sua lista está vazia.</p>
           <Link
             href="/"
-            className="cta-primary inline-flex h-11 items-center rounded-full px-5 text-sm font-semibold"
+            className="cta-primary inline-flex items-center rounded-full px-[22px] py-3 text-sm font-bold"
           >
             Explorar o catálogo
           </Link>
-        }
-      />
+        </div>
+      </div>
     )
   }
 
   return (
-    <div className="flex flex-col gap-10">
-      <div>
-        <h1 className="text-4xl font-semibold tracking-tight text-paper">Minha lista</h1>
-        <p className="mt-2 text-sm text-mist">
-          {watchlist.length} {watchlist.length === 1 ? "título salvo" : "títulos salvos"} ·
-          disponibilidade em {countryName}
-        </p>
-      </div>
+    <div className="mx-auto max-w-[880px]">
+      <h1 className="mb-1 text-[34px] font-black tracking-[-0.03em]">Minha lista</h1>
+      <p className="mb-[18px] text-sm text-white/50">
+        {watchlist.length} {watchlist.length === 1 ? "título salvo" : "títulos salvos"} ·
+        disponibilidade em {countryName}
+      </p>
       {error ? (
-        <p className="text-paper" role="alert">
+        <p className="mb-4 text-[13.5px] text-alert" role="alert">
           {error}
         </p>
       ) : null}
-      {loading && items.length === 0 ? <p className="text-mist">Carregando disponibilidade…</p> : null}
-      <CatalogGrid
-        items={visible}
-        showOffServiceHint
-        posterStamp={(item) => (
-          <WatchStatusToggle mediaType={item.mediaType} tmdbId={item.tmdbId} />
-        )}
-      />
+      {loading && items.length === 0 ? (
+        <p className="text-[13.5px] text-mute">Carregando disponibilidade…</p>
+      ) : null}
+      <ul className="flex flex-col gap-3">
+        {visible.map((item) => {
+          const src = posterUrl(item.posterPath)
+          const href = `/titulo/${tipoFromMedia(item.mediaType)}/${item.tmdbId}`
+          const meta = item.year
+            ? `${item.year} · ${mediaLabel(item.mediaType)}`
+            : mediaLabel(item.mediaType)
+          const availability = availabilityLine(item, countryName)
+
+          return (
+            <li
+              key={`${item.mediaType}-${item.tmdbId}`}
+              className="flex flex-wrap items-center gap-[18px] rounded-[14px] bg-white/4 py-3 pr-4 pl-3 transition-colors duration-[150ms] hover:bg-white/7"
+            >
+              <Link href={href} className="relative aspect-[2/3] w-[62px] flex-none overflow-hidden rounded-[10px] bg-[#15161c]">
+                {src ? (
+                  <Image src={src} alt="" fill sizes="62px" className="object-cover" />
+                ) : (
+                  <div className="hatch absolute inset-0" />
+                )}
+              </Link>
+              <Link href={href} className="min-w-0 flex-1">
+                <p className="text-[15.5px] font-bold">{item.title}</p>
+                <p className="mt-[3px] text-xs text-mute">{meta}</p>
+                <p className={`mt-1.5 text-[12.5px] ${availability.color}`}>{availability.label}</p>
+              </Link>
+              <WatchStatusToggle
+                mediaType={item.mediaType}
+                tmdbId={item.tmdbId}
+                variant="compact"
+              />
+              <button
+                type="button"
+                onClick={() => handleRemove(item)}
+                title="Remover"
+                aria-label={`Remover ${item.title} da lista`}
+                className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-white/7 text-[15px] leading-none text-white/70 transition-colors duration-[150ms] hover:bg-[oklch(0.5_0.14_25/0.35)] hover:text-white"
+              >
+                ✕
+              </button>
+            </li>
+          )
+        })}
+      </ul>
     </div>
   )
+}
+
+const availabilityLine = (item: CatalogItem, countryName: string) => {
+  if (item.onOwnServices) {
+    const names = item.offers
+      .filter((offer) => offer.isOwn)
+      .map((offer) => offer.providerName)
+      .filter((name, index, names) => names.indexOf(name) === index)
+      .join(" · ")
+    return {
+      label: names ? `Disponível em ${names}` : "Disponível nos provedores do país",
+      color: "text-positive",
+    }
+  }
+
+  if (item.offers.length > 0) {
+    const names = item.offers
+      .map((offer) => offer.providerName)
+      .filter((name, index, names) => names.indexOf(name) === index)
+      .join(" · ")
+    return {
+      label: `Fora dos seus serviços — ${names}`,
+      color: "text-white/55",
+    }
+  }
+
+  return {
+    label: `Sem oferta em ${countryName} no momento`,
+    color: "text-alert",
+  }
 }

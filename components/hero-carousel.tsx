@@ -4,8 +4,10 @@ import Image from "next/image"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 
-import { ChevronIcon, PlayIcon } from "@/components/icons"
+import { useAccount } from "@/components/account-provider"
 import { WatchlistToggle } from "@/components/watchlist-toggle"
+import { GUEST_PREFERENCES } from "@/lib/account/types"
+import { fetchTitle } from "@/lib/api"
 import { cn } from "@/lib/cn"
 import type { CatalogItem } from "@/lib/catalog/types"
 import type { MediaType } from "@/lib/media"
@@ -18,11 +20,18 @@ type HeroCarouselProps = {
 
 export const HeroCarousel = ({ items }: HeroCarouselProps) => {
   const slides = items.slice(0, 5)
+  const slideKey = slides.map((slide) => `${slide.mediaType}-${slide.tmdbId}`).join("|")
+  const { preferences } = useAccount()
+  const region = (preferences ?? GUEST_PREFERENCES).country
+  const providerKey = (preferences ?? GUEST_PREFERENCES).providerIds.join(",")
   const [index, setIndex] = useState(0)
-  const current = slides[index]
+  const [overviews, setOverviews] = useState<Record<string, string>>({})
+  const safeIndex = slides.length === 0 ? 0 : Math.min(index, slides.length - 1)
+  const current = slides[safeIndex]
 
   useEffect(() => {
     if (slides.length < 2) return
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
 
     const timer = window.setInterval(() => {
       setIndex((value) => (value === slides.length - 1 ? 0 : value + 1))
@@ -31,111 +40,127 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
     return () => window.clearInterval(timer)
   }, [slides.length])
 
+  useEffect(() => {
+    let cancelled = false
+    const catalogQuery = {
+      country: region,
+      providerIds: providerKey.split(",").filter(Boolean).map(Number),
+    }
+
+    const load = async () => {
+      const entries = await Promise.all(
+        slides.map(async (slide) => {
+          const key = `${slide.mediaType}-${slide.tmdbId}`
+          try {
+            const details = await fetchTitle(
+              catalogQuery,
+              tipoFromMedia(slide.mediaType),
+              String(slide.tmdbId),
+            )
+            return [key, details.overview] as const
+          } catch {
+            return [key, ""] as const
+          }
+        }),
+      )
+
+      if (!cancelled) setOverviews(Object.fromEntries(entries))
+    }
+
+    void load()
+    return () => {
+      cancelled = true
+    }
+  // slideKey identifica os slides; o array muda de identidade a cada render
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [providerKey, region, slideKey])
+
   if (!current) return null
 
-  const handlePrev = () => {
-    setIndex((value) => (value === 0 ? slides.length - 1 : value - 1))
-  }
-
-  const handleNext = () => {
-    setIndex((value) => (value === slides.length - 1 ? 0 : value + 1))
-  }
-
   const href = `/titulo/${tipoFromMedia(current.mediaType)}/${current.tmdbId}`
-  const still = atmosphereUrl(current.backdropPath, current.posterPath)
+  const synopsis = overviews[`${current.mediaType}-${current.tmdbId}`]
 
   return (
-    <section className="relative overflow-hidden rounded-[28px]" aria-roledescription="carrossel">
-      <div className="relative min-h-[22rem] md:min-h-[28rem] lg:min-h-[32rem]">
-        {still ? (
-          <Image
-            key={still}
-            src={still}
-            alt=""
-            fill
-            priority
-            loading="eager"
-            sizes="(max-width: 1280px) 100vw, 70vw"
-            className="still-layer object-cover"
-          />
-        ) : (
-          <div className="absolute inset-0 bg-panel" />
-        )}
-        <div className="scrim-hero absolute inset-0" />
-
-        {slides.length > 1 ? (
-          <>
-            <button
-              type="button"
-              onClick={handlePrev}
-              className="glass absolute top-1/2 left-4 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full text-paper md:inline-flex"
-              aria-label="Título anterior"
-            >
-              <ChevronIcon className="h-5 w-5 rotate-180" />
-            </button>
-            <button
-              type="button"
-              onClick={handleNext}
-              className="glass absolute top-1/2 right-4 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full text-paper md:inline-flex"
-              aria-label="Próximo título"
-            >
-              <ChevronIcon />
-            </button>
-          </>
-        ) : null}
-
-        <div className="relative flex min-h-[22rem] flex-col justify-end gap-8 p-6 md:min-h-[28rem] md:p-10 lg:min-h-[32rem]">
+    <section
+      className="relative h-[64vh] min-h-[520px] overflow-hidden bg-void"
+      aria-roledescription="carrossel"
+    >
+      {slides.map((slide, slideIndex) => {
+        const still = atmosphereUrl(slide.backdropPath, slide.posterPath)
+        return (
           <div
-            key={`${current.mediaType}-${current.tmdbId}`}
-            className="still-copy max-w-3xl"
+            key={`${slide.mediaType}-${slide.tmdbId}`}
+            className="absolute inset-0 bg-void transition-opacity duration-1000 ease"
+            style={{ opacity: slideIndex === index ? 1 : 0 }}
           >
-            <p className="text-sm font-semibold text-paper/70">
-              {heroKicker(current.mediaType, current.year)}
-            </p>
-            <h1 className="mt-2 line-clamp-3 text-5xl font-semibold leading-[0.95] tracking-tight text-paper md:text-7xl">
-              {current.title}
-            </h1>
-          </div>
-
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap items-center gap-3">
-              <Link
-                href={href}
-                className="cta-primary inline-flex h-12 items-center justify-center gap-2 rounded-full px-7 text-sm font-semibold"
-              >
-                <PlayIcon className="h-4 w-4" />
-                Ver Detalhes
-              </Link>
-              <WatchlistToggle
-                tmdbId={current.tmdbId}
-                mediaType={current.mediaType}
-                title={current.title}
-                posterPath={current.posterPath}
-                year={current.year}
-                variant="pill"
+            {still ? (
+              <Image
+                src={still}
+                alt=""
+                fill
+                priority={slideIndex === 0}
+                sizes="100vw"
+                className="object-cover"
               />
-            </div>
-            {slides.length > 1 ? (
-              <div className="flex justify-center gap-2" aria-label="Slides em destaque">
-                {slides.map((slide, slideIndex) => (
-                  <button
-                    key={`${slide.mediaType}-${slide.tmdbId}`}
-                    type="button"
-                    onClick={() => setIndex(slideIndex)}
-                    aria-label={`Mostrar ${slide.title}`}
-                    aria-current={slideIndex === index}
-                    className={cn(
-                      "h-2 rounded-full transition-[width,background-color] duration-ui ease",
-                      slideIndex === index
-                        ? "w-6 bg-paper"
-                        : "w-2 bg-white/35",
-                    )}
-                  />
-                ))}
-              </div>
             ) : null}
           </div>
+        )
+      })}
+      <div className="hatch-hero pointer-events-none absolute inset-0" />
+      <div className="scrim-hero pointer-events-none absolute inset-0" />
+
+      <div className="absolute inset-x-0 bottom-0 mx-auto max-w-[1280px] px-5 pb-[60px] sm:px-12">
+        <span className="inline-block rounded-full border border-white/12 bg-[rgba(18,20,26,0.85)] px-[13px] py-[7px] text-[11px] font-bold tracking-[0.06em] text-paper uppercase">
+          {heroKicker(current.mediaType, current.year)}
+        </span>
+        <h1 className="mt-5 mb-4 text-[clamp(38px,4.6vw,60px)] font-extrabold leading-none tracking-[-0.035em] text-shadow-[0_2px_30px_rgba(0,0,0,0.55)]">
+          {current.title}
+        </h1>
+        {synopsis ? (
+          <p className="mb-[26px] max-w-[640px] text-pretty text-base leading-[1.55] text-white/82">
+            {synopsis}
+          </p>
+        ) : (
+          <div className="mb-[26px]" />
+        )}
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href={href}
+            className="cta-primary inline-flex items-center rounded-full px-[26px] py-3.5 text-[15px] font-bold"
+          >
+            ▶&nbsp; Ver Detalhes
+          </Link>
+          <WatchlistToggle
+            tmdbId={current.tmdbId}
+            mediaType={current.mediaType}
+            title={current.title}
+            posterPath={current.posterPath}
+            year={current.year}
+            variant="pill"
+          />
         </div>
+        {slides.length > 1 ? (
+          <div
+            className="absolute right-5 bottom-[60px] flex items-center gap-[9px] sm:right-12"
+            aria-label="Slides em destaque"
+          >
+            {slides.map((slide, slideIndex) => (
+              <button
+                key={`${slide.mediaType}-${slide.tmdbId}`}
+                type="button"
+                onClick={() => setIndex(slideIndex)}
+                aria-label={`Mostrar ${slide.title}`}
+                aria-current={slideIndex === index}
+                className={cn(
+                  "h-2 rounded-full transition-[width,background-color] duration-[250ms] ease",
+                  slideIndex === index
+                    ? "w-[22px] cursor-default bg-white"
+                    : "w-2 cursor-pointer bg-white/35 hover:bg-white/55",
+                )}
+              />
+            ))}
+          </div>
+        ) : null}
       </div>
     </section>
   )

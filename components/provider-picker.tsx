@@ -1,9 +1,6 @@
 "use client"
 
-import Image from "next/image"
-
 import type { WatchProvider } from "@/lib/catalog/types"
-import { logoUrl } from "@/lib/tmdb/image"
 import { cn } from "@/lib/cn"
 
 type ProviderPickerProps = {
@@ -28,14 +25,13 @@ export const ProviderPicker = ({
   }
 
   if (providers.length === 0) {
-    return <p className="text-mist">Nenhum streaming listado para este país.</p>
+    return <p className="text-[13.5px] text-mute">Nenhum streaming listado para este país.</p>
   }
 
   return (
-    <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+    <ul className="grid grid-cols-[repeat(auto-fill,minmax(156px,1fr))] gap-3">
       {providers.map((provider) => {
         const isSelected = selected.has(provider.id)
-        const src = logoUrl(provider.logoPath)
 
         return (
           <li key={provider.id}>
@@ -43,23 +39,24 @@ export const ProviderPicker = ({
               type="button"
               onClick={() => handleToggle(provider.id)}
               aria-pressed={isSelected}
+              title={provider.name}
               className={cn(
-                "flex h-full w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition-colors duration-200",
-                isSelected ? "bg-ember/15 text-paper ring-1 ring-ember/40" : "bg-white/4 text-mist ring-1 ring-white/6",
+                "relative flex w-full flex-col items-center justify-center rounded-[14px] px-3 py-4 text-[14px] font-semibold transition-colors duration-[150ms]",
+                isSelected
+                  ? "border border-white/55 bg-white/12 text-white"
+                  : "border border-white/10 bg-white/4 text-white/78 hover:border-white/25",
               )}
             >
-              {src ? (
-                <Image
-                  src={src}
-                  alt=""
-                  width={32}
-                  height={32}
-                  className="h-8 w-8 rounded-lg bg-paper"
-                />
-              ) : (
-                <span className="h-8 w-8 rounded-lg bg-graphite" aria-hidden />
-              )}
-              <span className="text-sm">{provider.name}</span>
+              <span>{provider.name}</span>
+              <span
+                className={cn(
+                  "absolute top-2 right-2 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-paper text-[11px] font-extrabold text-void",
+                  isSelected ? "opacity-100" : "opacity-0",
+                )}
+                aria-hidden
+              >
+                ✓
+              </span>
             </button>
           </li>
         )

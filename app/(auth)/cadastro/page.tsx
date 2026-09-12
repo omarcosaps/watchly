@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 
 import { useAccount } from "@/components/account-provider"
-import { AuthForm, AuthLinks, ExploreAsGuest } from "@/components/auth-form"
+import { AuthForm, AuthSwitch, ExploreAsGuest } from "@/components/auth-form"
 import { ACQUISITION_SOURCE_OPTIONS } from "@/lib/account/types"
 
 export default function CadastroPage() {
@@ -11,7 +11,7 @@ export default function CadastroPage() {
   const { signUp } = useAccount()
 
   return (
-    <div className="flex w-full max-w-md flex-col items-center">
+    <>
       <AuthForm
         title="Criar sua conta"
         subtitle="Seja bem-vindo ao Watchly"
@@ -30,13 +30,9 @@ export default function CadastroPage() {
           signUp(values.email, values.password, values.acquisitionSource)
           router.replace("/onboarding")
         }}
-        footer={
-          <div className="flex flex-col gap-3">
-            <AuthLinks items={[{ href: "/login", label: "Já tem conta? Entrar" }]} />
-            <ExploreAsGuest />
-          </div>
-        }
+        footer={<AuthSwitch prompt="Já tem conta?" href="/login" label="Entrar" />}
       />
-    </div>
+      <ExploreAsGuest />
+    </>
   )
 }

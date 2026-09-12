@@ -1,10 +1,11 @@
 "use client"
 
+import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 
 import { useAccount } from "@/components/account-provider"
-import { AuthForm, AuthIntentNotice, AuthLinks, ExploreAsGuest } from "@/components/auth-form"
+import { AuthForm, AuthIntentNotice, AuthSwitch, ExploreAsGuest } from "@/components/auth-form"
 
 const LoginForm = () => {
   const router = useRouter()
@@ -13,12 +14,12 @@ const LoginForm = () => {
   const intent = searchParams.get("intent")
 
   return (
-    <div className="flex w-full max-w-md flex-col items-center">
-      <AuthIntentNotice intent={intent} />
+    <>
       <AuthForm
         title="Login"
         subtitle="Acesse sua conta para continuar"
         submitLabel="Entrar"
+        notice={<AuthIntentNotice intent={intent} />}
         fields={[
           { name: "email", label: "E-mail", type: "email", autoComplete: "email" },
           { name: "password", label: "Senha", type: "password", autoComplete: "current-password" },
@@ -27,19 +28,18 @@ const LoginForm = () => {
           signIn(values.email, values.password)
           router.replace("/onboarding")
         }}
-        footer={
-          <div className="flex flex-col gap-3">
-            <AuthLinks
-              items={[
-                { href: "/recuperar-senha", label: "Esqueci minha senha" },
-                { href: "/cadastro", label: "Novo por aqui? Criar conta" },
-              ]}
-            />
-            <ExploreAsGuest />
-          </div>
+        beforeSubmit={
+          <Link
+            href="/recuperar-senha"
+            className="self-start text-[13.5px] text-white/55 underline underline-offset-[3px] hover:text-white"
+          >
+            Esqueci minha senha
+          </Link>
         }
+        footer={<AuthSwitch prompt="Novo por aqui?" href="/cadastro" label="Criar conta" />}
       />
-    </div>
+      <ExploreAsGuest />
+    </>
   )
 }
 

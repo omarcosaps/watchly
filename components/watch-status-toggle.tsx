@@ -1,7 +1,6 @@
 "use client"
 
 import { useAccount } from "@/components/account-provider"
-import { CheckIcon } from "@/components/icons"
 import { cn } from "@/lib/cn"
 import { resolveWatchStatus, watchStatusLabel } from "@/lib/account/watch-status"
 import type { MediaType } from "@/lib/media"
@@ -9,13 +8,13 @@ import type { MediaType } from "@/lib/media"
 type WatchStatusToggleProps = {
   mediaType: MediaType
   tmdbId: number
-  variant?: "stamp" | "pill" | "segmented"
+  variant?: "detail" | "compact"
 }
 
 export const WatchStatusToggle = ({
   mediaType,
   tmdbId,
-  variant = "stamp",
+  variant = "detail",
 }: WatchStatusToggleProps) => {
   const { watchlist, setWatchlistWatched } = useAccount()
   const saved = watchlist.find((item) => {
@@ -25,80 +24,59 @@ export const WatchStatusToggle = ({
 
   if (!status) return null
 
-  const handleSet = (watched: boolean) => {
-    setWatchlistWatched(mediaType, tmdbId, watched)
-  }
-
-  const handleToggle = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault()
-    event.stopPropagation()
-    handleSet(!status.watched)
-  }
-
-  if (variant === "segmented") {
-    return (
-      <section className="mt-10">
-        <h2 className="mb-3 text-sm font-semibold text-paper">Meu status</h2>
-        <div
-          className="inline-flex rounded-full bg-white/5 p-1"
-          role="group"
-          aria-label="Status de visualização"
-        >
-          {[false, true].map((watched) => {
-            const active = status.watched === watched
-            const label = watchStatusLabel(watched)
-            return (
-              <button
-                key={label}
-                type="button"
-                onClick={() => handleSet(watched)}
-                aria-pressed={active}
-                className={cn(
-                  "inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-[13px] font-medium",
-                  active ? "bg-white/13 text-paper" : "cursor-pointer text-white/50 hover:text-white/80",
-                )}
-              >
-                {active ? <CheckIcon className="h-3.5 w-3.5" /> : null}
-                {label}
-              </button>
-            )
-          })}
-        </div>
-      </section>
-    )
-  }
-
-  if (variant === "pill") {
-    return (
-      <button
-        type="button"
-        onClick={handleToggle}
-        aria-pressed={status.watched}
-        aria-label={status.label}
-        className={cn(
-          "cta-ghost press-pill inline-flex h-12 items-center gap-2 rounded-full px-5 text-sm font-semibold focus-visible:outline-offset-2",
-          status.watched ? "text-paper" : "text-mist",
-        )}
-      >
-        {status.watched ? <CheckIcon className="h-4 w-4 shrink-0 text-gold" /> : null}
-        {status.label}
-      </button>
-    )
-  }
+  const compact = variant === "compact"
 
   return (
-    <button
-      type="button"
-      onClick={handleToggle}
-      aria-pressed={status.watched}
-      aria-label={status.label}
-      className={cn(
-        "press-pill inline-flex max-w-full items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[12px] font-medium backdrop-blur-md focus-visible:outline-offset-2",
-        status.watched ? "text-paper" : "text-mist",
+    <div className={compact ? undefined : "mb-[26px]"}>
+      {compact ? null : (
+        <p className="mb-2.5 text-[11px] font-bold tracking-[0.09em] text-mute uppercase">
+          Meu status
+        </p>
       )}
-    >
-      {status.watched ? <CheckIcon className="h-3 w-3 shrink-0 text-gold" /> : null}
-      <span className="truncate">{status.label}</span>
-    </button>
+      <div
+        className="inline-flex items-center gap-0.5 rounded-full bg-white/5 p-[3px]"
+        role="group"
+        aria-label="Status de visualização"
+      >
+        {[false, true].map((watched) => {
+          const active = status.watched === watched
+          const label = watchStatusLabel(watched)
+          return (
+            <button
+              key={label}
+              type="button"
+              onClick={() => setWatchlistWatched(mediaType, tmdbId, watched)}
+              aria-pressed={active}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full whitespace-nowrap transition-colors duration-[180ms]",
+                compact ? "px-3 py-1.5 text-xs" : "px-[15px] py-2 text-[13px]",
+                active
+                  ? "cursor-default bg-white/13 font-semibold text-white"
+                  : "cursor-pointer font-medium text-white/50 hover:text-white/80",
+              )}
+            >
+              <svg
+                width={compact ? 11 : 12}
+                height={compact ? 11 : 12}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+                className={cn(
+                  "block transition-opacity duration-[180ms]",
+                  active ? "opacity-100" : "opacity-0",
+                )}
+              >
+                <path d="M5 13l4.5 4.5L19 7" />
+              </svg>
+              <span>{label}</span>
+            </button>
+          )
+        })}
+      </div>
+    </div>
   )
 }
