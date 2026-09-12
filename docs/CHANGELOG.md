@@ -9,6 +9,7 @@
 
 ### Changed
 
+- O Hero da Home mostra as 5 tendências da semana no país, com oferta e still; independente da listagem.
 - O Hero da Home resume a sinopse para no máximo 3 linhas; o detalhe mantém o texto completo.
 - Onboarding e Perfil usam os mesmos streamings principais e o mesmo formato de pills em grade 2×4.
 - Onboarding alinhado à referência: bloco de 720px, país em outline, oito streamings principais em grade 2×4 e Continuar ao lado do hint.

@@ -4,10 +4,34 @@ import { buildDiscoverQuery } from "@/lib/catalog/discover-query"
 import { hydrateOffers } from "@/lib/catalog/hydrate"
 import { mergeCatalogPages } from "@/lib/catalog/merge"
 import type { CatalogQuery } from "@/lib/catalog/params"
-import type { CatalogPage } from "@/lib/catalog/types"
-import { discoverMovies, discoverTv } from "@/lib/tmdb/queries"
+import type { CatalogItem, CatalogPage } from "@/lib/catalog/types"
+import {
+  hasCatalogOffer,
+  hasHeroStill,
+  toCatalogItemFromTrending,
+} from "@/lib/catalog/trending"
+import { discoverMovies, discoverTv, getTrendingAll } from "@/lib/tmdb/queries"
+
+const getTrendingCatalogPage = async (query: CatalogQuery): Promise<CatalogPage> => {
+  const trending = await getTrendingAll("week")
+  const mapped = trending.results
+    .map(toCatalogItemFromTrending)
+    .filter((item): item is CatalogItem => item !== null)
+    .filter(hasHeroStill)
+  const hydrated = await hydrateOffers(mapped, query.region, query.providerIds, false)
+
+  return {
+    page: 1,
+    totalPages: 1,
+    items: hydrated.filter(hasCatalogOffer),
+  }
+}
 
 export const getCatalogPage = async (query: CatalogQuery): Promise<CatalogPage> => {
+  if (query.sort === "trending") {
+    return getTrendingCatalogPage(query)
+  }
+
   const providerIds = query.filteredProviderIds?.length ? query.filteredProviderIds : []
 
   const includeMovies = query.media !== "tv"

@@ -2,7 +2,7 @@ export const MONETIZATION_TYPES = ["flatrate", "free", "ads", "rent", "buy"] as 
 
 export type MonetizationType = (typeof MONETIZATION_TYPES)[number]
 
-export type CatalogSort = "popularity" | "vote" | "date"
+export type CatalogSort = "popularity" | "vote" | "date" | "trending"
 
 export type MediaFilter = "all" | "movie" | "tv"
 
@@ -57,7 +57,9 @@ export const parseMonetization = (value: string | null): MonetizationType[] => {
 }
 
 export const parseSort = (value: string | null): CatalogSort => {
-  if (value === "vote" || value === "date" || value === "popularity") return value
+  if (value === "vote" || value === "date" || value === "popularity" || value === "trending") {
+    return value
+  }
   return "popularity"
 }
 
