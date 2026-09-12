@@ -23,6 +23,21 @@ describe("buildDiscoverQuery", () => {
     expect(query.language).toBe("pt-BR")
   })
 
+  it("omite provedores quando a lista está vazia", () => {
+    const query = buildDiscoverQuery({ ...base, providerIds: [] })
+
+    expect(query.with_watch_providers).toBeUndefined()
+    expect(query.watch_region).toBe("BR")
+  })
+
+  it("aplica faixa de ano do catálogo", () => {
+    const query = buildDiscoverQuery({ ...base, yearRange: "2024-2025" })
+
+    expect(query["primary_release_date.gte"]).toBe("2024-01-01")
+    expect(query["primary_release_date.lte"]).toBe("2025-12-31")
+    expect(query.primary_release_year).toBeUndefined()
+  })
+
   it("usa todas as formas de oferta no padrão", () => {
     const query = buildDiscoverQuery(base)
 

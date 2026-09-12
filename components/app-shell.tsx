@@ -5,6 +5,7 @@ import { useEffect } from "react"
 import { AppShellProvider, useAppShell } from "@/components/app-shell-context"
 import { AppTopbar } from "@/components/app-topbar"
 import { Attribution } from "@/components/attribution"
+import { PendingWatchlistResume } from "@/components/pending-watchlist-resume"
 
 export const AppShell = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -36,6 +37,7 @@ const AppShellFrame = ({ children }: { children: React.ReactNode }) => {
         Ir para o conteúdo
       </a>
       <div className="flex min-w-0 flex-1 flex-col">
+        <PendingWatchlistResume />
         <AppTopbar />
         <div className="hide-scrollbar min-h-0 flex-1 overflow-y-auto">
           <main id="conteudo" className="px-4 pb-10 pt-3 sm:px-6 lg:px-7">

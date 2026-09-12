@@ -1,5 +1,38 @@
 # Changelog
 
+## 2026-09-12
+
+### Added
+
+- Exploração pública da Home, busca e detalhe, com autenticação só na watchlist e no perfil.
+- Cadastro com origem de aquisição e persistência mock isolada por e-mail.
+
+### Changed
+
+- UI alinhada ao protótipo: nav, hero, filtros, detalhe, Minha lista, Perfil e rótulos **Ainda não assistido** / **Já assistido**.
+- `GET /api/catalog` deixa de exigir provedores; a Home lista o que tem oferta no país.
+
+### Fixed
+
+### Removed
+
+- Fluxo de verificação de e-mail, trailer e link do título na TMDB da superfície de produto.
+
+## 2026-09-11
+
+### Added
+
+- Modelo de domínio e diagramas ER conceitual e persistido em `docs/SSD.md`.
+
+### Changed
+
+- O PRD passa a descrever o comportamento de produto aprovado e desejado no protótipo: exploração como visitante, cadastro com origem de aquisição, onboarding de país e streamings, e os fluxos de home, busca, detalhe, watchlist e perfil.
+- O SSD diferencia arquitetura atual e arquitetura alvo para suportar esse comportamento, sem inventar schema de banco.
+
+### Fixed
+
+### Removed
+
 ## 2026-09-10
 
 ### Added

@@ -2,13 +2,14 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { ChevronIcon, PlayIcon } from "@/components/icons"
 import { WatchlistToggle } from "@/components/watchlist-toggle"
 import { cn } from "@/lib/cn"
 import type { CatalogItem } from "@/lib/catalog/types"
-import { mediaLabel, tipoFromMedia } from "@/lib/media"
+import type { MediaType } from "@/lib/media"
+import { tipoFromMedia } from "@/lib/media"
 import { atmosphereUrl } from "@/lib/tmdb/image"
 
 type HeroCarouselProps = {
@@ -19,6 +20,16 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
   const slides = items.slice(0, 5)
   const [index, setIndex] = useState(0)
   const current = slides[index]
+
+  useEffect(() => {
+    if (slides.length < 2) return
+
+    const timer = window.setInterval(() => {
+      setIndex((value) => (value === slides.length - 1 ? 0 : value + 1))
+    }, 7000)
+
+    return () => window.clearInterval(timer)
+  }, [slides.length])
 
   if (!current) return null
 
@@ -78,11 +89,10 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
             key={`${current.mediaType}-${current.tmdbId}`}
             className="still-copy max-w-3xl"
           >
-            <p className="text-sm text-paper/70">
-              {mediaLabel(current.mediaType)}
-              {current.year ? ` · ${current.year}` : ""}
+            <p className="text-sm font-semibold text-paper/70">
+              {heroKicker(current.mediaType, current.year)}
             </p>
-            <h1 className="font-display mt-2 line-clamp-3 text-5xl italic leading-[0.95] tracking-tight text-paper md:text-7xl">
+            <h1 className="mt-2 line-clamp-3 text-5xl font-semibold leading-[0.95] tracking-tight text-paper md:text-7xl">
               {current.title}
             </h1>
           </div>
@@ -94,7 +104,7 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
                 className="cta-primary inline-flex h-12 items-center justify-center gap-2 rounded-full px-7 text-sm font-semibold"
               >
                 <PlayIcon className="h-4 w-4" />
-                Ver detalhes
+                Ver Detalhes
               </Link>
               <WatchlistToggle
                 tmdbId={current.tmdbId}
@@ -117,7 +127,7 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
                     className={cn(
                       "h-2 rounded-full transition-[width,background-color] duration-ui ease",
                       slideIndex === index
-                        ? "w-6 bg-ember"
+                        ? "w-6 bg-paper"
                         : "w-2 bg-white/35",
                     )}
                   />
@@ -129,4 +139,10 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
       </div>
     </section>
   )
+}
+
+const heroKicker = (mediaType: MediaType, year: number | null) => {
+  const isNew = (year ?? 0) >= 2024
+  if (mediaType === "movie") return isNew ? "Novo filme" : "Filme"
+  return isNew ? "Nova série" : "Série"
 }

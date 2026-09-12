@@ -3,29 +3,40 @@
 import { useRouter } from "next/navigation"
 
 import { useAccount } from "@/components/account-provider"
-import { AuthForm, AuthLinks } from "@/components/auth-form"
+import { AuthForm, AuthLinks, ExploreAsGuest } from "@/components/auth-form"
+import { ACQUISITION_SOURCE_OPTIONS } from "@/lib/account/types"
 
 export default function CadastroPage() {
   const router = useRouter()
   const { signUp } = useAccount()
 
   return (
-    <AuthForm
-      title="Criar conta"
-      submitLabel="Criar conta"
-      fields={[
-        { name: "email", label: "Email", type: "email", autoComplete: "email" },
-        { name: "password", label: "Senha", type: "password", autoComplete: "new-password" },
-      ]}
-      onSubmit={(values) => {
-        const session = signUp(values.email, values.password)
-        if (session.status === "email_pending") {
-          router.replace("/verificar-email")
-          return
+    <div className="flex w-full max-w-md flex-col items-center">
+      <AuthForm
+        title="Criar sua conta"
+        subtitle="Seja bem-vindo ao Watchly"
+        submitLabel="Criar conta"
+        fields={[
+          { name: "email", label: "E-mail", type: "email", autoComplete: "email" },
+          { name: "password", label: "Senha", type: "password", autoComplete: "new-password" },
+          {
+            name: "acquisitionSource",
+            label: "Onde conheceu o Watchly",
+            placeholder: "Onde você conheceu o Watchly?",
+            options: ACQUISITION_SOURCE_OPTIONS,
+          },
+        ]}
+        onSubmit={(values) => {
+          signUp(values.email, values.password, values.acquisitionSource)
+          router.replace("/onboarding")
+        }}
+        footer={
+          <div className="flex flex-col gap-3">
+            <AuthLinks items={[{ href: "/login", label: "Já tem conta? Entrar" }]} />
+            <ExploreAsGuest />
+          </div>
         }
-        router.replace("/onboarding")
-      }}
-      footer={<AuthLinks items={[{ href: "/login", label: "Já tenho conta" }]} />}
-    />
+      />
+    </div>
   )
 }

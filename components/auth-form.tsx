@@ -4,17 +4,21 @@ import Link from "next/link"
 import { useState } from "react"
 
 import { ACCOUNT_ERROR_COPY, AccountError } from "@/lib/account/types"
+import { clearPendingWatchlist } from "@/lib/account/pending-watchlist"
 
 type AuthField = {
   name: string
   label: string
-  type: string
-  autoComplete: string
+  type?: string
+  autoComplete?: string
   required?: boolean
+  options?: { value: string; label: string }[]
+  placeholder?: string
 }
 
 type AuthFormProps = {
   title: string
+  subtitle?: string
   submitLabel: string
   fields: AuthField[]
   onSubmit: (values: Record<string, string>) => void
@@ -24,6 +28,7 @@ type AuthFormProps = {
 
 export const AuthForm = ({
   title,
+  subtitle,
   submitLabel,
   fields,
   onSubmit,
@@ -53,28 +58,47 @@ export const AuthForm = ({
   }
 
   return (
-    <div className="w-full max-w-md rounded-[28px] bg-panel p-8 ring-1 ring-white/8">
-      <h1 className="font-display text-4xl italic tracking-tight text-paper">{title}</h1>
+    <div className="w-full max-w-md rounded-[28px] bg-panel/90 p-8 ring-1 ring-white/8">
+      <h1 className="text-3xl font-semibold tracking-tight text-paper">{title}</h1>
+      {subtitle ? <p className="mt-2 text-sm text-mist">{subtitle}</p> : null}
       <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
         {fields.map((field) => (
           <label key={field.name} className="flex flex-col gap-2 text-sm text-mist">
             {field.label}
-            <input
-              name={field.name}
-              type={field.type}
-              autoComplete={field.autoComplete}
-              required={field.required !== false}
-              className="focus-pill h-12 rounded-full border border-white/8 bg-white/5 px-4 text-paper"
-            />
+            {field.options ? (
+              <select
+                name={field.name}
+                required={field.required !== false}
+                defaultValue=""
+                className="focus-pill h-12 rounded-[13px] border border-white/8 bg-white/4 px-4 text-paper"
+              >
+                <option value="" className="bg-panel text-mist">
+                  {field.placeholder ?? "Selecione"}
+                </option>
+                {field.options.map((option) => (
+                  <option key={option.value} value={option.value} className="bg-panel text-paper">
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                name={field.name}
+                type={field.type ?? "text"}
+                autoComplete={field.autoComplete}
+                required={field.required !== false}
+                className="focus-pill h-12 rounded-[13px] border border-white/8 bg-white/4 px-4 text-paper"
+              />
+            )}
           </label>
         ))}
         {error ? (
-          <p className="text-paper" role="alert">
+          <p className="text-sm text-red-300" role="alert">
             {error}
           </p>
         ) : null}
         {success ? (
-          <p className="text-mist" role="status">
+          <p className="text-sm text-mist" role="status">
             {success}
           </p>
         ) : null}
@@ -105,5 +129,32 @@ export const AuthLinks = ({
         </li>
       ))}
     </ul>
+  )
+}
+
+export const ExploreAsGuest = () => {
+  const handleClick = () => {
+    clearPendingWatchlist()
+  }
+
+  return (
+    <Link
+      href="/"
+      onClick={handleClick}
+      className="mt-6 inline-flex text-sm font-semibold text-white/40 hover:text-white"
+    >
+      Explorar sem conta →
+    </Link>
+  )
+}
+
+export const AuthIntentNotice = ({ intent }: { intent?: string | null }) => {
+  if (intent !== "save" && intent !== "watchlist") return null
+
+  return (
+    <p className="mb-6 max-w-md text-sm text-mist" role="status">
+      Para adicionar filmes e séries à sua watchlist, entre na sua conta ou crie uma
+      gratuitamente.
+    </p>
   )
 }

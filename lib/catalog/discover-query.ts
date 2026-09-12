@@ -1,5 +1,5 @@
-import type { CatalogSort, MonetizationType } from "@/lib/catalog/params"
-import { isIsoCountry, MONETIZATION_TYPES } from "@/lib/catalog/params"
+import type { CatalogSort, MonetizationType, YearRange } from "@/lib/catalog/params"
+import { dateBoundsForYearRange, isIsoCountry, MONETIZATION_TYPES } from "@/lib/catalog/params"
 
 export type DiscoverQueryInput = {
   region: string
@@ -9,6 +9,7 @@ export type DiscoverQueryInput = {
   monetizationTypes?: MonetizationType[]
   genreId?: number
   year?: number
+  yearRange?: YearRange
   sort?: CatalogSort
 }
 
@@ -23,10 +24,6 @@ export const buildDiscoverQuery = (input: DiscoverQueryInput) => {
     return Number.isInteger(id) && id > 0
   })
 
-  if (providerIds.length === 0) {
-    throw new Error("Pelo menos um provedor é obrigatório")
-  }
-
   const page = Number.isInteger(input.page) && input.page > 0 ? input.page : 1
   const monetization = input.monetizationTypes?.length
     ? input.monetizationTypes
@@ -37,17 +34,27 @@ export const buildDiscoverQuery = (input: DiscoverQueryInput) => {
     language: "pt-BR",
     include_adult: "false",
     watch_region: region,
-    with_watch_providers: providerIds.join("|"),
     with_watch_monetization_types: monetization.join("|"),
     page: String(page),
     sort_by: sortByFor(sort, input.mediaType),
+  }
+
+  if (providerIds.length > 0) {
+    query.with_watch_providers = providerIds.join("|")
   }
 
   if (input.genreId) {
     query.with_genres = String(input.genreId)
   }
 
-  if (input.year) {
+  const bounds = dateBoundsForYearRange(input.yearRange)
+  const dateGteKey = input.mediaType === "movie" ? "primary_release_date.gte" : "first_air_date.gte"
+  const dateLteKey = input.mediaType === "movie" ? "primary_release_date.lte" : "first_air_date.lte"
+
+  if (bounds.gte) query[dateGteKey] = bounds.gte
+  if (bounds.lte) query[dateLteKey] = bounds.lte
+
+  if (!input.yearRange && input.year) {
     if (input.mediaType === "movie") {
       query.primary_release_year = String(input.year)
     } else {

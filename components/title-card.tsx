@@ -56,9 +56,16 @@ export const TitleCard = ({
         <div className="mt-3">
           <h2 className="line-clamp-2 text-sm font-semibold leading-snug text-paper">{item.title}</h2>
           <p className="mt-1 text-xs text-mist">{meta}</p>
-          {showOffServiceHint && !item.onOwnServices ? (
-            <p className="mt-1 text-xs text-mist">Fora dos seus serviços</p>
-          ) : null}
+          <p className="mt-1 line-clamp-1 text-xs text-mist">
+            {showOffServiceHint && !item.onOwnServices
+              ? "Fora dos seus serviços"
+              : item.offers
+                  .filter((offer) => (showOffServiceHint ? offer.isOwn : true))
+                  .map((offer) => offer.providerName)
+                  .filter((name, index, names) => names.indexOf(name) === index)
+                  .slice(0, 3)
+                  .join(" · ")}
+          </p>
         </div>
       </Link>
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 aspect-[2/3] p-2">

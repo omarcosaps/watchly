@@ -12,18 +12,21 @@ export default function RecuperarSenhaPage() {
   return (
     <AuthForm
       title="Recuperar senha"
-      submitLabel="Enviar email"
+      subtitle="Enviamos um link para você criar uma senha nova"
+      submitLabel="Enviar link de redefinição"
       success={success}
-      fields={[{ name: "email", label: "Email", type: "email", autoComplete: "email" }]}
+      fields={[{ name: "email", label: "E-mail", type: "email", autoComplete: "email" }]}
       onSubmit={(values) => {
         requestPasswordReset(values.email)
-        setSuccess("Se essa conta existir, enviamos um email para redefinir a senha.")
+        setSuccess(
+          `Se existir uma conta para ${values.email.trim().toLowerCase()}, enviamos um link de redefinição de senha.`,
+        )
       }}
       footer={
         <AuthLinks
           items={[
             { href: "/atualizar-senha", label: "Já tenho o link de redefinição" },
-            { href: "/login", label: "Voltar ao login" },
+            { href: "/login", label: "Lembrou a senha? Voltar para o login" },
           ]}
         />
       }

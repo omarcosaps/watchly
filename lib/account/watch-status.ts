@@ -1,7 +1,7 @@
 import type { WatchlistItem } from "@/lib/account/types"
 
 export const watchStatusLabel = (watched: boolean) => {
-  return watched ? "Já assistir" : "Ainda não assistir"
+  return watched ? "Já assistido" : "Ainda não assistido"
 }
 
 export const resolveWatchStatus = (item: WatchlistItem | undefined) => {

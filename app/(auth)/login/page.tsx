@@ -1,38 +1,52 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
+import { Suspense } from "react"
 
 import { useAccount } from "@/components/account-provider"
-import { AuthForm, AuthLinks } from "@/components/auth-form"
+import { AuthForm, AuthIntentNotice, AuthLinks, ExploreAsGuest } from "@/components/auth-form"
 
-export default function LoginPage() {
+const LoginForm = () => {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { signIn } = useAccount()
+  const intent = searchParams.get("intent")
 
   return (
-    <AuthForm
-      title="Entrar"
-      submitLabel="Entrar"
-      fields={[
-        { name: "email", label: "Email", type: "email", autoComplete: "email" },
-        { name: "password", label: "Senha", type: "password", autoComplete: "current-password" },
-      ]}
-      onSubmit={(values) => {
-        const session = signIn(values.email, values.password)
-        if (session.status === "email_pending") {
-          router.replace("/verificar-email")
-          return
+    <div className="flex w-full max-w-md flex-col items-center">
+      <AuthIntentNotice intent={intent} />
+      <AuthForm
+        title="Login"
+        subtitle="Acesse sua conta para continuar"
+        submitLabel="Entrar"
+        fields={[
+          { name: "email", label: "E-mail", type: "email", autoComplete: "email" },
+          { name: "password", label: "Senha", type: "password", autoComplete: "current-password" },
+        ]}
+        onSubmit={(values) => {
+          signIn(values.email, values.password)
+          router.replace("/onboarding")
+        }}
+        footer={
+          <div className="flex flex-col gap-3">
+            <AuthLinks
+              items={[
+                { href: "/recuperar-senha", label: "Esqueci minha senha" },
+                { href: "/cadastro", label: "Novo por aqui? Criar conta" },
+              ]}
+            />
+            <ExploreAsGuest />
+          </div>
         }
-        router.replace("/")
-      }}
-      footer={
-        <AuthLinks
-          items={[
-            { href: "/cadastro", label: "Criar conta" },
-            { href: "/recuperar-senha", label: "Esqueci a senha" },
-          ]}
-        />
-      }
-    />
+      />
+    </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   )
 }

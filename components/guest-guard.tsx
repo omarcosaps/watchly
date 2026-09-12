@@ -13,17 +13,12 @@ export const GuestGuard = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (!ready) return
 
-    if (!session && pathname === "/verificar-email") {
+    if (pathname === "/verificar-email") {
       router.replace("/login")
       return
     }
 
-    if (session?.status === "email_pending" && pathname !== "/verificar-email") {
-      router.replace("/verificar-email")
-      return
-    }
-
-    if (session?.status === "authenticated") {
+    if (session) {
       router.replace(preferences ? "/" : "/onboarding")
     }
   }, [pathname, preferences, ready, router, session])
@@ -36,9 +31,8 @@ export const GuestGuard = ({ children }: { children: React.ReactNode }) => {
     )
   }
 
-  if (session?.status === "authenticated") return null
-  if (session?.status === "email_pending" && pathname !== "/verificar-email") return null
-  if (!session && pathname === "/verificar-email") return null
+  if (pathname === "/verificar-email") return null
+  if (session) return null
 
   return <>{children}</>
 }

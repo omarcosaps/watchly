@@ -1,8 +1,12 @@
-import { mutateAccount } from "@/lib/account/mock/storage"
-import { AccountError, type Session } from "@/lib/account/types"
+import { mutateState } from "@/lib/account/mock/storage"
+import {
+  AccountError,
+  isAcquisitionSource,
+  type AcquisitionSource,
+  type Session,
+} from "@/lib/account/types"
 
 const TAKEN_EMAIL = "usado@watchly.app"
-const PENDING_EMAIL = "pendente@watchly.app"
 const WRONG_PASSWORD = "errada"
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -10,74 +14,118 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 export const validateEmail = (email: string) => {
   const normalized = email.trim().toLowerCase()
   if (!EMAIL_PATTERN.test(normalized)) {
-    throw new AccountError("invalid_email", "Email inválido")
+    throw new AccountError("invalid_email", "Informe um email válido.")
   }
   return normalized
 }
 
 export const validatePassword = (password: string) => {
   if (password.length < 6) {
-    throw new AccountError("short_password", "A senha precisa ter pelo menos 6 caracteres")
+    throw new AccountError(
+      "short_password",
+      "A senha precisa de pelo menos 6 caracteres.",
+    )
   }
 }
 
-export const signUp = (email: string, password: string): Session => {
+export const validateAcquisitionSource = (value: string): AcquisitionSource => {
+  const normalized = value.trim()
+  if (!isAcquisitionSource(normalized)) {
+    throw new AccountError(
+      "acquisition_required",
+      "Conte onde você conheceu o Watchly.",
+    )
+  }
+  return normalized
+}
+
+export const signUp = (
+  email: string,
+  password: string,
+  acquisitionSource: string,
+): Session => {
   const normalized = validateEmail(email)
   validatePassword(password)
+  const source = validateAcquisitionSource(acquisitionSource)
 
   if (normalized === TAKEN_EMAIL) {
-    throw new AccountError("email_taken", "Esse email já tem conta")
+    throw new AccountError(
+      "email_taken",
+      "Já existe uma conta com esse email. Use Entrar.",
+    )
   }
 
-  const status = normalized === PENDING_EMAIL ? "email_pending" : "authenticated"
+  const session: Session = { email: normalized, status: "authenticated" }
 
-  const account = mutateAccount((current) => ({
-    ...current,
-    session: { email: normalized, status },
-  }))
+  mutateState((current) => {
+    if (current.accounts[normalized]) {
+      throw new AccountError(
+        "email_taken",
+        "Já existe uma conta com esse email. Use Entrar.",
+      )
+    }
 
-  return account.session as Session
+    return {
+      session,
+      accounts: {
+        ...current.accounts,
+        [normalized]: {
+          password,
+          acquisitionSource: source,
+          preferences: null,
+          watchlist: [],
+        },
+      },
+    }
+  })
+
+  return session
 }
 
 export const signIn = (email: string, password: string): Session => {
   const normalized = validateEmail(email)
   validatePassword(password)
 
-  if (password === WRONG_PASSWORD) {
-    throw new AccountError("bad_credentials", "Email ou senha não conferem")
-  }
+  const session: Session = { email: normalized, status: "authenticated" }
 
-  const status = normalized === PENDING_EMAIL ? "email_pending" : "authenticated"
+  mutateState((current) => {
+    const user = current.accounts[normalized]
 
-  const account = mutateAccount((current) => ({
-    ...current,
-    session: { email: normalized, status },
-  }))
+    if (!user) {
+      throw new AccountError(
+        "account_not_found",
+        "Conta não encontrada. Crie uma conta primeiro.",
+      )
+    }
 
-  return account.session as Session
+    if (password === WRONG_PASSWORD || user.password !== password) {
+      throw new AccountError("bad_credentials", "Senha incorreta.")
+    }
+
+    return {
+      ...current,
+      session,
+    }
+  })
+
+  return session
 }
 
 export const signOut = () => {
-  mutateAccount((current) => ({
+  mutateState((current) => ({
     ...current,
     session: null,
   }))
 }
 
 export const confirmEmail = (): Session => {
-  const account = mutateAccount((current) => {
-    if (!current.session) return current
-    return {
-      ...current,
-      session: { ...current.session, status: "authenticated" },
-    }
-  })
+  const session = mutateState((current) => current).session
 
-  if (!account.session) {
-    throw new AccountError("bad_credentials", "Email ou senha não conferem")
+  if (!session) {
+    throw new AccountError("account_not_found", "Conta não encontrada. Crie uma conta primeiro.")
   }
 
-  return account.session
+  return session
 }
 
 export const requestPasswordReset = (email: string) => {

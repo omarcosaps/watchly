@@ -30,7 +30,7 @@ import type { MediaType } from "@/lib/media"
 
 const subscribe = (onStoreChange: () => void) => {
   const handleStorage = (event: StorageEvent) => {
-    if (event.key === "watchly-account-v1") onStoreChange()
+    if (event.key === "watchly-account-v2") onStoreChange()
   }
 
   window.addEventListener("watchly-account", onStoreChange)
