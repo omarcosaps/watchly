@@ -193,7 +193,7 @@ O catálogo mistura filmes e séries. Entram só títulos com pelo menos uma ofe
 
 O visitante vê disponibilidade no Brasil. Quem está autenticado vê disponibilidade no país salvo.
 
-Hero: carrossel com até 5 títulos da listagem filtrada, avançando a cada 7 segundos. Kicker **Novo filme** / **Filme** / **Nova série** / **Série** (ano ≥ 2024 usa “Novo/Nova”). CTAs: **Ver Detalhes** e adicionar/remover da lista (**Adicionar à minha lista** / **Na minha lista**).
+Hero: carrossel com até 5 títulos da listagem filtrada, avançando a cada 7 segundos. Kicker **Novo filme** / **Filme** / **Nova série** / **Série** (ano ≥ 2024 usa “Novo/Nova”). Texto de apoio: sinopse em até 3 linhas. Se a original não couber, o Hero mostra um resumo que preserva a ideia principal, o contexto e o tom; a sinopse completa fica só no detalhe. Sem corte com reticências e sem reduzir fonte ou largura só para caber. CTAs: **Ver Detalhes** e adicionar/remover da lista (**Adicionar à minha lista** / **Na minha lista**).
 
 A navegação é uma pill flutuante: **Watchly**, **Início**, **Filmes**, **Séries**, **Watchlist**, busca e, se autenticada, o atalho de perfil (avatar + nome) para `/preferencias`. Filmes e Séries aplicam o filtro de tipo na Home. Logout fica só no Perfil.
 

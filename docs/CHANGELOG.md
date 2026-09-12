@@ -9,6 +9,7 @@
 
 ### Changed
 
+- O Hero da Home resume a sinopse para no máximo 3 linhas; o detalhe mantém o texto completo.
 - UI alinhada ao HTML de referência e ao Style Guide: tokens `#0b0c10` / `#f2f3f5`, nav pill flutuante, hero full-bleed, filtros abaixo do hero, cards sem stamps, watchlist em lista, detalhe com overlap, auth com card de 404px e onboarding sem chrome.
 - UI alinhada ao protótipo: nav, hero, filtros, detalhe, Minha lista, Perfil e rótulos **Ainda não assistido** / **Já assistido**.
 - `GET /api/catalog` deixa de exigir provedores; a Home lista o que tem oferta no país.

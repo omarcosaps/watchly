@@ -2,12 +2,13 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
 
 import { useAccount } from "@/components/account-provider"
 import { WatchlistToggle } from "@/components/watchlist-toggle"
 import { GUEST_PREFERENCES } from "@/lib/account/types"
 import { fetchTitle } from "@/lib/api"
+import { pickHeroSynopsis } from "@/lib/catalog/hero-synopsis"
 import { cn } from "@/lib/cn"
 import type { CatalogItem } from "@/lib/catalog/types"
 import type { MediaType } from "@/lib/media"
@@ -26,6 +27,8 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
   const providerKey = (preferences ?? GUEST_PREFERENCES).providerIds.join(",")
   const [index, setIndex] = useState(0)
   const [overviews, setOverviews] = useState<Record<string, string>>({})
+  const [heroSynopsis, setHeroSynopsis] = useState("")
+  const measureRef = useRef<HTMLParagraphElement>(null)
   const safeIndex = slides.length === 0 ? 0 : Math.min(index, slides.length - 1)
   const current = slides[safeIndex]
 
@@ -75,10 +78,40 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [providerKey, region, slideKey])
 
+  const synopsis = current
+    ? overviews[`${current.mediaType}-${current.tmdbId}`]
+    : undefined
+
+  useLayoutEffect(() => {
+    const measure = measureRef.current
+    if (!measure) return
+
+    const fitsThreeLines = (text: string) => {
+      measure.textContent = text
+      const lineHeight = Number.parseFloat(getComputedStyle(measure).lineHeight)
+      if (!Number.isFinite(lineHeight) || lineHeight <= 0) return false
+      return measure.scrollHeight <= lineHeight * 3 + 1
+    }
+
+    const updateSynopsis = () => {
+      if (!synopsis) {
+        setHeroSynopsis("")
+        return
+      }
+
+      const next = pickHeroSynopsis(synopsis, fitsThreeLines)
+      setHeroSynopsis((currentText) => (currentText === next ? currentText : next))
+    }
+
+    updateSynopsis()
+    const observer = new ResizeObserver(updateSynopsis)
+    observer.observe(measure)
+    return () => observer.disconnect()
+  }, [synopsis])
+
   if (!current) return null
 
   const href = `/titulo/${tipoFromMedia(current.mediaType)}/${current.tmdbId}`
-  const synopsis = overviews[`${current.mediaType}-${current.tmdbId}`]
 
   return (
     <section
@@ -116,9 +149,17 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
         <h1 className="mt-5 mb-4 text-[clamp(38px,4.6vw,60px)] font-extrabold leading-none tracking-[-0.035em] text-shadow-[0_2px_30px_rgba(0,0,0,0.55)]">
           {current.title}
         </h1>
-        {synopsis ? (
-          <p className="mb-[26px] max-w-[640px] text-pretty text-base leading-[1.55] text-white/82">
-            {synopsis}
+        <p
+          ref={measureRef}
+          aria-hidden
+          className={cn(
+            HERO_SYNOPSIS_CLASS,
+            "pointer-events-none invisible absolute w-full",
+          )}
+        />
+        {heroSynopsis ? (
+          <p className={cn(HERO_SYNOPSIS_CLASS, "mb-[26px] text-white/82")}>
+            {heroSynopsis}
           </p>
         ) : (
           <div className="mb-[26px]" />
@@ -165,6 +206,8 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
     </section>
   )
 }
+
+const HERO_SYNOPSIS_CLASS = "max-w-[640px] text-pretty text-base leading-[1.55]"
 
 const heroKicker = (mediaType: MediaType, year: number | null) => {
   const isNew = (year ?? 0) >= 2024
