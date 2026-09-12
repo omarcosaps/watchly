@@ -179,7 +179,7 @@ A pessoa define a nova senha a partir do link e volta ao login. Quem já tem o l
 Depois de criar a conta, se ainda não houver streamings configurados:
 
 1. selecionar o país (Brasil pré-selecionado; opções: Brasil, Estados Unidos, Portugal)
-2. selecionar os serviços de streaming disponíveis naquele país
+2. selecionar os streamings principais daquele país (Netflix, Prime Video, Max, Disney+, Globoplay, Apple TV+, Paramount+ e Telecine, quando a região os tiver)
 3. exigir pelo menos um streaming
 4. continuar para a Home
 

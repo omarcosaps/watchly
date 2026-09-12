@@ -29,7 +29,7 @@ export const ProviderPicker = ({
   }
 
   return (
-    <ul className="grid grid-cols-[repeat(auto-fill,minmax(156px,1fr))] gap-3">
+    <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
       {providers.map((provider) => {
         const isSelected = selected.has(provider.id)
 
@@ -41,13 +41,13 @@ export const ProviderPicker = ({
               aria-pressed={isSelected}
               title={provider.name}
               className={cn(
-                "relative flex w-full flex-col items-center justify-center rounded-[14px] px-3 py-4 text-[14px] font-semibold transition-colors duration-[150ms]",
+                "relative flex w-full items-center justify-center rounded-full border px-3 py-4 text-[14px] font-semibold transition-colors duration-[150ms]",
                 isSelected
-                  ? "border border-white/55 bg-white/12 text-white"
-                  : "border border-white/10 bg-white/4 text-white/78 hover:border-white/25",
+                  ? "border-white/75 bg-transparent text-white hover:border-white"
+                  : "border-white/14 bg-transparent text-white/60 hover:border-white/50 hover:bg-white/10 hover:text-white",
               )}
             >
-              <span>{provider.name}</span>
+              <span className="truncate">{provider.name}</span>
               <span
                 className={cn(
                   "absolute top-2 right-2 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-paper text-[11px] font-extrabold text-void",

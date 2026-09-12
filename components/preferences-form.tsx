@@ -7,6 +7,7 @@ import { useAccount } from "@/components/account-provider"
 import { ProviderPicker } from "@/components/provider-picker"
 import { fetchProviders } from "@/lib/api"
 import { AccountError, ACCOUNT_ERROR_COPY, PRODUCT_COUNTRIES } from "@/lib/account/types"
+import { toOnboardingProviders } from "@/lib/catalog/onboarding-providers"
 import type { WatchProvider } from "@/lib/catalog/types"
 import { cn } from "@/lib/cn"
 
@@ -44,8 +45,9 @@ export const PreferencesForm = ({
       try {
         const data = await fetchProviders(country)
         if (cancelled) return
-        setProviders(data.providers)
-        const valid = new Set(data.providers.map((provider) => provider.id))
+        const visibleProviders = toOnboardingProviders(data.providers)
+        setProviders(visibleProviders)
+        const valid = new Set(visibleProviders.map((provider) => provider.id))
         setSelectedIds((current) => current.filter((id) => valid.has(id)))
         setLoadedCountry(country)
       } catch (loadError) {
@@ -118,10 +120,10 @@ export const PreferencesForm = ({
                 }}
                 aria-pressed={selected}
                 className={cn(
-                  "rounded-full border px-5 py-2.5 text-sm font-semibold transition-colors duration-[150ms]",
+                  "rounded-full border bg-transparent px-5 py-2.5 text-sm font-semibold transition-colors duration-[150ms]",
                   selected
-                    ? "cursor-default border-paper bg-paper text-void"
-                    : "cursor-pointer border-white/14 bg-white/6 text-white/80 hover:border-white/30 hover:text-white",
+                    ? "cursor-default border-white/75 text-white hover:border-white"
+                    : "cursor-pointer border-white/16 text-white/60 hover:border-white/50 hover:bg-white/10 hover:text-white",
                 )}
               >
                 {item.name}
@@ -161,7 +163,14 @@ export const PreferencesForm = ({
         <button
           type="submit"
           disabled={selectedIds.length < 1 || loading}
-          className="cta-primary rounded-full px-[22px] py-3 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-55"
+          className={cn(
+            "rounded-full font-bold transition-colors duration-[150ms]",
+            layout === "onboarding"
+              ? selectedIds.length < 1 || loading
+                ? "cursor-not-allowed bg-white/10 px-[26px] py-3.5 text-[15px] text-white/40 opacity-55"
+                : "cta-primary px-[26px] py-3.5 text-[15px]"
+              : "cta-primary px-[22px] py-3 text-sm disabled:cursor-not-allowed disabled:opacity-55",
+          )}
         >
           {submitLabel}
         </button>
