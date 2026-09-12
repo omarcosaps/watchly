@@ -5,12 +5,11 @@ import Link from "next/link"
 import { useEffect, useMemo, useState } from "react"
 
 import { useAccount } from "@/components/account-provider"
-import { useAppShell } from "@/components/app-shell-context"
 import { CatalogFilters } from "@/components/catalog-filters"
 import { CatalogGrid, CatalogSkeleton } from "@/components/catalog-grid"
 import { HeroCarousel } from "@/components/hero-carousel"
-import { HomeAside } from "@/components/home-aside"
 import { StatusPanel } from "@/components/status-panel"
+import { GUEST_PREFERENCES } from "@/lib/account/types"
 import { fetchCatalog, fetchMeta, fetchProviders } from "@/lib/api"
 import { dedupeItems } from "@/lib/catalog/merge"
 import type { CatalogItem, MergedGenre, WatchProvider } from "@/lib/catalog/types"
@@ -25,16 +24,14 @@ const catalogParams = (
   params.set("page", String(page))
 
   const media = searchParams.get("media")
-  const monetization = searchParams.get("monetization")
   const filterProviders = searchParams.get("filterProviders")
-  const year = searchParams.get("year")
+  const yearRange = searchParams.get("yearRange")
   const sort = searchParams.get("sort")
   const selectedGenre = genres.find((genre) => genre.name === searchParams.get("genre"))
 
   if (media) params.set("media", media)
-  if (monetization) params.set("monetization", monetization)
   if (filterProviders) params.set("filterProviders", filterProviders)
-  if (year) params.set("year", year)
+  if (yearRange) params.set("yearRange", yearRange)
   if (sort) params.set("sort", sort)
   if (selectedGenre?.movieId) params.set("genreMovie", String(selectedGenre.movieId))
   if (selectedGenre?.tvId) params.set("genreTv", String(selectedGenre.tvId))
@@ -45,7 +42,8 @@ const catalogParams = (
 export const CatalogHome = () => {
   const searchParams = useSearchParams()
   const { preferences } = useAccount()
-  const { filtersOpen, setFiltersOpen } = useAppShell()
+  const catalogPreferences = preferences ?? GUEST_PREFERENCES
+  const hasOwnServices = catalogPreferences.providerIds.length > 0
   const [genres, setGenres] = useState<MergedGenre[]>([])
   const [providers, setProviders] = useState<WatchProvider[]>([])
   const [items, setItems] = useState<CatalogItem[]>([])
@@ -55,11 +53,13 @@ export const CatalogHome = () => {
   const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const queryKey = searchParams.toString()
+  const region = catalogPreferences.country
+  const providerKey = catalogPreferences.providerIds.join(",")
 
   const ownProviders = useMemo(() => {
-    const allowed = new Set(preferences?.providerIds ?? [])
+    const allowed = new Set(catalogPreferences.providerIds)
     return providers.filter((provider) => allowed.has(provider.id))
-  }, [preferences?.providerIds, providers])
+  }, [catalogPreferences.providerIds, providers])
 
   const featured = items.slice(0, 5)
   const gridItems = items.slice(5)
@@ -68,14 +68,13 @@ export const CatalogHome = () => {
     let cancelled = false
 
     const load = async () => {
-      if (!preferences) return
       setLoading(true)
       setError(null)
 
       try {
         const [meta, providerData] = await Promise.all([
           fetchMeta(),
-          fetchProviders(preferences.country),
+          fetchProviders(region),
         ])
         if (cancelled) return
 
@@ -83,7 +82,7 @@ export const CatalogHome = () => {
         setProviders(providerData.providers)
 
         const data = await fetchCatalog(
-          preferences,
+          catalogPreferences,
           catalogParams(searchParams, meta.genres, 1),
         )
         if (cancelled) return
@@ -105,15 +104,14 @@ export const CatalogHome = () => {
     return () => {
       cancelled = true
     }
-  }, [preferences, queryKey, searchParams])
+  }, [catalogPreferences, providerKey, queryKey, region, searchParams])
 
   const handleLoadMore = async () => {
-    if (!preferences) return
     setLoadingMore(true)
     setError(null)
     try {
       const data = await fetchCatalog(
-        preferences,
+        catalogPreferences,
         catalogParams(searchParams, genres, page + 1),
       )
       setItems((current) => dedupeItems([...current, ...data.items]))
@@ -127,11 +125,10 @@ export const CatalogHome = () => {
   }
 
   const handleRetry = async () => {
-    if (!preferences) return
     setLoading(true)
     setError(null)
     try {
-      const data = await fetchCatalog(preferences, catalogParams(searchParams, genres, 1))
+      const data = await fetchCatalog(catalogPreferences, catalogParams(searchParams, genres, 1))
       setItems(data.items)
       setPage(data.page)
       setTotalPages(data.totalPages)
@@ -143,85 +140,71 @@ export const CatalogHome = () => {
   }
 
   return (
-    <div>
-      <div
-        id="filtros-catalogo"
-        className={cn(
-          "grid transition-[grid-template-rows,opacity,margin] duration-ui ease",
-          filtersOpen
-            ? "mb-6 grid-rows-[1fr] opacity-100"
-            : "pointer-events-none mb-0 grid-rows-[0fr] opacity-0",
-        )}
-        aria-hidden={!filtersOpen}
-        inert={!filtersOpen ? true : undefined}
-      >
-        <div className="min-h-0 overflow-hidden">
-          <CatalogFilters
-            genres={genres}
-            providers={ownProviders}
-            onClose={() => setFiltersOpen(false)}
-          />
+    <div className="flex flex-col gap-8">
+      <CatalogFilters
+        genres={genres}
+        providers={ownProviders}
+        showProviderFilter={hasOwnServices}
+      />
+
+      {loading ? <HomeSkeleton /> : null}
+
+      {!loading && error ? (
+        <StatusPanel
+          title="O catálogo não carregou"
+          message={error}
+          action={
+            <button
+              type="button"
+              onClick={handleRetry}
+              className="cta-primary inline-flex h-11 items-center rounded-full px-5 text-sm font-semibold"
+            >
+              Tentar de novo
+            </button>
+          }
+        />
+      ) : null}
+
+      {!loading && !error && items.length === 0 ? (
+        <StatusPanel
+          title="Nada por aqui com esses filtros"
+          message="Tente afrouxar algum deles."
+          action={
+            <Link
+              href="/"
+              className="cta-primary inline-flex h-11 items-center rounded-full px-5 text-sm font-semibold"
+            >
+              Limpar filtros
+            </Link>
+          }
+        />
+      ) : null}
+
+      {!loading && featured.length > 0 ? <HeroCarousel items={featured} /> : null}
+
+      {!loading && items.length > 0 ? (
+        <div>
+          <p className="mb-5 text-sm text-mist">
+            {items.length} {items.length === 1 ? "título" : "títulos"}
+          </p>
+          {gridItems.length > 0 ? (
+            <CatalogGrid items={gridItems} showOffServiceHint={hasOwnServices} />
+          ) : null}
+          {page < totalPages ? (
+            <button
+              type="button"
+              onClick={handleLoadMore}
+              disabled={loadingMore}
+              className={cn(
+                "cta-ghost press-pill mx-auto flex h-12 w-fit items-center rounded-full px-6 text-sm font-semibold disabled:opacity-40",
+                gridItems.length > 0 && "mt-10",
+              )}
+            >
+              {loadingMore ? "Carregando…" : "Carregar mais"}
+            </button>
+          ) : null}
         </div>
-      </div>
-
-      <div className="flex flex-col gap-8">
-        {loading ? <HomeSkeleton /> : null}
-
-        {!loading && error ? (
-          <StatusPanel
-            title="O catálogo não carregou"
-            message={error}
-            action={
-              <button
-                type="button"
-                onClick={handleRetry}
-                className="cta-primary inline-flex h-11 items-center rounded-full px-5 text-sm font-semibold"
-              >
-                Tentar de novo
-              </button>
-            }
-          />
-        ) : null}
-
-        {!loading && !error && items.length === 0 ? (
-          <StatusPanel
-            title="Nada com esses filtros"
-            message="Solte um filtro ou limpe tudo para ver de novo os títulos dos seus streamings."
-            action={
-              <Link
-                href="/"
-                className="cta-primary inline-flex h-11 items-center rounded-full px-5 text-sm font-semibold"
-              >
-                Limpar filtros
-              </Link>
-            }
-          />
-        ) : null}
-
-        {!loading && featured.length > 0 ? <HeroCarousel items={featured} /> : null}
-
-        {!loading && items.length > 0 ? (
-          <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_19.5rem]">
-            <div className="min-w-0">
-              {gridItems.length > 0 ? <CatalogGrid items={gridItems} /> : null}
-              {page < totalPages ? (
-                <button
-                  type="button"
-                  onClick={handleLoadMore}
-                  disabled={loadingMore}
-                  className={cn(
-                    "cta-ghost press-pill mx-auto flex h-12 w-fit items-center rounded-full px-6 text-sm font-semibold disabled:opacity-40",
-                    gridItems.length > 0 && "mt-10",
-                  )}
-                >
-                  {loadingMore ? "Carregando…" : "Carregar mais"}
-                </button>
-              ) : null}
-            </div>
-            <HomeAside items={items} genres={genres} />
-          </div>
-        ) : null}
-      </div>
+      ) : null}
     </div>
   )
 }

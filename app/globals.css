@@ -11,8 +11,8 @@
   --color-gold: #f5c518;
   --color-paper: #f6f6f4;
   --color-mist: #9a9aa3;
-  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-instrument), ui-serif, Georgia, serif;
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
   --duration-press: 160ms;
   --duration-ui: 220ms;
   --duration-still: 400ms;
@@ -29,8 +29,8 @@ body {
 }
 
 :focus-visible:not(input):not(select):not(textarea) {
-  outline: 2px solid rgb(229 9 20 / 0.7);
-  outline-offset: 3px;
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
 }
 
 input:focus-visible,

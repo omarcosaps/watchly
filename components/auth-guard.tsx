@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { useEffect } from "react"
 
 import { useAccount } from "@/components/account-provider"
+import { loginHref } from "@/lib/account/pending-watchlist"
 
 export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const { ready, session, preferences } = useAccount()
@@ -14,12 +15,7 @@ export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
     if (!ready) return
 
     if (!session) {
-      router.replace("/login")
-      return
-    }
-
-    if (session.status === "email_pending") {
-      router.replace("/verificar-email")
+      router.replace(loginHref(pathname === "/watchlist" ? "watchlist" : "save"))
       return
     }
 
@@ -41,7 +37,7 @@ export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
     )
   }
 
-  if (!session || session.status === "email_pending") return null
+  if (!session) return null
   if (!preferences && pathname !== "/onboarding") return null
   if (preferences && pathname === "/onboarding") return null
 

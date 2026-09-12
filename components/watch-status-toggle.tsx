@@ -3,13 +3,13 @@
 import { useAccount } from "@/components/account-provider"
 import { CheckIcon } from "@/components/icons"
 import { cn } from "@/lib/cn"
-import { resolveWatchStatus } from "@/lib/account/watch-status"
+import { resolveWatchStatus, watchStatusLabel } from "@/lib/account/watch-status"
 import type { MediaType } from "@/lib/media"
 
 type WatchStatusToggleProps = {
   mediaType: MediaType
   tmdbId: number
-  variant?: "stamp" | "pill"
+  variant?: "stamp" | "pill" | "segmented"
 }
 
 export const WatchStatusToggle = ({
@@ -25,17 +25,54 @@ export const WatchStatusToggle = ({
 
   if (!status) return null
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSet = (watched: boolean) => {
+    setWatchlistWatched(mediaType, tmdbId, watched)
+  }
+
+  const handleToggle = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault()
     event.stopPropagation()
-    setWatchlistWatched(mediaType, tmdbId, !status.watched)
+    handleSet(!status.watched)
+  }
+
+  if (variant === "segmented") {
+    return (
+      <section className="mt-10">
+        <h2 className="mb-3 text-sm font-semibold text-paper">Meu status</h2>
+        <div
+          className="inline-flex rounded-full bg-white/5 p-1"
+          role="group"
+          aria-label="Status de visualização"
+        >
+          {[false, true].map((watched) => {
+            const active = status.watched === watched
+            const label = watchStatusLabel(watched)
+            return (
+              <button
+                key={label}
+                type="button"
+                onClick={() => handleSet(watched)}
+                aria-pressed={active}
+                className={cn(
+                  "inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-[13px] font-medium",
+                  active ? "bg-white/13 text-paper" : "cursor-pointer text-white/50 hover:text-white/80",
+                )}
+              >
+                {active ? <CheckIcon className="h-3.5 w-3.5" /> : null}
+                {label}
+              </button>
+            )
+          })}
+        </div>
+      </section>
+    )
   }
 
   if (variant === "pill") {
     return (
       <button
         type="button"
-        onClick={handleClick}
+        onClick={handleToggle}
         aria-pressed={status.watched}
         aria-label={status.label}
         className={cn(
@@ -52,11 +89,11 @@ export const WatchStatusToggle = ({
   return (
     <button
       type="button"
-      onClick={handleClick}
+      onClick={handleToggle}
       aria-pressed={status.watched}
       aria-label={status.label}
       className={cn(
-        "press-pill inline-flex max-w-full items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[11px] font-medium backdrop-blur-md focus-visible:outline-offset-2",
+        "press-pill inline-flex max-w-full items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[12px] font-medium backdrop-blur-md focus-visible:outline-offset-2",
         status.watched ? "text-paper" : "text-mist",
       )}
     >

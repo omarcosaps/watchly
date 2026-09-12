@@ -1,16 +1,32 @@
+"use client"
+
+import { useRouter } from "next/navigation"
+
+import { useAccount } from "@/components/account-provider"
 import { PreferencesForm } from "@/components/preferences-form"
 
 export default function PreferenciasPage() {
+  const router = useRouter()
+  const { signOut } = useAccount()
+
+  const handleSignOut = () => {
+    signOut()
+    router.replace("/")
+  }
+
   return (
     <div className="mx-auto max-w-3xl">
-      <p className="text-sm text-mist">Conta</p>
-      <h1 className="font-display mt-1 text-5xl italic tracking-tight text-paper">Preferências</h1>
-      <p className="mt-3 max-w-xl text-mist">
-        Trocar o país ou os streamings atualiza o catálogo. A watchlist permanece.
-      </p>
+      <h1 className="text-4xl font-semibold tracking-tight text-paper">Perfil</h1>
       <div className="mt-10">
-        <PreferencesForm submitLabel="Salvar preferências" />
+        <PreferencesForm submitLabel="Salvar preferências" showAccount />
       </div>
+      <button
+        type="button"
+        onClick={handleSignOut}
+        className="mt-8 text-sm font-semibold text-mist hover:text-paper"
+      >
+        Sair da conta
+      </button>
     </div>
   )
 }

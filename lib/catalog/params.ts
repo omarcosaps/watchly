@@ -6,6 +6,15 @@ export type CatalogSort = "popularity" | "vote" | "date"
 
 export type MediaFilter = "all" | "movie" | "tv"
 
+export const YEAR_RANGES = ["2024-2025", "2020-2023", "2010-2019", "before-2010"] as const
+
+export type YearRange = (typeof YEAR_RANGES)[number]
+
+export type DateBounds = {
+  gte?: string
+  lte?: string
+}
+
 export type CatalogQuery = {
   region: string
   providerIds: number[]
@@ -15,6 +24,7 @@ export type CatalogQuery = {
   genreMovieId?: number
   genreTvId?: number
   year?: number
+  yearRange?: YearRange
   sort: CatalogSort
   filteredProviderIds?: number[]
 }
@@ -67,6 +77,22 @@ export const parseOptionalYear = (value: string | null) => {
   const year = Number.parseInt(value, 10)
   if (!Number.isInteger(year) || year < 1900 || year > 2100) return undefined
   return year
+}
+
+export const parseYearRange = (value: string | null): YearRange | undefined => {
+  if (!value) return undefined
+  if ((YEAR_RANGES as readonly string[]).includes(value)) {
+    return value as YearRange
+  }
+  return undefined
+}
+
+export const dateBoundsForYearRange = (range: YearRange | undefined): DateBounds => {
+  if (range === "2024-2025") return { gte: "2024-01-01", lte: "2025-12-31" }
+  if (range === "2020-2023") return { gte: "2020-01-01", lte: "2023-12-31" }
+  if (range === "2010-2019") return { gte: "2010-01-01", lte: "2019-12-31" }
+  if (range === "before-2010") return { lte: "2009-12-31" }
+  return {}
 }
 
 export const parseOptionalInt = (value: string | null) => {

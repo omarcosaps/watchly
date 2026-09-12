@@ -8,9 +8,7 @@ import type { CatalogPage } from "@/lib/catalog/types"
 import { discoverMovies, discoverTv } from "@/lib/tmdb/queries"
 
 export const getCatalogPage = async (query: CatalogQuery): Promise<CatalogPage> => {
-  const providerIds = query.filteredProviderIds?.length
-    ? query.filteredProviderIds
-    : query.providerIds
+  const providerIds = query.filteredProviderIds?.length ? query.filteredProviderIds : []
 
   const includeMovies = query.media !== "tv"
   const includeTv = query.media !== "movie"
@@ -24,6 +22,7 @@ export const getCatalogPage = async (query: CatalogQuery): Promise<CatalogPage> 
         monetizationTypes: query.monetizationTypes,
         genreId: query.genreMovieId,
         year: query.year,
+        yearRange: query.yearRange,
         sort: query.sort,
       })
     : null
@@ -37,6 +36,7 @@ export const getCatalogPage = async (query: CatalogQuery): Promise<CatalogPage> 
         monetizationTypes: query.monetizationTypes,
         genreId: query.genreTvId,
         year: query.year,
+        yearRange: query.yearRange,
         sort: query.sort,
       })
     : null
@@ -47,7 +47,7 @@ export const getCatalogPage = async (query: CatalogQuery): Promise<CatalogPage> 
   ])
 
   const items = mergeCatalogPages(movies?.results ?? [], shows?.results ?? [], query.sort)
-  const hydrated = await hydrateOffers(items, query.region, query.providerIds, true)
+  const hydrated = await hydrateOffers(items, query.region, query.providerIds, false)
 
   return {
     page: query.page,

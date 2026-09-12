@@ -1,21 +1,13 @@
 import type { Metadata } from "next"
-import { Instrument_Serif, Plus_Jakarta_Sans } from "next/font/google"
+import { Geist } from "next/font/google"
 
 import { AccountProvider } from "@/components/account-provider"
 
 import "./globals.css"
 
-const sans = Plus_Jakarta_Sans({
+const sans = Geist({
   subsets: ["latin"],
-  variable: "--font-jakarta",
-  weight: ["400", "500", "600", "700"],
-})
-
-const display = Instrument_Serif({
-  subsets: ["latin"],
-  variable: "--font-instrument",
-  weight: "400",
-  style: ["normal", "italic"],
+  variable: "--font-geist",
 })
 
 export const metadata: Metadata = {
@@ -28,7 +20,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${sans.variable} ${display.variable} h-full antialiased`}>
+    <html lang="pt-BR" className={`${sans.variable} h-full antialiased`}>
       <body className="min-h-dvh bg-void font-sans text-paper">
         <AccountProvider>{children}</AccountProvider>
       </body>

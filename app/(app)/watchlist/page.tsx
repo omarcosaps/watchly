@@ -1,9 +1,12 @@
 "use client"
 
+import Link from "next/link"
+
 import { CatalogGrid } from "@/components/catalog-grid"
 import { StatusPanel } from "@/components/status-panel"
 import { useAccount } from "@/components/account-provider"
 import { WatchStatusToggle } from "@/components/watch-status-toggle"
+import { PRODUCT_COUNTRIES } from "@/lib/account/types"
 import { fetchJson, preferenceQuery } from "@/lib/api"
 import type { CatalogItem } from "@/lib/catalog/types"
 import { useEffect, useRef, useState } from "react"
@@ -42,6 +45,10 @@ export default function WatchlistPage() {
     .map((item) => `${item.mediaType}:${item.tmdbId}`)
     .join("|")
   const lastHydrateKey = useRef("")
+  const countryName =
+    PRODUCT_COUNTRIES.find((country) => country.code === preferences?.country)?.name ??
+    preferences?.country ??
+    "Brasil"
 
   useEffect(() => {
     if (!preferences) return
@@ -80,7 +87,7 @@ export default function WatchlistPage() {
             return toCatalogItem(saved, {
               backdropPath: details.backdropPath,
               voteAverage: details.voteAverage,
-              offers: details.offers.filter((offer) => offer.isOwn),
+              offers: details.offers,
               onOwnServices: details.offers.some((offer) => offer.isOwn),
             })
           }),
@@ -111,8 +118,16 @@ export default function WatchlistPage() {
   if (watchlist.length === 0) {
     return (
       <StatusPanel
-        title="Nada guardado ainda"
-        message="Abra um título e toque em Guardar. A lista fica na sua conta."
+        title="Sua lista está vazia."
+        message="Guarde filmes e séries para acompanhar o que você quer assistir."
+        action={
+          <Link
+            href="/"
+            className="cta-primary inline-flex h-11 items-center rounded-full px-5 text-sm font-semibold"
+          >
+            Explorar o catálogo
+          </Link>
+        }
       />
     )
   }
@@ -120,10 +135,17 @@ export default function WatchlistPage() {
   return (
     <div className="flex flex-col gap-10">
       <div>
-        <p className="text-sm text-mist">Sua lista</p>
-        <h1 className="font-display mt-1 text-5xl italic tracking-tight text-paper">Watchlist</h1>
+        <h1 className="text-4xl font-semibold tracking-tight text-paper">Minha lista</h1>
+        <p className="mt-2 text-sm text-mist">
+          {watchlist.length} {watchlist.length === 1 ? "título salvo" : "títulos salvos"} ·
+          disponibilidade em {countryName}
+        </p>
       </div>
-      {error ? <p className="text-paper" role="alert">{error}</p> : null}
+      {error ? (
+        <p className="text-paper" role="alert">
+          {error}
+        </p>
+      ) : null}
       {loading && items.length === 0 ? <p className="text-mist">Carregando disponibilidade…</p> : null}
       <CatalogGrid
         items={visible}

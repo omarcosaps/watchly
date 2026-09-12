@@ -5,15 +5,9 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Suspense, useEffect, useRef, useState } from "react"
 
 import { useAccount } from "@/components/account-provider"
-import { useAppShell } from "@/components/app-shell-context"
-import {
-  BookmarkIcon,
-  FilterIcon,
-  LogoutIcon,
-  SearchIcon,
-  SlidersIcon,
-} from "@/components/icons"
+import { SearchIcon } from "@/components/icons"
 import { Wordmark } from "@/components/wordmark"
+import { loginHref } from "@/lib/account/pending-watchlist"
 import { cn } from "@/lib/cn"
 
 export const AppTopbar = () => {
@@ -29,88 +23,81 @@ const TopbarContent = () => {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const { session, preferences } = useAccount()
-  const { filtersOpen, setFiltersOpen } = useAppShell()
-  const searchQuery = searchParams.get("q") ?? ""
-  const displayName = session?.email.split("@")[0] ?? "Você"
-  const homeHref = preferences ? "/" : "/onboarding"
-  const homeActive = pathname === "/" || pathname === "/onboarding"
+  const media = searchParams.get("media")
+  const homeActive = pathname === "/" && !media
+  const moviesActive = pathname === "/" && media === "movie"
+  const seriesActive = pathname === "/" && media === "tv"
 
-  const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const term = String(new FormData(event.currentTarget).get("q") ?? "").trim()
-    if (!term) return
-    router.push(`/busca?q=${encodeURIComponent(term)}`)
+  const handleWatchlist = () => {
+    if (!session) {
+      router.push(loginHref("watchlist"))
+      return
+    }
+    if (!preferences) {
+      router.push("/onboarding")
+      return
+    }
+    router.push("/watchlist")
   }
 
   return (
     <TopbarFrame>
-      <Wordmark href={homeHref} className="shrink-0" />
+      <Wordmark href="/" className="shrink-0" />
 
-      <nav className="hidden items-center sm:flex" aria-label="Principal">
-        <NavLink href={homeHref} active={homeActive}>
+      <nav className="flex min-w-0 items-center gap-1 overflow-x-auto" aria-label="Principal">
+        <NavLink href="/" active={homeActive}>
           Início
         </NavLink>
-        {preferences ? (
-          <NavLink href="/watchlist" active={pathname === "/watchlist"}>
-            Watchlist
-          </NavLink>
-        ) : null}
-      </nav>
-
-      {preferences ? (
-        <form
-          onSubmit={handleSearch}
-          className="focus-pill flex min-w-0 flex-1 items-center rounded-full bg-white/6 px-3 ring-1 ring-white/8"
-          role="search"
-        >
-          <SearchIcon className="h-4 w-4 shrink-0 text-mist" />
-          <label htmlFor="header-search" className="sr-only">
-            Buscar título
-          </label>
-          <input
-            id="header-search"
-            name="q"
-            type="search"
-            defaultValue={searchQuery}
-            key={searchQuery}
-            placeholder="Buscar um título"
-            className="h-11 w-full bg-transparent px-3 text-sm text-paper outline-none placeholder:text-mist/80"
-          />
-          {pathname === "/" ? (
-            <button
-              type="button"
-              onClick={() => setFiltersOpen(!filtersOpen)}
-              aria-expanded={filtersOpen}
-              aria-controls="filtros-catalogo"
-              className={cn(
-                "press-pill inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-mist hover:bg-white/10 hover:text-paper",
-                filtersOpen && "bg-white/10 text-paper",
-              )}
-              aria-label="Filtros"
-            >
-              <FilterIcon />
-            </button>
-          ) : null}
-        </form>
-      ) : (
-        <div className="flex-1" />
-      )}
-
-      {preferences ? (
-        <Link
-          href="/watchlist"
-          aria-label="Watchlist"
-          aria-current={pathname === "/watchlist" ? "page" : undefined}
+        <NavLink href="/?media=movie" active={moviesActive}>
+          Filmes
+        </NavLink>
+        <NavLink href="/?media=tv" active={seriesActive}>
+          Séries
+        </NavLink>
+        <button
+          type="button"
+          onClick={handleWatchlist}
           className={cn(
-            "press-pill inline-flex h-10 w-10 items-center justify-center rounded-full sm:hidden",
-            pathname === "/watchlist" ? "text-ember" : "text-mist hover:text-paper",
+            "relative shrink-0 px-3 py-2 text-sm font-medium transition-colors duration-ui",
+            pathname === "/watchlist" ? "text-paper" : "text-mist hover:text-paper",
           )}
         >
-          <BookmarkIcon className="h-5 w-5" />
-        </Link>
-      ) : null}
+          Watchlist
+        </button>
+      </nav>
 
-      <ProfileMenu displayName={displayName} showPreferences={Boolean(preferences)} />
+      <div className="flex flex-1 justify-end" />
+
+      <Link
+        href="/busca"
+        aria-label="Buscar"
+        aria-current={pathname === "/busca" ? "page" : undefined}
+        className={cn(
+          "press-pill inline-flex h-10 w-10 items-center justify-center rounded-full text-mist hover:text-paper",
+          pathname === "/busca" && "text-paper",
+        )}
+      >
+        <SearchIcon className="h-5 w-5" />
+      </Link>
+
+      {session ? (
+        <ProfileMenu email={session.email} />
+      ) : (
+        <div className="flex items-center gap-2">
+          <Link
+            href="/login"
+            className="press-pill hidden h-10 items-center rounded-full px-4 text-sm font-semibold text-mist hover:text-paper sm:inline-flex"
+          >
+            Entrar
+          </Link>
+          <Link
+            href="/cadastro"
+            className="cta-primary press-pill inline-flex h-10 items-center rounded-full px-4 text-sm font-semibold"
+          >
+            Criar conta
+          </Link>
+        </div>
+      )}
     </TopbarFrame>
   )
 }
@@ -126,12 +113,10 @@ const TopbarFrame = ({ children }: { children?: React.ReactNode }) => {
 const NavLink = ({
   href,
   active,
-  className,
   children,
 }: {
   href: string
   active: boolean
-  className?: string
   children: React.ReactNode
 }) => {
   return (
@@ -140,31 +125,25 @@ const NavLink = ({
       aria-current={active ? "page" : undefined}
       className={cn(
         "relative shrink-0 px-3 py-2 text-sm font-medium transition-colors duration-ui",
-        active ? "text-ember" : "text-mist hover:text-paper",
-        className,
+        active ? "text-paper" : "text-mist hover:text-paper",
       )}
     >
       {children}
       {active ? (
-        <span className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-ember" />
+        <span className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-paper" />
       ) : null}
     </Link>
   )
 }
 
-const ProfileMenu = ({
-  displayName,
-  showPreferences,
-}: {
-  displayName: string
-  showPreferences: boolean
-}) => {
+const ProfileMenu = ({ email }: { email: string }) => {
   const router = useRouter()
   const pathname = usePathname()
   const { signOut } = useAccount()
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
-  const initial = displayName.slice(0, 1).toUpperCase()
+  const shortName = email.split("@")[0] ?? "Você"
+  const initials = shortName.slice(0, 2).toUpperCase()
 
   useEffect(() => {
     if (!open) return
@@ -190,22 +169,26 @@ const ProfileMenu = ({
   const handleSignOut = () => {
     signOut()
     setOpen(false)
-    router.replace("/login")
+    router.replace("/")
   }
 
   return (
     <div className="relative shrink-0" ref={rootRef}>
       <button
         type="button"
-        className="press-pill flex h-10 w-10 items-center justify-center rounded-full"
+        className="press-pill flex items-center gap-2 rounded-full bg-white/6 py-1 pr-3 pl-1"
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls="menu-perfil"
         aria-label="Menu da conta"
+        title="Sua conta e preferências"
         onClick={() => setOpen((current) => !current)}
       >
-        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-ember text-sm font-semibold text-white">
-          {initial}
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/12 text-xs font-semibold text-paper">
+          {initials}
+        </span>
+        <span className="hidden max-w-28 truncate text-sm font-semibold text-paper sm:inline">
+          {shortName}
         </span>
       </button>
       {open ? (
@@ -215,28 +198,24 @@ const ProfileMenu = ({
           aria-label="Conta"
           className="glass-stage absolute top-full right-0 z-30 mt-2 min-w-48 rounded-2xl p-1.5"
         >
-          {showPreferences ? (
-            <Link
-              href="/preferencias"
-              role="menuitem"
-              onClick={() => setOpen(false)}
-              className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-paper transition-colors duration-ui hover:bg-white/8",
-                pathname === "/preferencias" && "bg-white/8",
-              )}
-            >
-              <SlidersIcon className="h-4 w-4" />
-              Preferências
-            </Link>
-          ) : null}
+          <Link
+            href="/preferencias"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+            className={cn(
+              "flex items-center rounded-xl px-3 py-2.5 text-sm text-paper transition-colors duration-ui hover:bg-white/8",
+              pathname === "/preferencias" && "bg-white/8",
+            )}
+          >
+            Perfil
+          </Link>
           <button
             type="button"
             role="menuitem"
             onClick={handleSignOut}
-            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-paper transition-colors duration-ui hover:bg-white/8"
+            className="flex w-full items-center rounded-xl px-3 py-2.5 text-sm text-paper transition-colors duration-ui hover:bg-white/8"
           >
-            <LogoutIcon className="h-4 w-4" />
-            Sair
+            Sair da conta
           </button>
         </div>
       ) : null}

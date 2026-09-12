@@ -26,7 +26,9 @@ export const fetchCatalog = (
 ) => {
   const params = new URLSearchParams(search)
   params.set("region", preferences.country)
-  params.set("providers", preferences.providerIds.join(","))
+  if (preferences.providerIds.length > 0) {
+    params.set("providers", preferences.providerIds.join(","))
+  }
   return fetchJson<CatalogPage>(`/api/catalog?${params.toString()}`)
 }
 

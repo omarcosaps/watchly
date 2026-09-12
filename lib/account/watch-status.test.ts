@@ -14,12 +14,12 @@ const saved: WatchlistItem = {
 }
 
 describe("watchStatusLabel", () => {
-  it("usa o rótulo de ainda não assistir", () => {
-    expect(watchStatusLabel(false)).toBe("Ainda não assistir")
+  it("usa o rótulo de ainda não assistido", () => {
+    expect(watchStatusLabel(false)).toBe("Ainda não assistido")
   })
 
-  it("usa o rótulo de já assistir", () => {
-    expect(watchStatusLabel(true)).toBe("Já assistir")
+  it("usa o rótulo de já assistido", () => {
+    expect(watchStatusLabel(true)).toBe("Já assistido")
   })
 })
 
@@ -28,17 +28,17 @@ describe("resolveWatchStatus", () => {
     expect(resolveWatchStatus(undefined)).toBeNull()
   })
 
-  it("resolve ainda não assistir quando o item está guardado", () => {
+  it("resolve ainda não assistido quando o item está guardado", () => {
     expect(resolveWatchStatus(saved)).toEqual({
       watched: false,
-      label: "Ainda não assistir",
+      label: "Ainda não assistido",
     })
   })
 
-  it("resolve já assistir quando o item está marcado", () => {
+  it("resolve já assistido quando o item está marcado", () => {
     expect(resolveWatchStatus({ ...saved, watched: true })).toEqual({
       watched: true,
-      label: "Já assistir",
+      label: "Já assistido",
     })
   })
 })

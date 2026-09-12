@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { STORAGE_KEY } from "@/lib/account/mock/storage"
+import { signUp } from "@/lib/account/session"
 import {
   addToWatchlist,
   listWatchlist,
@@ -36,6 +37,7 @@ const createMemoryStorage = () => {
 
 beforeEach(() => {
   vi.stubGlobal("window", { localStorage: createMemoryStorage() })
+  signUp("qa@watchly.app", "123456", "amigo")
 })
 
 afterEach(() => {
@@ -60,7 +62,7 @@ describe("addToWatchlist", () => {
 
     expect(resolveWatchStatus(listWatchlist()[0])).toEqual({
       watched: false,
-      label: "Ainda não assistir",
+      label: "Ainda não assistido",
     })
   })
 })
@@ -70,18 +72,24 @@ describe("listWatchlist", () => {
     window.localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({
-        session: null,
-        preferences: null,
-        watchlist: [
-          {
-            tmdbId: dune.tmdbId,
-            mediaType: dune.mediaType,
-            title: dune.title,
-            posterPath: dune.posterPath,
-            year: dune.year,
-            createdAt: "2026-09-01T00:00:00.000Z",
+        session: { email: "qa@watchly.app", status: "authenticated" },
+        accounts: {
+          "qa@watchly.app": {
+            password: "123456",
+            acquisitionSource: "amigo",
+            preferences: null,
+            watchlist: [
+              {
+                tmdbId: dune.tmdbId,
+                mediaType: dune.mediaType,
+                title: dune.title,
+                posterPath: dune.posterPath,
+                year: dune.year,
+                createdAt: "2026-09-01T00:00:00.000Z",
+              },
+            ],
           },
-        ],
+        },
       }),
     )
 

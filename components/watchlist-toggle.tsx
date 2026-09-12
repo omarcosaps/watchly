@@ -1,9 +1,11 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 import { useAccount } from "@/components/account-provider"
 import { BookmarkIcon, CheckIcon, PlusIcon } from "@/components/icons"
+import { loginHref, setPendingWatchlist } from "@/lib/account/pending-watchlist"
 import { cn } from "@/lib/cn"
 import type { MediaType } from "@/lib/media"
 
@@ -26,6 +28,7 @@ export const WatchlistToggle = ({
   className,
   variant = "icon",
 }: WatchlistToggleProps) => {
+  const router = useRouter()
   const account = useAccount()
   const [stampTick, setStampTick] = useState(0)
   const saved = account.watchlist.some((item) => {
@@ -35,6 +38,12 @@ export const WatchlistToggle = ({
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault()
     event.stopPropagation()
+
+    if (!account.session) {
+      setPendingWatchlist({ tmdbId, mediaType, title, posterPath, year })
+      router.push(loginHref("save"))
+      return
+    }
 
     try {
       if (saved) {
