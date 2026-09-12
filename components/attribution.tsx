@@ -1,11 +1,11 @@
 export const Attribution = () => {
   return (
-    <footer className="relative z-10 mt-auto px-4 py-8 text-center text-xs text-mist">
+    <footer className="border-t border-white/7 px-5 py-[22px] pb-7 text-center text-[11.5px] text-white/35 sm:px-12">
       <p>
         Este produto usa a API do{" "}
         <a
           href="https://www.themoviedb.org/"
-          className="text-paper/80 underline-offset-2 hover:text-paper hover:underline"
+          className="text-[#c9d4e3] hover:text-white hover:underline"
           rel="noreferrer"
           target="_blank"
         >
@@ -17,7 +17,7 @@ export const Attribution = () => {
         Disponibilidade de streaming via{" "}
         <a
           href="https://www.justwatch.com/"
-          className="text-paper/80 underline-offset-2 hover:text-paper hover:underline"
+          className="text-[#c9d4e3] hover:text-white hover:underline"
           rel="noreferrer"
           target="_blank"
         >

@@ -1,10 +1,9 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useState } from "react"
 
 import { useAccount } from "@/components/account-provider"
-import { BookmarkIcon, CheckIcon, PlusIcon } from "@/components/icons"
+import { useToast } from "@/components/toast-provider"
 import { loginHref, setPendingWatchlist } from "@/lib/account/pending-watchlist"
 import { cn } from "@/lib/cn"
 import type { MediaType } from "@/lib/media"
@@ -16,7 +15,7 @@ type WatchlistToggleProps = {
   posterPath: string | null
   year: number | null
   className?: string
-  variant?: "icon" | "pill" | "plus"
+  variant?: "pill" | "primary"
 }
 
 export const WatchlistToggle = ({
@@ -26,11 +25,11 @@ export const WatchlistToggle = ({
   posterPath,
   year,
   className,
-  variant = "icon",
+  variant = "pill",
 }: WatchlistToggleProps) => {
   const router = useRouter()
   const account = useAccount()
-  const [stampTick, setStampTick] = useState(0)
+  const { showToast } = useToast()
   const saved = account.watchlist.some((item) => {
     return item.mediaType === mediaType && item.tmdbId === tmdbId
   })
@@ -48,6 +47,7 @@ export const WatchlistToggle = ({
     try {
       if (saved) {
         account.removeFromWatchlist(mediaType, tmdbId)
+        showToast(`Removido da minha lista: ${title}`)
       } else {
         account.addToWatchlist({
           tmdbId,
@@ -56,69 +56,36 @@ export const WatchlistToggle = ({
           posterPath,
           year,
         })
+        showToast(`Adicionado a minha lista: ${title}`)
       }
-      setStampTick((tick) => tick + 1)
     } catch {
       return
     }
   }
 
-  const stampClass = stampTick > 0 ? "stamp-icon inline-flex" : "inline-flex"
-
-  if (variant === "pill") {
-    return (
-      <button
-        type="button"
-        onClick={handleClick}
-        aria-pressed={saved}
-        aria-label={saved ? "Remover da minha lista" : "Adicionar à minha lista"}
-        className={cn(
-          "cta-ghost press-pill inline-flex h-12 items-center gap-2 rounded-full px-5 text-sm font-semibold",
-          className,
-        )}
-      >
-        <span key={stampTick} className={stampClass}>
-          {saved ? <CheckIcon /> : <PlusIcon />}
-        </span>
-        {saved ? "Na minha lista" : "Adicionar à minha lista"}
-      </button>
-    )
-  }
-
-  if (variant === "plus") {
-    return (
-      <button
-        type="button"
-        onClick={handleClick}
-        aria-pressed={saved}
-        aria-label={saved ? "Remover da watchlist" : "Guardar na watchlist"}
-        className={cn(
-          "press-pill inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/14 text-paper backdrop-blur-md hover:bg-white/22",
-          className,
-        )}
-      >
-        <span key={stampTick} className={stampClass}>
-          {saved ? <CheckIcon /> : <PlusIcon />}
-        </span>
-      </button>
-    )
-  }
+  const label = saved
+    ? variant === "primary"
+      ? "✓ Na minha lista"
+      : "Na minha lista"
+    : variant === "primary"
+      ? "+ Add a minha lista"
+      : "Adicionar à minha lista"
 
   return (
     <button
       type="button"
       onClick={handleClick}
       aria-pressed={saved}
-      aria-label={saved ? "Remover da watchlist" : "Guardar na watchlist"}
+      aria-label={saved ? "Remover da minha lista" : "Adicionar à minha lista"}
       className={cn(
-        "press-pill inline-flex h-9 w-9 items-center justify-center rounded-full text-paper",
-        saved ? "glass-strong" : "glass",
+        "inline-flex items-center rounded-full font-semibold",
+        variant === "primary"
+          ? "cta-primary px-[22px] py-3 text-sm font-bold"
+          : "cta-ghost px-6 py-3.5 text-[15px] font-semibold",
         className,
       )}
     >
-      <span key={stampTick} className={stampClass}>
-        <BookmarkIcon className="h-4 w-4" />
-      </span>
+      {label}
     </button>
   )
 }

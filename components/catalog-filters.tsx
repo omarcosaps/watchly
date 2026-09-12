@@ -8,12 +8,14 @@ type CatalogFiltersProps = {
   genres: MergedGenre[]
   providers: WatchProvider[]
   showProviderFilter?: boolean
+  resultCount?: number
 }
 
 export const CatalogFilters = ({
   genres,
   providers,
   showProviderFilter = false,
+  resultCount,
 }: CatalogFiltersProps) => {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -30,7 +32,7 @@ export const CatalogFilters = ({
 
   return (
     <form
-      className="flex flex-wrap items-center gap-2"
+      className="mb-[22px] flex flex-wrap items-center gap-2.5"
       aria-label="Filtros do catálogo"
       onSubmit={(event) => event.preventDefault()}
     >
@@ -83,15 +85,18 @@ export const CatalogFilters = ({
           { value: "before-2010", label: "Antes de 2010" },
         ]}
       />
-      <label className="focus-pill press-pill flex h-11 items-center gap-2 rounded-full bg-white/6 px-4 text-sm text-mist ring-1 ring-white/8">
-        <span>Ordenar por</span>
+      <div className="ml-auto flex flex-none items-center gap-2.5">
+        <span className="whitespace-nowrap text-xs text-mute">Ordenar por</span>
+        <label htmlFor="filtro-ordem" className="sr-only">
+          Ordenar por
+        </label>
         <select
           id="filtro-ordem"
           value={searchParams.get("sort") ?? "popularity"}
           onChange={(event) => {
             handleChange("sort", event.target.value === "popularity" ? "" : event.target.value)
           }}
-          className="max-w-40 bg-transparent text-sm text-paper outline-none"
+          className="filter-select"
         >
           <option value="popularity" className="bg-panel text-paper">
             Popularidade
@@ -103,7 +108,12 @@ export const CatalogFilters = ({
             Data de lançamento
           </option>
         </select>
-      </label>
+        {resultCount !== undefined ? (
+          <span className="ml-1.5 whitespace-nowrap text-[12.5px] text-mute">
+            {resultCount} {resultCount === 1 ? "título" : "títulos"}
+          </span>
+        ) : null}
+      </div>
     </form>
   )
 }
@@ -122,13 +132,13 @@ const FilterSelect = ({
   options: { value: string; label: string }[]
 }) => {
   return (
-    <label htmlFor={id} className="focus-pill press-pill flex h-11 items-center gap-2 rounded-full bg-white/6 px-4 text-sm text-mist ring-1 ring-white/8">
+    <label htmlFor={id}>
       <span className="sr-only">{label}</span>
       <select
         id={id}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="max-w-44 bg-transparent text-sm text-paper outline-none"
+        className="filter-select"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value} className="bg-panel text-paper">

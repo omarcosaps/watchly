@@ -8,11 +8,14 @@ import { ProviderPicker } from "@/components/provider-picker"
 import { fetchProviders } from "@/lib/api"
 import { AccountError, ACCOUNT_ERROR_COPY, PRODUCT_COUNTRIES } from "@/lib/account/types"
 import type { WatchProvider } from "@/lib/catalog/types"
+import { cn } from "@/lib/cn"
 
 type PreferencesFormProps = {
   submitLabel: string
   redirectTo?: string
   showAccount?: boolean
+  showLogout?: boolean
+  layout?: "default" | "onboarding"
   onSaved?: () => void
 }
 
@@ -20,6 +23,8 @@ export const PreferencesForm = ({
   submitLabel,
   redirectTo = "/",
   showAccount = false,
+  showLogout = false,
+  layout = "default",
   onSaved,
 }: PreferencesFormProps) => {
   const router = useRouter()
@@ -82,17 +87,25 @@ export const PreferencesForm = ({
     }
   }
 
+  const handleSignOut = () => {
+    account.signOut()
+    router.replace("/")
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+    <form onSubmit={handleSubmit}>
       {showAccount && account.session ? (
-        <p className="text-sm text-mist">
-          Conectado como {account.session.email}. Trocar país ou streamings não apaga sua
-          watchlist.
+        <p className="mb-[30px] text-sm text-white/50">
+          Conectado como{" "}
+          <strong className="font-semibold text-white/80">{account.session.email}</strong>. Trocar
+          país ou streamings não apaga sua watchlist.
         </p>
       ) : null}
       <fieldset>
-        <legend className="mb-3 text-sm text-mist">País</legend>
-        <div className="flex flex-wrap gap-2">
+        <legend className="mb-2.5 text-[11px] font-bold tracking-[0.09em] text-mute uppercase">
+          País
+        </legend>
+        <div className="mb-7 flex flex-wrap gap-2">
           {PRODUCT_COUNTRIES.map((item) => {
             const selected = country === item.code
             return (
@@ -104,7 +117,12 @@ export const PreferencesForm = ({
                   setSuccess(null)
                 }}
                 aria-pressed={selected}
-                className={cnCountry(selected)}
+                className={cn(
+                  "rounded-full border px-5 py-2.5 text-sm font-semibold transition-colors duration-[150ms]",
+                  selected
+                    ? "cursor-default border-paper bg-paper text-void"
+                    : "cursor-pointer border-white/14 bg-white/6 text-white/80 hover:border-white/30 hover:text-white",
+                )}
               >
                 {item.name}
               </button>
@@ -113,9 +131,11 @@ export const PreferencesForm = ({
         </div>
       </fieldset>
       <fieldset>
-        <legend className="mb-3 text-sm text-mist">Seus streamings</legend>
+        <legend className="mb-2.5 text-[11px] font-bold tracking-[0.09em] text-mute uppercase">
+          Seus streamings
+        </legend>
         {loading ? (
-          <p className="text-mist">Carregando streamings…</p>
+          <p className="text-[13.5px] text-mute">Carregando streamings…</p>
         ) : (
           <ProviderPicker
             providers={providers}
@@ -126,38 +146,42 @@ export const PreferencesForm = ({
             }}
           />
         )}
-        <p className="mt-3 text-sm text-mist">
-          {selectedIds.length < 1
-            ? "Escolha pelo menos um streaming."
-            : `${selectedIds.length} selecionado(s)`}
-        </p>
       </fieldset>
       {error ? (
-        <p className="text-sm text-red-300" role="alert">
+        <p className="mt-4 text-[13.5px] text-alert" role="alert">
           {error}
         </p>
       ) : null}
       {success ? (
-        <p className="text-sm text-emerald-300" role="status">
+        <p className="mt-4 text-[13.5px] text-positive" role="status">
           {success}
         </p>
       ) : null}
-      <button
-        type="submit"
-        disabled={selectedIds.length < 1 || loading}
-        className="cta-primary h-12 w-fit rounded-full px-6 font-semibold disabled:cursor-not-allowed disabled:opacity-55"
-      >
-        {submitLabel}
-      </button>
+      <div className={cn("flex items-center gap-4", layout === "onboarding" ? "mt-7" : "mt-6")}>
+        <button
+          type="submit"
+          disabled={selectedIds.length < 1 || loading}
+          className="cta-primary rounded-full px-[22px] py-3 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-55"
+        >
+          {submitLabel}
+        </button>
+        {showLogout ? (
+          <button
+            type="button"
+            onClick={handleSignOut}
+            className="cta-destructive rounded-full px-[22px] py-3 text-sm font-semibold"
+          >
+            Sair da conta
+          </button>
+        ) : null}
+        {layout === "onboarding" ? (
+          <span className="text-[13px] text-mute">
+            {selectedIds.length < 1
+              ? "Escolha pelo menos um streaming."
+              : `${selectedIds.length} selecionado(s)`}
+          </span>
+        ) : null}
+      </div>
     </form>
   )
-}
-
-const cnCountry = (selected: boolean) => {
-  return [
-    "h-11 rounded-full border px-4 text-sm font-semibold transition-colors",
-    selected
-      ? "border-white/75 text-paper"
-      : "border-white/16 text-white/60 hover:border-white/50 hover:text-white",
-  ].join(" ")
 }

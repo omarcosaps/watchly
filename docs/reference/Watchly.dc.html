@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0b0c10;color:#f2f3f5;font-family:'Geist',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#c9d4e3;text-decoration:none}a:hover{color:#ffffff;text-decoration:underline}
+select,input,button{font-family:inherit}
+button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid rgba(255,255,255,.6);outline-offset:2px}
+select{appearance:none;-webkit-appearance:none;background:rgba(255,255,255,.07);border:1px solid transparent;border-radius:999px;padding:8px 30px 8px 14px;color:#f2f3f5;font-size:13px;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23aab' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+select:hover{background-color:rgba(255,255,255,.12)}
+option{background:#15161c;color:#f2f3f5}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:#0b0c10">
+
+<sc-if value="{{ isAuth }}" hint-placeholder-val="{{ true }}">
+<div data-screen-label="Autenticação" style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(1200px 900px at -6% -12%, oklch(0.34 0.075 250 / .85), transparent 58%), radial-gradient(900px 1100px at -4% 48%, oklch(0.3 0.045 205 / .5), transparent 62%), radial-gradient(1000px 800px at 108% 104%, oklch(0.22 0.02 250 / .55), transparent 60%), radial-gradient(1500px 1100px at 50% 50%, transparent 42%, rgba(0,0,0,.55) 100%), #0c0d10;padding:52px 20px;box-sizing:border-box">
+  <div style="width:404px;max-width:100%;background:linear-gradient(158deg, #191c22 0%, #14161b 52%, #101216 100%);border:1px solid rgba(255,255,255,.06);border-radius:22px;padding:34px 34px 28px;box-sizing:border-box;box-shadow:0 28px 70px rgba(0,0,0,.55);animation:fadeUp .45s ease both">
+    <h1 style="font-family:'Geist',sans-serif;font-weight:900;font-size:30px;letter-spacing:-0.035em;line-height:1;margin:0">{{ authTitle }}</h1>
+    <p style="color:rgba(255,255,255,.48);font-size:14.5px;margin:9px 0 0">{{ authSubtitle }}</p>
+
+    <sc-if value="{{ hasAuthNotice }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;gap:11px;align-items:flex-start;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);border-left:2px solid rgba(255,255,255,.55);border-radius:4px 12px 12px 4px;padding:13px 15px;margin-top:20px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.72)" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="display:block;flex:none;margin-top:2px"><rect x="4" y="10.5" width="16" height="10.5" rx="3"></rect><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"></path></svg>
+        <div style="font-size:13.5px;line-height:1.55;color:rgba(255,255,255,.88);text-wrap:pretty">{{ authNotice }}</div>
+      </div>
+    </sc-if>
+
+    <div style="display:flex;flex-direction:column;gap:17px;margin-top:26px">
+
+      <label style="display:flex;flex-direction:column;gap:8px">
+        <span style="font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.45)">E-mail</span>
+        <input type="email" placeholder="" value="{{ aEmail }}" onChange="{{ onAEmail }}" onKeyDown="{{ onAKey }}" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:13px;padding:13px 15px;color:#f2f3f5;font-size:14.5px;outline:none" style-focus="border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.06)">
+      </label>
+
+      <sc-if value="{{ notForgot }}" hint-placeholder-val="{{ true }}">
+      <label style="display:flex;flex-direction:column;gap:8px">
+        <span style="font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.45)">Senha</span>
+        <input type="password" placeholder="" value="{{ aPass }}" onChange="{{ onAPass }}" onKeyDown="{{ onAKey }}" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:13px;padding:13px 15px;color:#f2f3f5;font-size:14.5px;outline:none" style-focus="border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.06)">
+      </label>
+      </sc-if>
+
+      <sc-if value="{{ isSignup }}" hint-placeholder-val="{{ false }}">
+      <label style="display:flex;flex-direction:column;gap:8px">
+        <span style="font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.45)">Onde conheceu o Watchly</span>
+        <select value="{{ aSource }}" onChange="{{ onASource }}" style="width:100%;box-sizing:border-box;background-color:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:13px;padding:13px 40px 13px 15px;font-size:14.5px;background-position:right 15px center;color:{{ sourceColor }}">
+          <sc-for list="{{ sourceOpts }}" as="o" hint-placeholder-count="8"><option value="{{ o.v }}">{{ o.l }}</option></sc-for>
+        </select>
+      </label>
+      </sc-if>
+
+      <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ onGoForgot }}" style="align-self:flex-start;background:none;border:none;padding:0;color:rgba(255,255,255,.55);font-size:13.5px;cursor:pointer;text-decoration:underline;text-underline-offset:3px" style-hover="color:#ffffff">Esqueci minha senha</button>
+      </sc-if>
+
+      <sc-if value="{{ hasAInfo }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;line-height:1.5;color:oklch(0.82 0.12 160)">{{ aInfo }}</div></sc-if>
+      <sc-if value="{{ hasAErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;line-height:1.5;color:oklch(0.75 0.16 25)">{{ aErr }}</div></sc-if>
+
+      <button onClick="{{ onSubmitAuth }}" style="width:100%;background:#ffffff;color:#0b0c10;border:none;border-radius:999px;padding:14px 26px;font-weight:700;font-size:15px;cursor:pointer;margin-top:3px;transition:background .15s ease" style-hover="background:#e6e8ec">{{ authCta }}</button>
+
+      <div style="text-align:center;font-size:13.5px;color:rgba(255,255,255,.48)">
+        {{ switchPrompt }}
+        <button onClick="{{ onSwitchMode }}" style="background:none;border:none;padding:0 0 0 6px;color:#ffffff;font-size:13.5px;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px">{{ switchCta }}</button>
+      </div>
+    </div>
+  </div>
+  <button onClick="{{ onExitAuth }}" style="background:none;border:none;color:rgba(255,255,255,.4);font-size:13px;font-weight:600;cursor:pointer;padding:6px" style-hover="color:#ffffff">Explorar sem conta →</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ isOnboarding }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Onboarding" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:60px 20px;box-sizing:border-box;background:radial-gradient(1000px 600px at 50% -10%, oklch(0.24 0.05 265 / .6), transparent 65%), #0b0c10">
+  <div style="width:720px;max-width:100%;animation:fadeUp .5s ease both">
+    <div style="font-family:'Geist',sans-serif;font-weight:800;font-size:15px;letter-spacing:-0.02em;color:rgba(255,255,255,.5)">Watchly</div>
+    <h1 style="font-family:'Geist',sans-serif;font-weight:900;font-size:34px;letter-spacing:-0.03em;margin:10px 0 6px">Onde você assiste?</h1>
+    <p style="color:rgba(255,255,255,.55);font-size:15px;margin:0 0 28px">Escolha seu país e os streamings que você assina. Dá pra mudar depois, sem perder a watchlist.</p>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:rgba(255,255,255,.45);margin-bottom:10px">País</div>
+    <div style="display:flex;gap:8px;margin-bottom:28px">
+      <sc-for list="{{ countries }}" as="c" hint-placeholder-count="3">
+        <button onClick="{{ c.on }}" onMouseEnter="{{ c.onEnter }}" onMouseLeave="{{ c.onLeave }}" style="border:1px solid {{ c.border }};border-radius:999px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;background:{{ c.bg }};color:{{ c.c }};transition:background .15s ease, border-color .15s ease, color .15s ease">{{ c.name }}</button>
+      </sc-for>
+    </div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:rgba(255,255,255,.45);margin-bottom:10px">Seus streamings</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(156px,1fr));gap:12px">
+      <sc-for list="{{ provCards }}" as="p" hint-placeholder-count="8">
+        <button onClick="{{ p.on }}" onMouseEnter="{{ p.onEnter }}" onMouseLeave="{{ p.onLeave }}" title="{{ p.name }}" style="position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px;border-radius:14px;padding:16px 12px;cursor:pointer;background:{{ p.bg }};border:1px solid {{ p.border }};color:{{ p.textC }};transition:background .15s ease, border-color .15s ease, color .15s ease">
+          <span style="font-size:14px;font-weight:600">{{ p.name }}</span>
+          <span style="position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:999px;background:#f2f3f5;color:#0b0c10;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;opacity:{{ p.check }}">✓</span>
+        </button>
+      </sc-for>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;margin-top:28px">
+      <button onClick="{{ onFinishOb }}" style="border:none;border-radius:999px;padding:14px 26px;font-weight:700;font-size:15px;background:{{ contBg }};color:{{ contC }};cursor:{{ contCur }};opacity:{{ contOp }};transition:background .15s ease, opacity .15s ease">Continuar</button>
+      <span style="font-size:13px;color:rgba(255,255,255,.45)">{{ obHint }}</span>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+<div>
+  <div style="position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:60;width:max-content;max-width:none;white-space:nowrap;display:flex;align-items:center;gap:2px;padding:6px 8px;border-radius:999px;background:rgba(16,17,23,.7);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.09);box-shadow:0 10px 40px rgba(0,0,0,.45)">
+    <span style="font-family:'Geist',sans-serif;font-weight:700;font-size:16px;letter-spacing:-0.02em;color:#ffffff;padding:0 14px 0 10px">Watchly</span>
+    <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="5">
+      <button onClick="{{ n.on }}" onMouseEnter="{{ n.onEnter }}" onMouseLeave="{{ n.onLeave }}" style="flex:none;white-space:nowrap;border:none;background:transparent;border-radius:999px;padding:8px 13px;font-size:13.5px;font-weight:{{ n.w }};cursor:{{ n.cur }};color:{{ n.c }};transition:color .15s ease">{{ n.l }}</button>
+    </sc-for>
+    <button onClick="{{ onGoBusca }}" onMouseEnter="{{ onBuscaEnter }}" onMouseLeave="{{ onBuscaLeave }}" title="Buscar" style="flex:none;display:flex;align-items:center;justify-content:center;border:none;background:transparent;border-radius:999px;width:32px;height:30px;cursor:{{ buscaCur }};color:{{ buscaC }};transition:color .15s ease">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" aria-hidden="true" style="display:block"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5 L21 21"></path></svg>
+    </button>
+    <span style="width:1px;height:18px;background:rgba(255,255,255,.14);margin:0 6px"></span>
+    <sc-if value="{{ isAuthed }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ onGoPrefs }}" title="Sua conta e preferências" style="flex:none;white-space:nowrap;display:flex;align-items:center;gap:9px;border:none;border-radius:999px;padding:5px 14px 5px 5px;font-size:13px;font-weight:600;cursor:{{ prefsTabCur }};background:{{ prefsTabBg }};color:{{ prefsTabC }};transition:background .15s ease" onMouseEnter="{{ onPrefsEnter }}" onMouseLeave="{{ onPrefsLeave }}">
+        <span style="width:26px;height:26px;border-radius:999px;flex:none;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;background:{{ avatarBg }};color:{{ avatarC }}">{{ avatarInitials }}</span>
+        <span>{{ userShort }}</span>
+      </button>
+    </sc-if>
+    <sc-if value="{{ isGuest }}" hint-placeholder-val="{{ true }}">
+      <button onClick="{{ onGoAuth }}" onMouseEnter="{{ onLoginEnter }}" onMouseLeave="{{ onLoginLeave }}" style="flex:none;white-space:nowrap;border:none;border-radius:999px;padding:8px 13px;font-size:13.5px;font-weight:600;cursor:{{ loginCur }};background:transparent;color:{{ loginC }};transition:color .15s ease">Entrar</button>
+      <button onClick="{{ onGoSignup }}" style="flex:none;white-space:nowrap;border:none;border-radius:999px;padding:9px 17px;font-size:13.5px;font-weight:600;cursor:pointer;background:#ffffff;color:#0b0c10;transition:background .15s ease" style-hover="background:#e6e8ec">Criar conta</button>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+  <div data-screen-label="Home">
+    <sc-if value="{{ hasHero }}" hint-placeholder-val="{{ true }}">
+    <div style="position:relative;height:64vh;min-height:520px;background:#0b0c10;overflow:hidden">
+      <sc-for list="{{ heroLayers }}" as="L" hint-placeholder-count="1">
+        <div style="position:absolute;inset:0;background:{{ L.bg }};background-size:cover;background-position:center;opacity:{{ L.op }};transition:opacity 1s ease"></div>
+      </sc-for>
+      <div style="position:absolute;inset:0;background:repeating-linear-gradient(115deg, rgba(255,255,255,.03) 0 2px, transparent 2px 10px)"></div>
+      <div style="position:absolute;inset:0;background:linear-gradient(100deg, rgba(8,9,12,.94) 0%, rgba(8,9,12,.8) 32%, rgba(8,9,12,.3) 62%, rgba(8,9,12,.15) 100%)"></div>
+      <div style="position:absolute;inset:0;background:linear-gradient(to top, #0b0c10 0%, rgba(11,12,16,.25) 34%, transparent 62%)"></div>
+      <div style="position:absolute;left:0;right:0;bottom:0;max-width:1280px;margin:0 auto;padding:0 48px 60px;box-sizing:border-box">
+      <div style="opacity:{{ heroFade }};transition:opacity .45s ease">
+        <span style="display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:7px 13px;border-radius:999px;background:rgba(18,20,26,.85);border:1px solid rgba(255,255,255,.12);color:#f2f3f5">{{ heroKicker }}</span>
+        <h1 style="font-family:'Geist',sans-serif;font-weight:800;font-size:clamp(38px, 4.6vw, 60px);letter-spacing:-0.035em;line-height:1;margin:20px 0 16px;text-shadow:0 2px 30px rgba(0,0,0,.55)">{{ heroTitle }}</h1>
+        <p style="max-width:640px;font-size:16px;line-height:1.55;color:rgba(255,255,255,.82);margin:0 0 26px;text-wrap:pretty">{{ heroSyn }}</p>
+        <div style="display:flex;gap:12px">
+          <button onClick="{{ heroOpen }}" style="background:#ffffff;color:#0b0c10;border:none;border-radius:999px;padding:14px 26px;font-weight:700;font-size:15px;cursor:pointer;transition:background .15s ease" style-hover="background:#e6e8ec">▶&nbsp; Ver Detalhes</button>
+          <button onClick="{{ heroWl }}" style="background:transparent;color:#f2f3f5;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:14px 24px;font-weight:600;font-size:15px;cursor:pointer;transition:border-color .15s ease, background .15s ease" style-hover="border-color:rgba(255,255,255,.7);background:rgba(255,255,255,.07)">{{ heroWlLabel }}</button>
+        </div>
+      </div>
+        <div style="position:absolute;right:48px;bottom:60px;display:flex;align-items:center;gap:9px">
+          <sc-for list="{{ heroDots }}" as="d" hint-placeholder-count="4">
+            <button onClick="{{ d.on }}" title="{{ d.title }}" aria-label="{{ d.title }}" data-active="{{ d.act }}" style="border:none;padding:0;width:{{ d.w }}px;height:8px;border-radius:999px;cursor:{{ d.cur }};background:{{ d.bg }};transition:background .25s ease, width .25s ease"></button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+    <div style="max-width:1280px;margin:0 auto;padding:26px 48px 60px;box-sizing:border-box">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:22px">
+        <sc-for list="{{ filters }}" as="f" hint-placeholder-count="5">
+          <select value="{{ f.val }}" onChange="{{ f.on }}">
+            <sc-for list="{{ f.opts }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.l }}</option></sc-for>
+          </select>
+        </sc-for>
+        <div style="display:flex;align-items:center;gap:10px;margin-left:auto;flex:none">
+          <span style="font-size:12px;color:rgba(255,255,255,.45);white-space:nowrap">Ordenar por</span>
+          <select value="{{ sortVal }}" onChange="{{ onSort }}">
+            <sc-for list="{{ sortOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.l }}</option></sc-for>
+          </select>
+          <span style="font-size:12.5px;color:rgba(255,255,255,.45);white-space:nowrap;margin-left:6px">{{ resultCount }}</span>
+        </div>
+      </div>
+      <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:70px 0;text-align:center;color:rgba(255,255,255,.5);font-size:14.5px">Nada por aqui com esses filtros. Tente afrouxar algum deles.</div>
+      </sc-if>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax({{ gridMin }}px,1fr));gap:20px 16px">
+        <sc-for list="{{ cards }}" as="t" hint-placeholder-count="12">
+          <div onClick="{{ t.open }}" style="cursor:pointer;transition:transform .18s ease" style-hover="transform:translateY(-4px)">
+            <div style="position:relative;aspect-ratio:2/3;border-radius:12px;overflow:hidden;background:{{ t.bg }};border:1px solid rgba(255,255,255,.07)">
+              <div style="position:absolute;inset:0;background:repeating-linear-gradient(115deg, rgba(255,255,255,.04) 0 2px, transparent 2px 9px)"></div>
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;text-align:center;opacity:{{ t.labelOp }}">
+                <div style="font-family:'Geist',sans-serif;font-weight:800;font-size:17px;line-height:1.15;letter-spacing:-0.02em;text-shadow:0 1px 12px rgba(0,0,0,.4)">{{ t.title }}</div>
+                <div style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:rgba(255,255,255,.55);margin-top:8px;letter-spacing:.12em">{{ t.tag }}</div>
+              </div>
+              <span style="position:absolute;top:8px;right:8px;font-size:10.5px;font-weight:700;padding:4px 7px;border-radius:5px;background:rgba(0,0,0,.45);color:rgba(255,255,255,.85)">★ {{ t.rating }}</span>
+            </div>
+            <div style="margin-top:9px;font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.title }}</div>
+            <div style="font-size:11.5px;color:rgba(255,255,255,.45);margin-top:2px">{{ t.meta }}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px">{{ t.provLine }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isBusca }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Busca" style="max-width:1280px;margin:0 auto;padding:110px 48px 60px;box-sizing:border-box">
+    <input type="text" placeholder="Buscar filmes e séries por título…" value="{{ query }}" onChange="{{ onQuery }}" autofocus="" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:13px;padding:16px 20px;color:#f2f3f5;font-size:16px;outline:none" style-focus="border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.06)">
+    <sc-if value="{{ hasQuery }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:34px">
+        <h2 style="font-family:'Geist',sans-serif;font-weight:800;font-size:20px;letter-spacing:-0.02em;margin:0 0 16px">{{ sMineTitle }} <span style="color:rgba(255,255,255,.4);font-weight:600;font-size:14px">{{ sMineN }}</span></h2>
+        <sc-if value="{{ sMineEmpty }}" hint-placeholder-val="{{ false }}"><div style="font-size:13.5px;color:rgba(255,255,255,.45);margin-bottom:8px">Nenhum título encontrado para essa busca.</div></sc-if>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax({{ gridMin }}px,1fr));gap:20px 16px">
+          <sc-for list="{{ sMine }}" as="t" hint-placeholder-count="4">
+            <div onClick="{{ t.open }}" style="cursor:pointer;transition:transform .18s ease" style-hover="transform:translateY(-4px)">
+              <div style="position:relative;aspect-ratio:2/3;border-radius:12px;overflow:hidden;background:{{ t.bg }};border:1px solid rgba(255,255,255,.07)">
+                <div style="position:absolute;inset:0;background:repeating-linear-gradient(115deg, rgba(255,255,255,.04) 0 2px, transparent 2px 9px)"></div>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;text-align:center;opacity:{{ t.labelOp }}">
+                  <div style="font-family:'Geist',sans-serif;font-weight:800;font-size:17px;line-height:1.15;letter-spacing:-0.02em">{{ t.title }}</div>
+                  <div style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:rgba(255,255,255,.55);margin-top:8px;letter-spacing:.12em">{{ t.tag }}</div>
+                </div>
+              </div>
+              <div style="margin-top:9px;font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.title }}</div>
+              <div style="font-size:11.5px;color:rgba(255,255,255,.45);margin-top:2px">{{ t.meta }}</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px">{{ t.provLine }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ searchSplit }}" hint-placeholder-val="{{ false }}">
+        <h2 style="font-family:'Geist',sans-serif;font-weight:800;font-size:20px;letter-spacing:-0.02em;margin:38px 0 16px">Fora dos seus streamings <span style="color:rgba(255,255,255,.4);font-weight:600;font-size:14px">{{ sOutN }}</span></h2>
+        <sc-if value="{{ sOutEmpty }}" hint-placeholder-val="{{ false }}"><div style="font-size:13.5px;color:rgba(255,255,255,.45)">Nada fora dos seus serviços para essa busca.</div></sc-if>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax({{ gridMin }}px,1fr));gap:20px 16px">
+          <sc-for list="{{ sOut }}" as="t" hint-placeholder-count="4">
+            <div onClick="{{ t.open }}" style="cursor:pointer;opacity:.75;transition:transform .18s ease, opacity .18s ease" style-hover="transform:translateY(-4px);opacity:1">
+              <div style="position:relative;aspect-ratio:2/3;border-radius:12px;overflow:hidden;background:{{ t.bg }};border:1px solid rgba(255,255,255,.07)">
+                <div style="position:absolute;inset:0;background:repeating-linear-gradient(115deg, rgba(255,255,255,.04) 0 2px, transparent 2px 9px)"></div>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;text-align:center;opacity:{{ t.labelOp }}">
+                  <div style="font-family:'Geist',sans-serif;font-weight:800;font-size:17px;line-height:1.15;letter-spacing:-0.02em">{{ t.title }}</div>
+                  <div style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:rgba(255,255,255,.55);margin-top:8px;letter-spacing:.12em">{{ t.tag }}</div>
+                </div>
+              </div>
+              <div style="margin-top:9px;font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.title }}</div>
+              <div style="font-size:11.5px;color:rgba(255,255,255,.45);margin-top:2px">{{ t.meta }}</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px">{{ t.provLine }}</div>
+            </div>
+          </sc-for>
+        </div>
+        </sc-if>
+      </div>
+    </sc-if>
+    <sc-if value="{{ noQuery }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:80px 0;text-align:center;color:rgba(255,255,255,.4);font-size:14.5px">Digite um título para buscar no catálogo.</div>
+    </sc-if>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isTitulo }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Detalhe do título">
+    <div style="position:relative;height:44vh;min-height:340px;background:{{ dBg }}">
+      <div style="position:absolute;inset:0;background:repeating-linear-gradient(115deg, rgba(255,255,255,.035) 0 2px, transparent 2px 10px)"></div>
+      <div style="position:absolute;inset:0;background:linear-gradient(to top, #0b0c10 2%, rgba(11,12,16,.4) 45%, rgba(11,12,16,.45) 100%)"></div>
+    </div>
+    <div style="max-width:1080px;margin:-170px auto 0;padding:0 48px 70px;box-sizing:border-box;position:relative">
+      <button onClick="{{ onBack }}" style="background:rgba(255,255,255,.1);color:#f2f3f5;border:none;border-radius:999px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;backdrop-filter:blur(8px);margin-bottom:22px;transition:background .15s ease" style-hover="background:rgba(255,255,255,.18)">← Voltar</button>
+      <div style="display:flex;gap:36px;align-items:flex-start;flex-wrap:wrap">
+        <div style="flex:none;width:230px;position:relative;aspect-ratio:2/3;border-radius:14px;overflow:hidden;background:{{ dPosterBg }};border:1px solid rgba(255,255,255,.12);box-shadow:0 20px 60px rgba(0,0,0,.5)">
+          <div style="position:absolute;inset:0;background:repeating-linear-gradient(115deg, rgba(255,255,255,.04) 0 2px, transparent 2px 9px)"></div>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;text-align:center;opacity:{{ dLabelOp }}">
+            <div style="font-family:'Geist',sans-serif;font-weight:800;font-size:23px;line-height:1.15;letter-spacing:-0.02em">{{ dTitle }}</div>
+            <div style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:rgba(255,255,255,.55);margin-top:10px;letter-spacing:.12em">{{ dTag }}</div>
+          </div>
+        </div>
+        <div style="flex:1;min-width:0">
+          <h1 style="font-family:'Geist',sans-serif;font-weight:900;font-size:42px;letter-spacing:-0.03em;line-height:1.05;margin:6px 0 10px">{{ dTitle }}</h1>
+          <div style="font-size:14px;color:rgba(255,255,255,.65);font-weight:500;margin-bottom:16px">{{ dMeta }} · ★ {{ dRating }}</div>
+          <p style="font-size:15px;line-height:1.6;color:rgba(255,255,255,.85);margin:0 0 26px;max-width:600px;text-wrap:pretty">{{ dSyn }}</p>
+          <sc-if value="{{ dInList }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:26px">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:rgba(255,255,255,.45);margin-bottom:10px">Meu status</div>
+            <div style="display:inline-flex;align-items:center;gap:2px;padding:3px;border-radius:999px;background:rgba(255,255,255,.05)">
+              <sc-for list="{{ dStatusOpts }}" as="st" hint-placeholder-count="2">
+                <button onClick="{{ st.on }}" onMouseEnter="{{ st.onEnter }}" onMouseLeave="{{ st.onLeave }}" style="display:flex;align-items:center;gap:6px;border:none;background:{{ st.bg }};color:{{ st.c }};border-radius:999px;padding:8px 15px;font-size:13px;font-weight:{{ st.w }};cursor:{{ st.cur }};transition:background .18s ease, color .18s ease">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;opacity:{{ st.check }};transition:opacity .18s ease"><path d="M5 13l4.5 4.5L19 7"></path></svg>
+                  <span>{{ st.l }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+          </sc-if>
+          <div style="display:flex;gap:10px;margin-bottom:36px">
+            <button onClick="{{ dWl }}" style="background:#ffffff;color:#0b0c10;border:none;border-radius:999px;padding:12px 22px;font-weight:700;font-size:14px;cursor:pointer;transition:background .15s ease" style-hover="background:#e6e8ec">{{ dWlLabel }}</button>
+          </div>
+          <h2 style="font-family:'Geist',sans-serif;font-weight:800;font-size:20px;letter-spacing:-0.02em;margin:0 0 16px">Onde assistir · {{ countryName }}</h2>
+          <sc-if value="{{ dNoOffer }}" hint-placeholder-val="{{ false }}">
+            <div style="background:rgba(255,255,255,.05);border:none;border-radius:12px;padding:18px 20px;font-size:14px;color:rgba(255,255,255,.65);max-width:600px">Este título não está disponível em nenhum serviço em {{ countryName }} no momento.</div>
+          </sc-if>
+          <sc-if value="{{ dHasMine }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:oklch(0.82 0.13 160);margin-bottom:8px">Nos seus streamings</div>
+            <div style="display:flex;flex-direction:column;gap:8px;max-width:600px;margin-bottom:20px">
+              <sc-for list="{{ dMine }}" as="o" hint-placeholder-count="2">
+                <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.06);border:none;border-radius:12px;padding:12px 16px">
+                  <sc-if value="{{ o.hasLogo }}" hint-placeholder-val="{{ false }}">
+                    <span style="width:34px;height:34px;border-radius:9px;flex:none;background:{{ o.dot }};background-size:cover;background-position:center"></span>
+                  </sc-if>
+                  <sc-if value="{{ o.hasMark }}" hint-placeholder-val="{{ true }}">
+                    <span style="width:34px;height:34px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;text-align:center;padding:3px;box-sizing:border-box;background:#0f1116;font-size:{{ o.markSize }}px;font-weight:{{ o.markWeight }};letter-spacing:{{ o.markSpacing }};text-transform:{{ o.markTransform }};line-height:1.05;color:{{ o.markColor }}">{{ o.markText }}</span>
+                  </sc-if>
+                  <span style="font-size:14px;font-weight:600;flex:1">{{ o.name }}</span>
+                  <span style="font-size:12px;color:rgba(255,255,255,.55)">{{ o.price }}</span>
+                  <span style="font-size:11px;font-weight:700;padding:4px 9px;border-radius:5px;background:{{ o.kindBg }};color:#0b0c10">{{ o.kindL }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ dHasOther }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:rgba(255,255,255,.45);margin-bottom:8px">{{ dOtherLabel }}</div>
+            <div style="display:flex;flex-direction:column;gap:8px;max-width:600px">
+              <sc-for list="{{ dOther }}" as="o" hint-placeholder-count="2">
+                <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.03);border:none;border-radius:12px;padding:12px 16px;opacity:.8">
+                  <sc-if value="{{ o.hasLogo }}" hint-placeholder-val="{{ false }}">
+                    <span style="width:34px;height:34px;border-radius:9px;flex:none;background:{{ o.dot }};background-size:cover;background-position:center"></span>
+                  </sc-if>
+                  <sc-if value="{{ o.hasMark }}" hint-placeholder-val="{{ true }}">
+                    <span style="width:34px;height:34px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;text-align:center;padding:3px;box-sizing:border-box;background:#0f1116;font-size:{{ o.markSize }}px;font-weight:{{ o.markWeight }};letter-spacing:{{ o.markSpacing }};text-transform:{{ o.markTransform }};line-height:1.05;color:{{ o.markColor }}">{{ o.markText }}</span>
+                  </sc-if>
+                  <span style="font-size:14px;font-weight:600;flex:1">{{ o.name }}</span>
+                  <span style="font-size:12px;color:rgba(255,255,255,.55)">{{ o.price }}</span>
+                  <span style="font-size:11px;font-weight:700;padding:4px 9px;border-radius:5px;background:rgba(255,255,255,.14);color:rgba(255,255,255,.85)">{{ o.kindL }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ dHasCast }}" hint-placeholder-val="{{ true }}">
+          <h2 style="font-family:'Geist',sans-serif;font-weight:800;font-size:20px;letter-spacing:-0.02em;margin:36px 0 16px">Elenco</h2>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:20px 16px;max-width:600px">
+            <sc-for list="{{ dCastList }}" as="c" hint-placeholder-count="6">
+              <div>
+                <div style="position:relative;aspect-ratio:1/1.28;border-radius:16px;overflow:hidden;background:{{ c.bg }};background-size:cover;background-position:center top">
+                  <sc-if value="{{ c.noPhoto }}" hint-placeholder-val="{{ true }}">
+                    <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Geist',sans-serif;font-weight:800;font-size:24px;letter-spacing:-0.02em;color:rgba(255,255,255,.5)">{{ c.initials }}</span>
+                  </sc-if>
+                </div>
+                <div style="font-size:14px;font-weight:600;line-height:1.25;margin-top:11px;color:#f2f3f5;text-wrap:pretty">{{ c.name }}</div>
+                <div style="font-size:13.5px;line-height:1.25;color:rgba(255,255,255,.42);margin-top:4px;text-wrap:pretty">{{ c.character }}</div>
+              </div>
+            </sc-for>
+          </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isWatchlist }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Watchlist" style="max-width:880px;margin:0 auto;padding:110px 48px 70px;box-sizing:border-box">
+    <h1 style="font-family:'Geist',sans-serif;font-weight:900;font-size:34px;letter-spacing:-0.03em;margin:0 0 4px">Minha lista</h1>
+    <p style="color:rgba(255,255,255,.5);font-size:14px;margin:0 0 18px">{{ wlSub }}</p>
+
+    <sc-if value="{{ wlEmpty }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:60px 0;text-align:center;color:rgba(255,255,255,.5);font-size:14.5px">
+        <div style="margin-bottom:16px">Sua lista está vazia.</div>
+        <button onClick="{{ onGoHome }}" style="background:#ffffff;color:#0b0c10;border:none;border-radius:999px;padding:12px 22px;font-weight:700;font-size:14px;cursor:pointer;transition:background .15s ease" style-hover="background:#e6e8ec">Explorar o catálogo</button>
+      </div>
+    </sc-if>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <sc-for list="{{ wlItems }}" as="w" hint-placeholder-count="3">
+        <div style="display:flex;align-items:center;gap:18px;background:rgba(255,255,255,.04);border:none;border-radius:14px;padding:12px 16px 12px 12px;transition:background .15s ease" style-hover="background:rgba(255,255,255,.07)">
+          <div onClick="{{ w.open }}" style="flex:none;width:62px;aspect-ratio:2/3;border-radius:10px;overflow:hidden;position:relative;background:{{ w.bg }};cursor:pointer">
+            <div style="position:absolute;inset:0;background:repeating-linear-gradient(115deg, rgba(255,255,255,.05) 0 2px, transparent 2px 8px)"></div>
+          </div>
+          <div onClick="{{ w.open }}" style="flex:1;min-width:0;cursor:pointer">
+            <div style="font-size:15.5px;font-weight:700">{{ w.title }}</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.45);margin-top:3px">{{ w.meta }}</div>
+            <div style="font-size:12.5px;margin-top:6px;color:{{ w.availC }}">{{ w.avail }}</div>
+          </div>
+          <div style="display:inline-flex;align-items:center;gap:2px;padding:3px;border-radius:999px;background:rgba(255,255,255,.05);flex:none">
+            <sc-for list="{{ w.statusOpts }}" as="st" hint-placeholder-count="2">
+              <button onClick="{{ st.on }}" onMouseEnter="{{ st.onEnter }}" onMouseLeave="{{ st.onLeave }}" style="display:flex;align-items:center;gap:5px;border:none;background:{{ st.bg }};color:{{ st.c }};border-radius:999px;padding:6px 12px;font-size:12px;font-weight:{{ st.w }};cursor:{{ st.cur }};white-space:nowrap;transition:background .18s ease, color .18s ease">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;opacity:{{ st.check }};transition:opacity .18s ease"><path d="M5 13l4.5 4.5L19 7"></path></svg>
+                <span>{{ st.l }}</span>
+              </button>
+            </sc-for>
+          </div>
+          <button onClick="{{ w.remove }}" title="Remover" style="flex:none;background:rgba(255,255,255,.07);border:none;color:rgba(255,255,255,.7);border-radius:999px;width:32px;height:32px;font-size:15px;cursor:pointer;line-height:1;transition:background .15s ease, color .15s ease" style-hover="background:oklch(0.5 0.14 25 / .35);color:#ffffff">✕</button>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isPrefs }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Perfil" style="max-width:880px;margin:0 auto;padding:110px 48px 70px;box-sizing:border-box">
+    <h1 style="font-family:'Geist',sans-serif;font-weight:900;font-size:34px;letter-spacing:-0.03em;margin:0 0 4px">Perfil</h1>
+    <p style="color:rgba(255,255,255,.5);font-size:14px;margin:0 0 30px">Conectado como <strong style="color:rgba(255,255,255,.8)">{{ userEmail }}</strong>. Trocar país ou streamings não apaga sua watchlist.</p>
+
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:rgba(255,255,255,.45);margin-bottom:10px">País</div>
+    <div style="display:flex;gap:8px;margin-bottom:26px">
+      <sc-for list="{{ countries }}" as="c" hint-placeholder-count="3">
+        <button onClick="{{ c.on }}" onMouseEnter="{{ c.onEnter }}" onMouseLeave="{{ c.onLeave }}" style="border:1px solid {{ c.border }};border-radius:999px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;background:{{ c.bg }};color:{{ c.c }};transition:background .15s ease, border-color .15s ease, color .15s ease">{{ c.name }}</button>
+      </sc-for>
+    </div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:rgba(255,255,255,.45);margin-bottom:10px">Seus streamings</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(156px,1fr));gap:12px">
+      <sc-for list="{{ provCards }}" as="p" hint-placeholder-count="8">
+        <button onClick="{{ p.on }}" onMouseEnter="{{ p.onEnter }}" onMouseLeave="{{ p.onLeave }}" title="{{ p.name }}" style="position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px;border-radius:14px;padding:16px 12px;cursor:pointer;background:{{ p.bg }};border:1px solid {{ p.border }};color:{{ p.textC }};transition:background .15s ease, border-color .15s ease, color .15s ease">
+          <span style="font-size:14px;font-weight:600">{{ p.name }}</span>
+          <span style="position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:999px;background:#f2f3f5;color:#0b0c10;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;opacity:{{ p.check }}">✓</span>
+        </button>
+      </sc-for>
+    </div>
+    <sc-if value="{{ hasPrefsMsg }}" hint-placeholder-val="{{ false }}"><div style="margin-top:16px;font-size:13.5px;color:{{ prefsMsgC }}">{{ prefsMsg }}</div></sc-if>
+    <div style="display:flex;align-items:center;gap:14px;margin-top:24px">
+      <button onClick="{{ onSavePrefs }}" style="background:#ffffff;color:#0b0c10;border:none;border-radius:999px;padding:12px 22px;font-weight:700;font-size:14px;cursor:pointer;transition:background .15s ease" style-hover="background:#e6e8ec">Salvar preferências</button>
+      <button onClick="{{ onLogout }}" style="background:rgba(255,255,255,.06);border:none;color:rgba(255,255,255,.75);border-radius:999px;padding:12px 22px;font-weight:600;font-size:14px;cursor:pointer;transition:background .15s ease, color .15s ease" style-hover="background:oklch(0.5 0.14 25 / .3);color:#ffffff">Sair da conta</button>
+    </div>
+  </div>
+  </sc-if>
+
+  <div style="border-top:1px solid rgba(255,255,255,.07);padding:22px 48px 28px;text-align:center;font-size:11.5px;color:rgba(255,255,255,.35)">
+    Protótipo com dados simulados · Dados de títulos: <a href="https://www.themoviedb.org" target="_blank" rel="noreferrer">TMDB</a> · Dados de disponibilidade: <a href="https://www.justwatch.com" target="_blank" rel="noreferrer">JustWatch</a>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:80;background:rgba(28,30,38,.92);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:11px 22px;font-size:13.5px;font-weight:600;box-shadow:0 12px 40px rgba(0,0,0,.5);animation:fadeUp .25s ease both">{{ toast }}</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;contaDemo&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Demo&quot;}, &quot;densidadeGrade&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;confortavel&quot;, &quot;densa&quot;], &quot;default&quot;: &quot;confortavel&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Grade&quot;}}">
+class Component extends DCLogic {
+  state = {screen:'auth', authMode:'login', aEmail:'', aPass:'', aSource:'', aErr:'', aInfo:'', session:null,
+    prefs:{country:'BR', providers:[]}, watchlist:[], curId:null, prevScreen:'home',
+    fTipo:'all', fGen:'all', fProv:'all', fAno:'all', sort:'pop', query:'',
+    toast:'', prefsMsg:'', prefsMsgOk:false, draftCountry:'BR', draftProviders:[],
+    tmdbKey:'', keyInput:'', tmdbStatus:'off', tmdbErr:'', castCache:{},
+    remote:{titles:[], provList:[], provMap:{}}};
+
+  PROVIDERS = [
+    {id:'netflix', name:'Netflix', dot:'oklch(0.65 0.21 25)', cc:['BR','US','PT']},
+    {id:'prime', name:'Prime Video', dot:'oklch(0.75 0.13 220)', cc:['BR','US','PT']},
+    {id:'max', name:'Max', dot:'oklch(0.6 0.19 275)', cc:['BR','US','PT']},
+    {id:'disney', name:'Disney+', dot:'oklch(0.78 0.1 250)', cc:['BR','US','PT']},
+    {id:'globoplay', name:'Globoplay', dot:'oklch(0.68 0.2 15)', cc:['BR']},
+    {id:'appletv', name:'Apple TV+', dot:'oklch(0.85 0.01 260)', cc:['BR','US','PT']},
+    {id:'paramount', name:'Paramount+', dot:'oklch(0.62 0.16 255)', cc:['BR','US','PT']},
+    {id:'telecine', name:'Telecine', dot:'oklch(0.74 0.15 60)', cc:['BR']}
+  ];
+  KINDS = {
+    incluso:{l:'Incluso', c:'oklch(0.8 0.15 155)'},
+    gratis:{l:'Grátis', c:'oklch(0.8 0.13 195)'},
+    anuncios:{l:'Com anúncios', c:'oklch(0.82 0.13 85)'},
+    aluguel:{l:'Aluguel', c:'oklch(0.76 0.11 250)'},
+    compra:{l:'Compra', c:'oklch(0.74 0.13 310)'}
+  };
+  KORDER = ['incluso','gratis','anuncios','aluguel','compra'];
+  WORDMARK = {
+    netflix:{t:'Netflix', c:'oklch(0.62 0.23 25)', w:900, ls:'-0.04em', s:20, u:true},
+    prime:{t:'prime video', c:'oklch(0.78 0.13 225)', w:700, ls:'-0.02em', s:15},
+    max:{t:'max', c:'oklch(0.72 0.18 280)', w:900, ls:'-0.05em', s:22},
+    disney:{t:'Disney+', c:'oklch(0.82 0.09 250)', w:800, ls:'-0.01em', s:17},
+    globoplay:{t:'globoplay', c:'oklch(0.75 0.19 20)', w:800, ls:'-0.03em', s:15},
+    appletv:{t:'Apple TV+', c:'oklch(0.92 0.005 260)', w:700, ls:'-0.02em', s:16},
+    paramount:{t:'Paramount+', c:'oklch(0.7 0.16 258)', w:700, ls:'-0.02em', s:15},
+    telecine:{t:'telecine', c:'oklch(0.8 0.15 65)', w:800, ls:'0.02em', s:15, u:true}
+  };
+  COUNTRIES = [{code:'BR', name:'Brasil'},{code:'US', name:'Estados Unidos'},{code:'PT', name:'Portugal'}];
+  PRICES = {BR:{aluguel:'R$ 11,90', compra:'R$ 34,90'}, US:{aluguel:'US$ 3,99', compra:'US$ 14,99'}, PT:{aluguel:'3,99 €', compra:'13,99 €'}};
+
+  ART = {2:{img:'uploads/pasted-1787712538428-0.png', back:'uploads/pasted-1787712523425-0.png',
+    cast:'Pedro Pascal, Bella Ramsey'},
+    7:{img:'uploads/pasted-1787713524302-0.png', back:'uploads/pasted-1787713470142-0.png',
+    cast:'Matt Damon, Tom Holland, Anne Hathaway',
+    people:[{name:'Matt Damon', character:'Odysseus', photo:'uploads/pasted-1789093248524-0.png'},
+      {name:'Tom Holland', character:'Telemachus', photo:'uploads/pasted-1789093253687-0.png'},
+      {name:'Anne Hathaway', character:'Penelope', photo:'uploads/pasted-1789093258116-0.png'}]}};
+
+  get D(){
+    if(this._D) return this._D;
+    const R = [
+      [1,'m','A Última Maré',2023,['Drama','Suspense'],7.8,92,210,'Uma bióloga volta ao vilarejo de pescadores onde cresceu e descobre o que o mar levou.','netflix:incluso,appletv:aluguel'],
+      [2,'s','The Last of Us',2023,['Drama','Ficção científica'],8.7,99,260,'Vinte anos depois do colapso da civilização, Joel é contratado para tirar Ellie de uma zona de quarentena. O que começa como um pequeno trabalho vira uma travessia brutal pelo país.','max:incluso,max:anuncios,appletv:compra'],
+      [3,'m','Cidade Fantasma',2021,['Terror','Suspense'],6.9,74,300,'Um inventário de rotina num condomínio abandonado vira uma noite sem saída.','prime:incluso,prime:aluguel'],
+      [4,'s','O Peso do Ouro',2022,['Crime','Drama'],8.1,88,80,'Três gerações de garimpeiros disputam a mesma terra e o mesmo segredo.','globoplay:incluso'],
+      [5,'m','Vento Sul',2019,['Aventura','Drama'],7.2,65,150,'Dois irmãos cruzam o pampa a cavalo para cumprir a última vontade do pai.','telecine:incluso,appletv:compra'],
+      [6,'s','Meia-Noite no Museu',2023,['Comédia','Fantasia'],7.5,81,40,'Uma vigia noturna descobre que as obras do museu têm opinião própria.','disney:incluso'],
+      [7,'m','A Odisseia',2026,['Aventura','Drama'],7.9,97,230,'Depois da guerra de Troia, Ulisses tenta voltar para casa enquanto deuses, monstros e o próprio orgulho estendem a travessia por dez anos.','appletv:incluso,appletv:aluguel,prime:compra'],
+      [8,'s','As Herdeiras',2020,['Drama','Romance'],7.0,60,350,'Duas irmãs herdam uma vinícola falida e um casamento arranjado no contrato.','globoplay:incluso,globoplay:gratis'],
+      [9,'m','Trilha Sonora para o Fim',2024,['Romance','Drama'],7.9,77,20,'Um produtor musical tem trinta dias para gravar o último disco da carreira dela.','paramount:incluso'],
+      [10,'s','Protocolo Aurora',2025,['Suspense','Ficção científica'],8.2,95,200,'Uma auditora descobre que o algoritmo que investiga aprendeu a mentir.','netflix:incluso'],
+      [11,'m','O Jardim Submerso',2018,['Fantasia','Aventura'],7.4,58,170,'Sob a represa que engoliu a cidade, um mergulhador encontra o jardim intacto.','max:incluso,prime:compra'],
+      [12,'s','Km 404',2021,['Crime','Suspense'],7.7,70,100,'Numa rodovia federal, cada parada de caminhão esconde uma carga diferente.','prime:incluso'],
+      [13,'m','Noites de Fevereiro',2022,['Romance','Drama'],6.8,55,330,'Dois vizinhos insones dividem a varanda, o silêncio e um verão inteiro.','netflix:incluso'],
+      [14,'s','A Torre de Vidro',2019,['Drama'],8.0,63,250,'A ascensão e o colapso de uma família dona do prédio mais alto do país.','appletv:incluso'],
+      [15,'m','Circuito Fechado',2023,['Ação','Suspense'],7.1,79,0,'Um segurança de shopping percebe que o assalto foi ensaiado nas suas próprias câmeras.','telecine:incluso,prime:aluguel'],
+      [16,'s','Fábrica de Heróis',2024,['Animação','Comédia'],7.6,72,130,'Numa fábrica que produz super-heróis sob encomenda, o estagiário erra o molde.','disney:incluso'],
+      [17,'m','O Silêncio das Turbinas',2020,['Documentário'],8.3,50,190,'O último ano da usina que iluminou uma cidade inteira por meio século.','globoplay:gratis'],
+      [18,'s','Rota Clandestina',2023,['Crime','Ação'],7.3,76,60,'Uma piloto de fuga aceita a corrida errada na noite errada.','max:incluso'],
+      [19,'m','Aurora Boreal',2017,['Romance'],6.5,42,280,'Um guia de turismo e uma astrônoma esperam juntos o céu que nunca aparece.','prime:anuncios,prime:aluguel'],
+      [20,'s','Depois da Chuva',2025,['Drama','Romance'],8.5,90,140,'Uma cidade do interior reconstrói a praça, as casas e os relacionamentos.','globoplay:incluso'],
+      [21,'m','Contagem Regressiva',2024,['Ação','Ficção científica'],7.0,85,240,'Faltam dez horas para o lançamento e alguém sabotou a contagem.','netflix:incluso,appletv:compra'],
+      [22,'s','O Arquivista',2022,['Suspense','Crime'],8.6,87,30,'Um funcionário de cartório cataloga documentos que ainda não aconteceram.','appletv:incluso'],
+      [23,'m','Mar de Vidro',2021,['Drama'],7.2,48,205,'Depois do naufrágio, o único sobrevivente precisa contar duas versões da história.','paramount:incluso,prime:aluguel'],
+      [24,'s','Bairro das Luzes',2018,['Comédia','Drama'],7.8,66,55,'As histórias cruzadas de um bairro que decide organizar a própria festa junina.','globoplay:incluso'],
+      [25,'m','A Rota do Café',2019,['Documentário','Aventura'],7.9,45,95,'Do pé à xícara: a viagem de um grão através de três continentes.','netflix:incluso'],
+      [26,'s','Zona de Sombra',2024,['Terror','Suspense'],7.4,83,310,'Num apagão nacional, o que acende primeiro não é a luz.','max:incluso,max:anuncios'],
+      [27,'m','O Último Ato',2016,['Drama','Suspense'],8.8,68,15,'Um ator decide encerrar a carreira no palco, na frente de quem o traiu.','telecine:incluso,appletv:aluguel,appletv:compra'],
+      [28,'s','Colônia 9',2025,['Ficção científica','Aventura'],7.7,93,245,'A nona tentativa de colonizar o planeta recebe uma mensagem das oito anteriores.','disney:incluso'],
+      [29,'m','Estática',2023,['Terror'],6.7,71,290,'Uma rádio comunitária começa a transmitir vozes que ninguém gravou.','prime:incluso,prime:anuncios'],
+      [30,'s','As Cartas de Amanhã',2021,['Fantasia','Romance'],7.1,57,345,'Uma agência de correios entrega cartas escritas no futuro.','netflix:incluso'],
+      [31,'m','Fronteira Líquida',2022,['Ação','Crime'],6.9,62,115,'Na tríplice fronteira, um perito em documentos falsos quer um documento verdadeiro.','prime:aluguel,appletv:aluguel'],
+      [32,'s','Turno da Noite',2020,['Drama','Crime'],8.2,78,225,'O plantão de um hospital público visto por quem nunca aparece no crachá.','paramount:incluso'],
+      [33,'m','O Mapa dos Ventos',2015,['Aventura','Fantasia'],7.5,40,160,'Uma cartógrafa desenha ilhas que só existem quando alguém acredita nelas.','disney:incluso,appletv:compra'],
+      [34,'s','Código Carmim',2023,['Ação','Suspense'],6.8,69,5,'Uma negociadora de sequestros percebe que o refém é ela.','netflix:incluso'],
+      [35,'m','Sal e Fumaça',2024,['Comédia','Romance'],7.3,73,70,'Dois food trucks rivais são obrigados a dividir a mesma esquina.','globoplay:incluso,telecine:incluso'],
+      [36,'s','A Década Perdida',2019,['Documentário'],8.1,52,185,'Dez anos de um país contados por dez objetos esquecidos.','max:incluso'],
+      [37,'m','Inverno Aceso',2021,['Drama','Ação'],7.0,59,35,'Durante a pior geada em décadas, uma vila decide queimar o que restou.','appletv:aluguel,appletv:compra'],
+      [38,'s','Vila Esperança',2025,['Drama'],7.9,84,125,'Uma novela dentro da novela: os bastidores da vila cenográfica mais antiga da TV.','globoplay:incluso,globoplay:gratis'],
+      [39,'m','O Colecionador de Sons',2020,['Fantasia','Drama'],8.0,61,265,'Um técnico de som guarda o último ruído de lugares que vão desaparecer.','paramount:incluso,prime:compra'],
+      [40,'s','Linha do Horizonte',2022,['Aventura','Drama'],7.2,64,175,'Duas amigas atravessam o litoral a pé, uma praia por episódio.','disney:incluso']
+    ];
+    const FIRST=['Fernanda','Caio','Marina','Rodrigo','Luiza','Antônio','Beatriz','Paulo','Camila','Vicente','Helena','Otávio','Clarice','Miguel','Sofia','Rafael'];
+    const LAST=['Prado','Meirelles','Fontes','Sales','Bittencourt','Rocha','Amaral','Queiroz','Duarte','Linhares','Castelo','Ferraz'];
+    const titles = R.map(r => {
+      const cast = [0,1,2].map(k => FIRST[(r[0]*5+k*3)%FIRST.length]+' '+LAST[(r[0]*7+k*5)%LAST.length]).join(', ');
+      const offers = r[9] ? r[9].split(',').map(s => {const [p,k]=s.split(':'); return {p,k};}) : [];
+      const art = this.ART[r[0]];
+      return {id:r[0], t:r[1], title:r[2], year:r[3], genres:r[4], rating:r[5], pop:r[6], hue:r[7], syn:r[8],
+        cast: art&&art.cast?art.cast:cast, people:art&&art.people, img:art&&art.img, back:art&&art.back, offers};
+    });
+    const genres = [...new Set(titles.flatMap(t=>t.genres))].sort((a,b)=>a.localeCompare(b));
+    this._D = {titles, genres};
+    return this._D;
+  }
+
+  componentDidMount(){
+    const hash=(location.hash||'').replace(/^#/,'');
+    const forced = new URLSearchParams(location.search).get('tela')
+      || new URLSearchParams(hash).get('tela');
+    if(forced) return this.mountForced(forced);
+    const email = localStorage.getItem('watchly_session');
+    let session=null, prefs={country:'BR',providers:[]}, watchlist=[];
+    if(email){
+      session=email; const u=this.loadUser(email); prefs=u.prefs||prefs;
+      watchlist=(u.watchlist||[]).map(w=>Object.assign({}, w, {status:this.normStatus(w.status)}));
+    }
+    if(!session && (this.props.contaDemo ?? false)){
+      session='demo@watchly.app'; prefs={country:'BR',providers:['netflix','max','globoplay']};
+      localStorage.setItem('watchly_session',session); this.saveUser(session,{prefs,watchlist});
+    }
+    const screen = !session ? 'home' : (prefs.providers.length ? 'home' : 'onboarding');
+    if(session) this.saveUser(session,{prefs,watchlist});
+    const key = localStorage.getItem('watchly_tmdb_key') || '';
+    this.setState({session,prefs,watchlist,screen,draftCountry:prefs.country,draftProviders:prefs.providers.slice(),
+      tmdbKey:key, keyInput:key}, ()=>{ if(key) this.connectTmdb(key); });
+    this.startHeroTimer();
+  }
+
+  TMDB_IMG='https://image.tmdb.org/t/p/';
+  KMAP={flatrate:'incluso', free:'gratis', ads:'anuncios', rent:'aluguel', buy:'compra'};
+  ALIAS={netflix:['netflix'], prime:['prime video'], max:['max','hbo'], disney:['disney'],
+    globoplay:['globoplay'], appletv:['apple tv'], paramount:['paramount'], telecine:['telecine']};
+
+  get remote(){ return this.state.tmdbStatus==='ok'; }
+  catalog(){ return this.remote ? this.state.remote.titles : this.D.titles; }
+
+  async tmdbGet(path, params, key){
+    const u = new URL('https://api.themoviedb.org/3'+path);
+    u.searchParams.set('api_key', key||this.state.tmdbKey);
+    u.searchParams.set('language','pt-BR');
+    Object.keys(params||{}).forEach(k=>u.searchParams.set(k, params[k]));
+    const r = await fetch(u.toString());
+    if(!r.ok) throw new Error(r.status===401?'Chave inválida ou não autorizada.':'Erro na TMDB ('+r.status+').');
+    return r.json();
+  }
+
+  async connectTmdb(key){
+    key = (key||'').trim();
+    if(!key) return this.setState({tmdbStatus:'error', tmdbErr:'Cole sua chave de API v3 da TMDB.'});
+    this.setState({tmdbStatus:'loading', tmdbErr:'', tmdbKey:key});
+    const region = this.state.prefs.country || 'BR';
+    try{
+      const [gm, gt, provRes] = await Promise.all([
+        this.tmdbGet('/genre/movie/list', null, key),
+        this.tmdbGet('/genre/tv/list', null, key),
+        this.tmdbGet('/watch/providers/movie', {watch_region:region}, key)
+      ]);
+      const gmap={}; gm.genres.concat(gt.genres).forEach(g=>{ gmap[g.id]=g.name; });
+      const provMap={}; (provRes.results||[]).forEach(p=>{ provMap[String(p.provider_id)]={name:p.provider_name, logo:p.logo_path}; });
+      const provList=(provRes.results||[]).slice()
+        .sort((a,b)=>(a.display_priority??999)-(b.display_priority??999)).slice(0,16)
+        .map(p=>({id:String(p.provider_id), name:p.provider_name, logo:p.logo_path}));
+
+      const pages = await Promise.all([1,2,3].map(p=>this.tmdbGet('/trending/all/week',{page:p}, key)));
+      const seen=new Set(), items=[];
+      pages.forEach(pg=>(pg.results||[]).forEach(x=>{
+        if((x.media_type!=='movie'&&x.media_type!=='tv')||!x.poster_path) return;
+        const k=x.media_type+x.id; if(seen.has(k)) return; seen.add(k); items.push(x);
+      }));
+
+      const titles = await Promise.all(items.slice(0,48).map(async x=>{
+        const type = x.media_type==='movie'?'movie':'tv';
+        const offers=[];
+        try{
+          const wp = await this.tmdbGet('/'+type+'/'+x.id+'/watch/providers', null, key);
+          const r = (wp.results||{})[region]||{};
+          Object.keys(this.KMAP).forEach(tk=>(r[tk]||[]).forEach(p=>{
+            const pid=String(p.provider_id);
+            offers.push({p:pid, k:this.KMAP[tk]});
+            if(!provMap[pid]) provMap[pid]={name:p.provider_name, logo:p.logo_path};
+          }));
+        }catch(e){}
+        const date = x.release_date || x.first_air_date || '';
+        return {id:type+':'+x.id, tmdbId:x.id, tmdbType:type, t:type==='movie'?'m':'s',
+          title:x.title||x.name, year:date?parseInt(date.slice(0,4),10):0,
+          genres:(x.genre_ids||[]).map(g=>gmap[g]).filter(Boolean),
+          rating:x.vote_average||0, pop:x.popularity||0,
+          syn:x.overview||'Sinopse não disponível em português.',
+          poster:x.poster_path, backdrop:x.backdrop_path, cast:'', offers};
+      }));
+
+      const prefs=Object.assign({}, this.state.prefs);
+      if(!prefs.providersMock) prefs.providersMock=prefs.providers.slice();
+      if(prefs.providers.some(id=>!/^\d+$/.test(id))){
+        const names=Object.keys(provMap).map(id=>({id, n:provMap[id].name.toLowerCase()}));
+        const mapped=[];
+        prefs.providers.forEach(mid=>{
+          const al=this.ALIAS[mid]||[mid];
+          const hit=names.find(x=>al.some(a=>x.n.includes(a)));
+          if(hit&&!mapped.includes(hit.id)) mapped.push(hit.id);
+        });
+        prefs.providers=mapped;
+      }
+      localStorage.setItem('watchly_tmdb_key', key);
+      this.setState({remote:{titles, provList, provMap}, tmdbStatus:'ok', tmdbErr:'', castCache:{},
+        prefs, draftCountry:prefs.country, draftProviders:prefs.providers.slice()},
+        ()=>{ this.persist(); if(!prefs.providers.length&&this.state.screen!=='auth') this.goTo('onboarding'); });
+      this.showToast('Catálogo da TMDB carregado ('+titles.length+' títulos, '+region+').');
+    }catch(e){
+      this.setState({tmdbStatus:'error', tmdbErr:e.message||'Falha ao conectar à TMDB.'});
+    }
+  }
+
+  disconnectTmdb(){
+    localStorage.removeItem('watchly_tmdb_key');
+    const prefs=Object.assign({}, this.state.prefs);
+    if(prefs.providersMock) prefs.providers=prefs.providersMock.slice();
+    this.setState({tmdbStatus:'off', tmdbKey:'', keyInput:'', tmdbErr:'', prefs,
+      draftProviders:prefs.providers.slice(), remote:{titles:[],provList:[],provMap:{}}},
+      ()=>this.persist());
+  }
+
+  async loadCast(id){
+    const t=this.catalog().find(x=>x.id===id); if(!t||!t.tmdbId) return;
+    try{
+      const d=await this.tmdbGet('/'+t.tmdbType+'/'+t.tmdbId+'/credits');
+      const cast=(d.cast||[]).slice(0,8).map(c=>({name:c.name, character:c.character||'', photo:c.profile_path||null}));
+      this.setState(s=>({castCache:Object.assign({}, s.castCache, {[id]:cast})}));
+    }catch(e){}
+  }
+
+  mountForced(tela){
+    const prefs={country:'BR', providers:['netflix','max','globoplay','appletv']};
+    const wl=[{id:2,at:3},{id:27,at:2},{id:31,at:1}];
+    const map={login:['auth','login'], cadastro:['auth','signup'], senha:['auth','forgot'],
+      onboarding:['onboarding','login'], home:['home','login'], busca:['busca','login'],
+      titulo:['titulo','login'], watchlist:['watchlist','login'], preferencias:['prefs','login']};
+    const [screen, authMode] = map[tela] || map.home;
+    this.setState({session:'voce@watchly.app', prefs, watchlist: screen==='auth'||screen==='onboarding'?[]:wl,
+      screen, authMode, prevScreen:'home', curId:2, query: screen==='busca'?'a':'',
+      draftCountry:'BR', draftProviders: screen==='onboarding'?['netflix','max']:prefs.providers.slice(),
+      aEmail: screen==='auth'?'voce@email.com':'', aPass: authMode==='forgot'?'':'••••••••',
+      forced:true});
+    this.startHeroTimer();
+  }
+
+  HERO_MS=7000;
+  heroCount(){ return Math.max(1, (this._heroLen||1)); }
+  goHero(i, auto){
+    if(i===(this.state.heroIdx||0)) return;
+    if(!auto) this.startHeroTimer();
+    clearTimeout(this._heroFade);
+    this.setState({heroFade:false});
+    this._heroFade=setTimeout(()=>{
+      this.setState({heroIdx:i, heroFade:true});
+      this.forceUpdate();
+    }, 320);
+  }
+  startHeroTimer(){
+    clearInterval(this._heroTimer);
+    this._heroTimer=setInterval(()=>{
+      if(document.hidden) return;
+      const n=this.heroCount();
+      this.goHero(((this.state.heroIdx||0)+1)%n, true);
+    }, this.HERO_MS);
+  }
+  componentWillUnmount(){ clearInterval(this._heroTimer); clearTimeout(this._heroFade); clearTimeout(this._tt); }
+
+  loadUser(e){ try{ return JSON.parse(localStorage.getItem('watchly_u_'+e))||{}; }catch(x){ return {}; } }
+  saveUser(e,u){ localStorage.setItem('watchly_u_'+e, JSON.stringify(u)); }
+  persist(){ const s=this.state; if(s.forced) return; if(s.session) this.saveUser(s.session,{prefs:s.prefs,watchlist:s.watchlist}); }
+  showToast(m){ this.setState({toast:m}); clearTimeout(this._tt); this._tt=setTimeout(()=>this.setState({toast:''}),2400); }
+  goTo(screen, extra){ this.setState(Object.assign({screen}, extra||{})); window.scrollTo(0,0); }
+
+  doAuth(){
+    const {authMode,aEmail,aPass,aSource}=this.state; const email=aEmail.trim().toLowerCase();
+    let acc={}; try{ acc=JSON.parse(localStorage.getItem('watchly_accounts'))||{}; }catch(x){}
+    if(authMode==='signup'){
+      if(!/.+@.+\..+/.test(email)) return this.setState({aErr:'Informe um email válido.'});
+      if(acc[email]) return this.setState({aErr:'Já existe uma conta com esse email. Use Entrar.'});
+      if(aPass.length<6) return this.setState({aErr:'A senha precisa de pelo menos 6 caracteres.'});
+      if(!aSource) return this.setState({aErr:'Conte onde você conheceu o Watchly.'});
+      acc[email]={p:aPass, source:aSource};
+      localStorage.setItem('watchly_accounts',JSON.stringify(acc));
+    } else {
+      if(!/.+@.+\..+/.test(email)) return this.setState({aErr:'Informe um email válido.'});
+      const rec=acc[email];
+      if(!rec) return this.setState({aErr:'Conta não encontrada. Crie uma conta primeiro.'});
+      if((typeof rec==='string'?rec:rec.p)!==aPass) return this.setState({aErr:'Senha incorreta.'});
+    }
+    localStorage.setItem('watchly_session',email);
+    const u=this.loadUser(email); const prefs=u.prefs||{country:'BR',providers:[]};
+    const needsOb=!prefs.providers.length;
+    const wlMigrated=(u.watchlist||[]).map(w=>Object.assign({}, w, {status:this.normStatus(w.status)}));
+    this.setState({session:email, prefs, watchlist:wlMigrated, aErr:'', aPass:'',
+      authNotice:'', draftCountry:prefs.country, draftProviders:prefs.providers.slice(),
+      screen: needsOb ? 'onboarding' : 'home'}, ()=>{ if(!needsOb) this.runPending(); });
+    window.scrollTo(0,0);
+  }
+  doForgot(){
+    const email=this.state.aEmail.trim().toLowerCase();
+    if(!/.+@.+\..+/.test(email)) return this.setState({aErr:'Informe um email válido.', aInfo:''});
+    this.setState({aErr:'', aInfo:'Se existir uma conta para '+email+', enviamos um link de redefinição de senha. (simulado nesta fase)'});
+  }
+  logout(){
+    localStorage.removeItem('watchly_session');
+    this.setState({session:null, screen:'home', authMode:'login', aPass:'', aErr:'', aInfo:'',
+      authNotice:'', pendingWl:null, prefs:{country:'BR',providers:[]}, watchlist:[], query:'', prefsMsg:''});
+    window.scrollTo(0,0);
+  }
+
+  prov(id){
+    if(this.remote){
+      const p=this.state.remote.provMap[String(id)];
+      if(!p) return {id:String(id), name:'Serviço '+id, dot:'rgba(255,255,255,.3)', initial:'?'};
+      return {id:String(id), name:p.name, initial:'', logo:p.logo,
+        dot:'url("'+this.TMDB_IMG+'w92'+p.logo+'") center/cover no-repeat #ffffff'};
+    }
+    const p=this.PROVIDERS.find(x=>x.id===id);
+    return p?{id:p.id, name:p.name, dot:p.dot, initial:p.name[0]}
+            :{id:String(id), name:String(id), dot:'rgba(255,255,255,.3)', initial:'?'};
+  }
+  availableProviders(country){
+    if(this.remote) return this.state.remote.provList.map(p=>this.prov(p.id));
+    return this.PROVIDERS.filter(p=>p.cc.includes(country)).map(p=>this.prov(p.id));
+  }
+  offersIn(t, country){
+    if(this.remote) return t.offers;
+    if(country==='BR') return t.offers;
+    return t.offers.filter(o => this.PROVIDERS.find(p=>p.id===o.p).cc.includes(country));
+  }
+  best(list){ for(const k of this.KORDER){ if(list.some(o=>o.k===k)) return k; } return null; }
+  pname(id){ return this.prov(id).name; }
+
+  hover(key){
+    return {onEnter:()=>this.setState({hoverKey:key}), onLeave:()=>this.setState({hoverKey:null}),
+      isOn:this.state.hoverKey===key};
+  }
+  pill(key, on, hovered){
+    if(on) return {bg:hovered?'#c7ccd4':'#f2f3f5', c:'#0b0c10', border:hovered?'#c7ccd4':'#f2f3f5'};
+    return {bg:hovered?'rgba(255,255,255,.1)':'transparent',
+      c:hovered?'#ffffff':'rgba(255,255,255,.6)',
+      border:hovered?'rgba(255,255,255,.55)':'rgba(255,255,255,.18)'};
+  }
+  STATUS=[{v:'nao',l:'Ainda não assistido'},{v:'sim',l:'Já assistido'}];
+  normStatus(v){ return (v==='sim'||v==='assistido')?'sim':'nao'; }
+  statusOf(id){ const w=this.state.watchlist.find(x=>x.id===id); return w?this.normStatus(w.status):null; }
+  statusLabel(v){ const s=this.STATUS.find(x=>x.v===v); return s?s.l:''; }
+  setStatus(id, st){
+    if(!this.state.session) return this.requireAuth(id);
+    const t=this.catalog().find(x=>x.id===id);
+    const wl=this.state.watchlist.slice();
+    const i=wl.findIndex(w=>w.id===id);
+    if(i<0) return;
+    if(this.normStatus(wl[i].status)===st) return;
+    wl[i]=Object.assign({}, wl[i], {status:st});
+    this.setState({watchlist:wl}, ()=>this.persist());
+    this.showToast(t.title+' · '+this.statusLabel(st));
+  }
+  inWL(id){ return this.state.watchlist.some(w=>w.id===id); }
+  requireAuth(id){
+    this.setState({pendingWl:id||null, screen:'auth', authMode:'login', aErr:'', aInfo:'',
+      authNotice:'Para adicionar filmes e séries à sua watchlist, entre na sua conta ou crie uma gratuitamente.'});
+    // gate de ação protegida
+    window.scrollTo(0,0);
+  }
+  runPending(){
+    const id=this.state.pendingWl;
+    if(!id) return false;
+    this.setState({pendingWl:null});
+    if(!this.inWL(id)) this.toggleWL(id);
+    this.openTitle(id);
+    return true;
+  }
+  toggleWL(id){
+    if(!this.state.session) return this.requireAuth(id);
+    const t=this.catalog().find(x=>x.id===id)||this.D.titles.find(x=>x.id===id);
+    let wl=this.state.watchlist.slice();
+    if(this.inWL(id)){ wl=wl.filter(w=>w.id!==id); this.showToast('Removido da minha lista: '+t.title); }
+    else { wl.unshift({id, at:Date.now(), status:'nao'}); this.showToast('Adicionado a minha lista: '+t.title); }
+    this.setState({watchlist:wl}, ()=>this.persist());
+  }
+  openTitle(id){
+    this.setState({curId:id, prevScreen: this.state.screen==='titulo'?this.state.prevScreen:this.state.screen, screen:'titulo'});
+    window.scrollTo(0,0);
+    if(this.remote && !this.state.castCache[id]) this.loadCast(id);
+  }
+
+  posterBg(t){
+    if(t.img) return 'url("'+t.img+'") center/cover no-repeat #15161c';
+    if(t.poster) return 'url("'+this.TMDB_IMG+'w500'+t.poster+'") center/cover no-repeat #15161c';
+    const h=t.hue, h2=(h+45)%360;
+    return 'linear-gradient(155deg, oklch(0.44 0.1 '+h+') 0%, oklch(0.23 0.08 '+h2+') 55%, oklch(0.13 0.04 '+h2+') 100%)';
+  }
+  heroBgFor(t){
+    if(t.back) return 'url("'+t.back+'") center 22%/cover no-repeat #15161c';
+    if(t.backdrop) return 'url("'+this.TMDB_IMG+'w1280'+t.backdrop+'") center/cover no-repeat #15161c';
+    if(t.poster) return 'url("'+this.TMDB_IMG+'w780'+t.poster+'") center/cover no-repeat #15161c';
+    const h=t.hue, h2=(h+55)%360;
+    return 'linear-gradient(115deg, oklch(0.4 0.11 '+h+') 0%, oklch(0.2 0.07 '+h2+') 60%, oklch(0.12 0.04 '+h2+') 100%)';
+  }
+
+  card(t){
+    const s=this.state, c=s.prefs.country;
+    const off=this.offersIn(t,c);
+    const mine=off.filter(o=>s.prefs.providers.includes(o.p));
+    const bk=this.best(mine.length?mine:off);
+    const K=bk?this.KINDS[bk]:null;
+    const personalized=s.prefs.providers.length>0;
+    const isMine=personalized ? mine.length>0 : off.length>0;
+    return {
+      key:t.id, title:t.title, tag:(t.t==='m'?'FILME':'SÉRIE')+' · '+t.year,
+      meta:t.year+' · '+(t.t==='m'?'Filme':'Série')+' · '+t.genres[0],
+      rating:t.rating.toFixed(1), bg:this.posterBg(t), labelOp:(t.poster||t.img)?0:1,
+      badgeL:K?K.l:'Indisponível',
+      badgeBg:isMine&&K?K.c:'rgba(0,0,0,.5)',
+      badgeFg:isMine&&K?'#0b0c10':'rgba(255,255,255,.8)',
+      provLine: personalized
+        ? (mine.length?[...new Set(mine.map(o=>this.pname(o.p)))].join(' · '):'Fora dos seus serviços')
+        : [...new Set(off.map(o=>this.pname(o.p)))].slice(0,3).join(' · '),
+      pop:t.pop, mineFlag:personalized?mine.length>0:false,
+      open:()=>this.openTitle(t.id)
+    };
+  }
+
+  matchAno(t){
+    switch(this.state.fAno){
+      case 'a2425': return t.year>=2024;
+      case 'a2023': return t.year>=2020&&t.year<=2023;
+      case 'a2010': return t.year>=2010&&t.year<=2019;
+      case 'old': return t.year<2010;
+      default: return true;
+    }
+  }
+  filtered(){
+    const s=this.state, c=s.prefs.country;
+    let list=this.catalog().filter(t=>this.offersIn(t,c).length>0);
+    if(s.fTipo!=='all') list=list.filter(t=>t.t===s.fTipo);
+    if(s.fGen!=='all') list=list.filter(t=>t.genres.includes(s.fGen));
+    if(s.session && s.fProv!=='all') list=list.filter(t=>this.offersIn(t,c).some(o=>o.p===s.fProv));
+    list=list.filter(t=>this.matchAno(t));
+    if(s.sort==='nota') list.sort((a,b)=>b.rating-a.rating);
+    else if(s.sort==='data') list.sort((a,b)=>b.year-a.year||b.pop-a.pop);
+    else list.sort((a,b)=>b.pop-a.pop);
+    return list;
+  }
+
+  offerRow(o){
+    const P=this.prov(o.p), K=this.KINDS[o.k];
+    const pr=this.PRICES[this.state.prefs.country];
+    const wm=this.WORDMARK[o.p];
+    return {key:o.p+o.k, name:P.name, initial:P.initial, dot:P.dot, kindL:K.l, kindBg:K.c,
+      price:o.k==='aluguel'?pr.aluguel:(o.k==='compra'?pr.compra:''),
+      hasLogo:!!P.logo, hasMark:!P.logo,
+      markText:wm?wm.t:P.name, markColor:wm?wm.c:'#f2f3f5', markWeight:wm?wm.w:700,
+      markSize:wm?Math.max(7.5, Math.round(wm.s*0.46*10)/10):8,
+      markSpacing:wm?wm.ls:'-0.02em', markTransform:wm&&wm.u?'uppercase':'none'};
+  }
+
+  setDraftCountry(code){
+    const av=this.availableProviders(code).map(p=>p.id);
+    this.setState({draftCountry:code, draftProviders:this.state.draftProviders.filter(id=>av.includes(id)), prefsMsg:''});
+  }
+  toggleDraft(id){
+    const d=this.state.draftProviders.slice(); const i=d.indexOf(id);
+    if(i>=0) d.splice(i,1); else d.push(id);
+    this.setState({draftProviders:d, prefsMsg:''});
+  }
+  finishOb(){
+    if(!this.state.draftProviders.length) return;
+    const changed=this.state.draftCountry!==this.state.prefs.country;
+    const prefs=Object.assign({}, this.state.prefs, {country:this.state.draftCountry, providers:this.state.draftProviders.slice()});
+    this.setState({prefs, screen:'home'}, ()=>{
+      this.persist();
+      if(changed && this.remote) this.connectTmdb(this.state.tmdbKey);
+      this.runPending();
+    });
+    window.scrollTo(0,0);
+  }
+  savePrefs(){
+    if(!this.state.draftProviders.length){
+      this.setState({prefsMsg:'Escolha pelo menos um streaming disponível neste país para continuar.', prefsMsgOk:false});
+      return;
+    }
+    const changed=this.state.draftCountry!==this.state.prefs.country;
+    const prefs=Object.assign({}, this.state.prefs, {country:this.state.draftCountry, providers:this.state.draftProviders.slice()});
+    this.setState({prefs, prefsMsg:'Preferências salvas. Sua watchlist continua intacta.', prefsMsgOk:true}, ()=>{
+      this.persist();
+      if(changed && this.remote) this.connectTmdb(this.state.tmdbKey);
+    });
+  }
+
+  renderVals(){
+    const s=this.state, D=this.D;
+    const country=s.prefs.country;
+    const countryName=this.COUNTRIES.find(x=>x.code===country).name;
+    const isApp=['home','busca','titulo','watchlist','prefs'].includes(s.screen);
+    const dens=(this.props.densidadeGrade??'confortavel')==='densa'?148:176;
+
+    const sel='#f2f3f5', selC='#0b0c10', un='rgba(255,255,255,.06)', unC='rgba(255,255,255,.8)';
+    const countries=this.COUNTRIES.map(c=>{
+      const on=s.draftCountry===c.code, h=this.hover('ct:'+c.code);
+      return {key:c.code, name:c.name, bg:h.isOn?'rgba(255,255,255,.1)':'transparent',
+        c:(on||h.isOn)?'#ffffff':'rgba(255,255,255,.6)',
+        border:on?(h.isOn?'#ffffff':'rgba(255,255,255,.75)'):(h.isOn?'rgba(255,255,255,.5)':'rgba(255,255,255,.16)'),
+        onEnter:h.onEnter, onLeave:h.onLeave,
+        on:()=>this.setDraftCountry(c.code)};
+    });
+    const provCards=this.availableProviders(s.draftCountry).map(p=>{
+      const on=s.draftProviders.includes(p.id);
+      const hp=this.hover('pv:'+p.id);
+      const wm=this.WORDMARK[p.id];
+      return {key:p.id, name:p.name, initial:p.initial, dot:p.dot,
+        logoBg:p.logo?p.dot:'rgba(255,255,255,.05)', hasLogo:!!p.logo, hasWordmark:!p.logo,
+        wmText:wm?wm.t:p.name, wmColor:wm?wm.c:'#f2f3f5', wmWeight:wm?wm.w:700,
+        wmSpacing:wm?wm.ls:'-0.02em', wmSize:wm?wm.s:15, wmFont:wm&&wm.f?wm.f:"'Geist',sans-serif",
+        wmTransform:wm&&wm.u?'uppercase':'none',
+        wmCircleSize:wm?Math.max(9, Math.round(wm.s*0.62)):10,
+        check:on?1:0,
+        bg:hp.isOn?'rgba(255,255,255,.1)':'transparent',
+        textC:(on||hp.isOn)?'#ffffff':'rgba(255,255,255,.6)',
+        border:on?(hp.isOn?'#ffffff':'rgba(255,255,255,.75)'):(hp.isOn?'rgba(255,255,255,.5)':'rgba(255,255,255,.14)'),
+        onEnter:hp.onEnter, onLeave:hp.onLeave,
+        on:()=>this.toggleDraft(p.id)};
+    });
+
+    const genreList=this.remote
+      ? [...new Set(this.catalog().flatMap(t=>t.genres))].sort((a,b)=>a.localeCompare(b))
+      : D.genres;
+    const flist=this.filtered();
+    const cards=flist.map(t=>this.card(t));
+    const heroT=flist.find(t=>this.offersIn(t,country).some(o=>s.prefs.providers.includes(o.p)))||flist[0];
+    let hero={};
+    const heroPool=flist.slice(0,5);
+    this._heroLen=heroPool.length;
+    const hi=Math.min(s.heroIdx||0, Math.max(0, heroPool.length-1));
+    const heroCur=heroPool[hi]||heroT;
+    if(heroCur){
+      hero={hasHero:true, heroBg:this.heroBgFor(heroCur), heroTitle:heroCur.title,
+        heroKicker:(heroCur.t==='m'?(heroCur.year>=2024?'Novo filme':'Filme'):(heroCur.year>=2024?'Nova série':'Série')),
+        heroSyn:heroCur.syn,
+        heroOpen:()=>this.openTitle(heroCur.id),
+        heroWl:()=>this.toggleWL(heroCur.id),
+        heroWlLabel:this.inWL(heroCur.id)?'✓ Na minha lista':'Adicionar à minha lista',
+        heroFade:s.heroFade===false?0:1,
+        heroLayers:heroPool.map((t,i)=>({key:t.id, bg:this.heroBgFor(t), op:i===hi?1:0})),
+        heroDots:heroPool.map((t,i)=>({key:t.id+':'+(i===hi?'on':'off'), title:t.title,
+          act:i===hi?'1':'0',
+          bg:i===hi?'#ffffff':'rgba(255,255,255,.3)',
+          w:i===hi?22:8, cur:i===hi?'default':'pointer',
+          on:()=>this.goHero(i)}))};
+    } else hero={hasHero:false};
+
+    const filters=[
+      {key:'tipo', val:s.fTipo, on:e=>this.setState({fTipo:e.target.value}), opts:[{v:'all',l:'Filmes e séries'},{v:'m',l:'Filmes'},{v:'s',l:'Séries'}]},
+      {key:'gen', val:s.fGen, on:e=>this.setState({fGen:e.target.value}), opts:[{v:'all',l:'Todos os gêneros'}].concat(genreList.map(g=>({v:g,l:g})))},
+      {key:'ano', val:s.fAno, on:e=>this.setState({fAno:e.target.value}), opts:[{v:'all',l:'Todos os anos'},{v:'a2425',l:'2024–2025'},{v:'a2023',l:'2020–2023'},{v:'a2010',l:'2010–2019'},{v:'old',l:'Antes de 2010'}]}
+    ];
+    if(s.session && s.prefs.providers.length)
+      filters.splice(2, 0, {key:'prov', val:s.fProv, on:e=>this.setState({fProv:e.target.value}),
+        opts:[{v:'all',l:'Todos os serviços'}].concat(
+          s.prefs.providers.map(id=>({v:id, l:this.pname(id)})))});
+
+    const q=s.query.trim().toLowerCase();
+    const found=q?this.catalog().filter(t=>t.title.toLowerCase().includes(q)):[];
+    const sMine=[], sOut=[];
+    found.forEach(t=>{
+      if(!s.prefs.providers.length) return sMine.push(this.card(t));
+      const off=this.offersIn(t,country);
+      const mine=off.some(o=>s.prefs.providers.includes(o.p));
+      (mine?sMine:sOut).push(this.card(t));
+    });
+
+    let det={};
+    if(s.screen==='titulo'&&s.curId){
+      const t=this.catalog().find(x=>x.id===s.curId)||D.titles[0];
+      const off=this.offersIn(t,country);
+      const seen=new Set();
+      const uniq=off.filter(o=>{const k=o.p+o.k; if(seen.has(k))return false; seen.add(k); return true;});
+      const mine=uniq.filter(o=>s.prefs.providers.includes(o.p));
+      const other=uniq.filter(o=>!s.prefs.providers.includes(o.p));
+      det={dTitle:t.title, dTag:(t.t==='m'?'FILME':'SÉRIE')+' · '+t.year, dBg:this.heroBgFor(t),
+        dPosterBg:this.posterBg(t), dLabelOp:(t.poster||t.img)?0:1,
+        dMeta:(t.t==='m'?'Filme':'Série')+' · '+t.year+' · '+t.genres.join(', '), dRating:t.rating.toFixed(1),
+        dCastList:(()=>{
+          const src=s.castCache[t.id];
+          const list=Array.isArray(src)?src
+            :(Array.isArray(t.people)?t.people
+            :String(t.cast||'').split(',').map(n=>n.trim()).filter(Boolean).map(n=>({name:n, character:'', photo:null})));
+          return list.slice(0,8).map((c,i)=>({key:c.name+i, name:c.name, character:c.character||'—',
+            noPhoto:!c.photo,
+            bg:c.photo?'url("'+(/^uploads\//.test(c.photo)?c.photo:this.TMDB_IMG+'w300'+c.photo)+'") center top/cover no-repeat #15161c'
+              :'linear-gradient(160deg, oklch(0.3 0.03 '+((t.hue||200)+i*28)%360+') 0%, oklch(0.18 0.02 250) 100%)',
+            initials:c.name.split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()}));
+        })(),
+        dHasCast:!!(Array.isArray(s.castCache[t.id])?s.castCache[t.id].length:(Array.isArray(t.people)?t.people.length:String(t.cast||'').trim())),
+        dSyn:t.syn,
+        dWl:()=>this.toggleWL(t.id), dWlLabel:this.inWL(t.id)?'✓ Na minha lista':'+ Add a minha lista',
+        dInList:this.inWL(t.id),
+        dStatusOpts:this.STATUS.map(st=>{
+          const on=this.statusOf(t.id)===st.v, hv=this.hover('det:'+st.v);
+          return {key:st.v+(on?':on':':off'), l:st.l, onEnter:hv.onEnter, onLeave:hv.onLeave,
+            bg:on?'rgba(255,255,255,.13)':'transparent',
+            c:on?'#ffffff':(hv.isOn?'rgba(255,255,255,.8)':'rgba(255,255,255,.5)'),
+            w:on?600:500, cur:on?'default':'pointer', check:on?1:0,
+            on:()=>this.setStatus(t.id, st.v)};
+        }),
+        dMine:mine.map(o=>this.offerRow(o)), dOther:other.map(o=>this.offerRow(o)),
+        dHasMine:mine.length>0, dHasOther:other.length>0, dNoOffer:uniq.length===0,
+        dOtherLabel:mine.length?'Também disponível em '+countryName:'Disponível em '+countryName+' (fora dos seus serviços)',
+        onBack:()=>this.goTo(s.prevScreen)};
+    }
+
+    const wlAll=s.watchlist.slice().sort((a,b)=>b.at-a.at);
+    const wlItems=wlAll.map(w=>{
+      const t=this.catalog().find(x=>x.id===w.id); if(!t) return null;
+      const c=this.card(t);
+      const off=this.offersIn(t,country);
+      let avail, availC;
+      if(c.mineFlag){ avail='Disponível em '+c.provLine; availC='oklch(0.8 0.12 160)'; }
+      else if(off.length){ avail='Fora dos seus serviços — '+[...new Set(off.map(o=>this.pname(o.p)))].join(' · '); availC='rgba(255,255,255,.55)'; }
+      else { avail='Sem oferta em '+countryName+' no momento'; availC='oklch(0.72 0.12 25)'; }
+      const cur=this.normStatus(w.status);
+      return {key:t.id, title:t.title, meta:c.meta, bg:c.bg, avail, availC,
+        badgeL:c.badgeL, badgeBg:c.badgeBg, badgeFg:c.badgeFg,
+        statusOpts:this.STATUS.map(st=>{
+          const on=cur===st.v, hv=this.hover('wl:'+t.id+':'+st.v);
+          return {key:st.v+(on?':on':':off'), l:st.l, onEnter:hv.onEnter, onLeave:hv.onLeave,
+            bg:on?'rgba(255,255,255,.13)':'transparent',
+            c:on?'#ffffff':(hv.isOn?'rgba(255,255,255,.8)':'rgba(255,255,255,.5)'),
+            w:on?600:500, cur:on?'default':'pointer', check:on?1:0,
+            on:()=>{ if(!on) this.setStatus(t.id, st.v); }};
+        }),
+        open:()=>this.openTitle(t.id), remove:()=>this.toggleWL(t.id)};
+    }).filter(Boolean);
+
+    const navDef=[
+      {l:'Início', active:s.screen==='home'&&s.fTipo==='all', on:()=>this.goTo('home',{fTipo:'all'})},
+      {l:'Filmes', active:s.screen==='home'&&s.fTipo==='m', on:()=>this.goTo('home',{fTipo:'m'})},
+      {l:'Séries', active:s.screen==='home'&&s.fTipo==='s', on:()=>this.goTo('home',{fTipo:'s'})},
+      {l:'Watchlist', active:s.screen==='watchlist', on:()=>{ if(s.session) this.goTo('watchlist'); else this.requireAuth(null); }}
+    ];
+    const navItems=navDef.map((n,i)=>{
+      const h=this.hover('nav:'+i);
+      return {key:i, l:n.l, on:n.on, onEnter:h.onEnter, onLeave:h.onLeave,
+        c:n.active?'#ffffff':(h.isOn?'#ffffff':'rgba(255,255,255,.6)'),
+        w:n.active?700:500,
+        cur:n.active?'default':'pointer'};
+    });
+
+    const obReady=s.draftProviders.length>0;
+    return Object.assign({
+      isAuth:s.screen==='auth', isOnboarding:s.screen==='onboarding', isApp,
+      isHome:s.screen==='home', isBusca:s.screen==='busca', isTitulo:s.screen==='titulo',
+      isWatchlist:s.screen==='watchlist', isPrefs:s.screen==='prefs',
+      isForgot:s.authMode==='forgot', notForgot:s.authMode!=='forgot', isSignup:s.authMode==='signup',
+      isLogin:s.authMode==='login',
+      authTitle: s.authMode==='signup'?'Criar sua conta':(s.authMode==='forgot'?'Recuperar senha':'Login'),
+      authSubtitle: s.authMode==='signup'?'Seja bem-vindo ao Watchly'
+        :(s.authMode==='forgot'?'Enviamos um link para você criar uma senha nova':'Acesse sua conta para continuar'),
+      switchPrompt: s.authMode==='signup'?'Já tem conta?':(s.authMode==='forgot'?'Lembrou a senha?':'Novo por aqui?'),
+      switchCta: s.authMode==='signup'?'Entrar':(s.authMode==='forgot'?'Voltar para o login':'Criar conta'),
+      onSwitchMode:()=>this.setState({authMode: s.authMode==='login'?'signup':'login', aErr:'', aInfo:'', aPass:''}),
+      onSubmitAuth:()=>{ if(s.authMode==='forgot') this.doForgot(); else this.doAuth(); },
+      aEmail:s.aEmail, aPass:s.aPass, aErr:s.aErr, aInfo:s.aInfo, aSource:s.aSource,
+      onASource:e=>this.setState({aSource:e.target.value, aErr:''}),
+      sourceColor:s.aSource?'#f2f3f5':'rgba(255,255,255,.45)',
+      sourceOpts:[{v:'',l:'Onde você conheceu o Watchly?'},{v:'amigo',l:'Indicação de um amigo'},
+        {v:'redes',l:'Redes sociais'},{v:'busca',l:'Busca no Google'},{v:'youtube',l:'YouTube ou podcast'},
+        {v:'imprensa',l:'Notícia ou blog'},{v:'appstore',l:'Loja de aplicativos'},{v:'outro',l:'Outro'}],
+      hasAErr:!!s.aErr, hasAInfo:!!s.aInfo,
+      onAEmail:e=>this.setState({aEmail:e.target.value, aErr:''}),
+      onAPass:e=>this.setState({aPass:e.target.value, aErr:''}),
+      onAKey:e=>{ if(e.key!=='Enter') return; if(s.authMode==='forgot') this.doForgot(); else this.doAuth(); },
+      onAuth:()=>this.doAuth(), onForgot:()=>this.doForgot(),
+      onTabLogin:()=>this.setState({authMode:'login', aErr:''}),
+      onTabSignup:()=>this.setState({authMode:'signup', aErr:''}),
+      onGoForgot:()=>this.setState({authMode:'forgot', aErr:'', aInfo:''}),
+      onBackToLogin:()=>this.setState({authMode:'login', aErr:'', aInfo:''}),
+      tabLoginBg:s.authMode==='login'?sel:'transparent', tabLoginC:s.authMode==='login'?selC:unC,
+      tabSignupBg:s.authMode==='signup'?sel:'transparent', tabSignupC:s.authMode==='signup'?selC:unC,
+      authCta:s.authMode==='signup'?'Criar conta':(s.authMode==='forgot'?'Enviar link de redefinição':'Entrar'),
+      countries, provCards,
+      onFinishOb:()=>this.finishOb(),
+      contBg:obReady?'#ffffff':'rgba(255,255,255,.1)', contC:obReady?'#0b0c10':'rgba(255,255,255,.4)',
+      contCur:obReady?'pointer':'not-allowed', contOp:obReady?1:.55,
+      obHint:obReady?s.draftProviders.length+' selecionado(s)':'Escolha pelo menos um streaming.',
+      navItems, isGuest:!s.session, isAuthed:!!s.session,
+      userShort:s.session?s.session.split('@')[0]:'',
+      avatarInitials:s.session?s.session[0].toUpperCase():'',
+      onGoAuth:()=>{ this.setState({pendingWl:null, authNotice:''}); this.goTo('auth',{authMode:'login', aErr:'', aInfo:''}); },
+      onGoSignup:()=>{ this.setState({pendingWl:null, authNotice:''}); this.goTo('auth',{authMode:'signup', aErr:'', aInfo:''}); },
+      onGoBusca:()=>this.goTo('busca'),
+      onBuscaEnter:()=>this.setState({hoverKey:'buscaTab'}), onBuscaLeave:()=>this.setState({hoverKey:null}),
+      buscaC: s.screen==='busca' ? '#ffffff' : (s.hoverKey==='buscaTab'?'#ffffff':'rgba(255,255,255,.6)'),
+      buscaCur: s.screen==='busca' ? 'default' : 'pointer',
+      onLoginEnter:()=>this.setState({hoverKey:'loginTab'}), onLoginLeave:()=>this.setState({hoverKey:null}),
+      loginC: (s.screen==='auth'&&s.authMode==='login')||s.hoverKey==='loginTab' ? '#ffffff' : 'rgba(255,255,255,.6)',
+      loginCur: s.screen==='auth'&&s.authMode==='login' ? 'default' : 'pointer',
+      authNotice:s.authNotice||'', hasAuthNotice:!!s.authNotice,
+      onExitAuth:()=>this.goTo('home',{authNotice:'', pendingWl:null, aErr:'', aInfo:''}),
+      prefsTabBg:s.screen==='prefs'?'#f2f3f5':(s.hoverKey==='prefsTab'?'rgba(255,255,255,.16)':'rgba(255,255,255,.08)'),
+      prefsTabC:s.screen==='prefs'?'#0b0c10':'#ffffff',
+      prefsTabCur:s.screen==='prefs'?'default':'pointer',
+      onPrefsEnter:()=>this.setState({hoverKey:'prefsTab'}), onPrefsLeave:()=>this.setState({hoverKey:null}),
+      avatarBg:s.screen==='prefs'?'#0b0c10':'rgba(255,255,255,.18)',
+      avatarC:s.screen==='prefs'?'#f2f3f5':'#ffffff',
+      onGoPrefs:()=>this.goTo('prefs',{draftCountry:s.prefs.country, draftProviders:s.prefs.providers.slice(), prefsMsg:''}),
+      onGoHome:()=>this.goTo('home'),
+      filters, sortVal:s.sort, onSort:e=>this.setState({sort:e.target.value}),
+      sortOpts:[{v:'pop',l:'Popularidade'},{v:'nota',l:'Nota'},{v:'data',l:'Data de lançamento'}],
+      cards, resultCount:cards.length+(cards.length===1?' título':' títulos'), noResults:cards.length===0,
+      gridMin:dens,
+      query:s.query, onQuery:e=>this.setState({query:e.target.value}),
+      hasQuery:q.length>0, noQuery:q.length===0,
+      sMine, sOut, sMineN:'('+sMine.length+')', sOutN:'('+sOut.length+')',
+      sMineEmpty:sMine.length===0, sOutEmpty:sOut.length===0,
+      searchSplit:s.prefs.providers.length>0,
+      sMineTitle:s.prefs.providers.length?'Nos seus streamings':'Resultados',
+      wlItems, wlEmpty:wlItems.length===0,
+      wlSub:wlAll.length+(wlAll.length===1?' título salvo':' títulos salvos')+' · disponibilidade em '+countryName,
+      userEmail:s.session||'', countryName,
+      onSavePrefs:()=>this.savePrefs(), onLogout:()=>this.logout(),
+      keyInput:s.keyInput, onKeyInput:e=>this.setState({keyInput:e.target.value, tmdbErr:''}),
+      onConnectTmdb:()=>this.connectTmdb(s.keyInput), onDisconnectTmdb:()=>this.disconnectTmdb(),
+      tmdbOn:this.remote, tmdbCta:s.tmdbStatus==='loading'?'Carregando…':(this.remote?'Recarregar':'Conectar'),
+      tmdbStatusMsg: s.tmdbStatus==='ok' ? 'Conectado à TMDB — catálogo, pôsteres e disponibilidade reais em '+countryName+'.'
+        : s.tmdbStatus==='loading' ? 'Buscando catálogo, provedores e disponibilidade…'
+        : s.tmdbStatus==='error' ? s.tmdbErr
+        : 'Usando o catálogo simulado. Pegue a chave em themoviedb.org → Configurações → API.',
+      tmdbStatusC: s.tmdbStatus==='ok' ? 'oklch(0.8 0.12 160)' : s.tmdbStatus==='error' ? 'oklch(0.75 0.16 25)' : 'rgba(255,255,255,.5)',
+      prefsMsg:s.prefsMsg, hasPrefsMsg:!!s.prefsMsg,
+      prefsMsgC:s.prefsMsgOk?'oklch(0.8 0.12 160)':'oklch(0.75 0.16 25)',
+      toast:s.toast, hasToast:!!s.toast
+    }, hero, det);
+  }
+}
+</script>
+</body></html>
