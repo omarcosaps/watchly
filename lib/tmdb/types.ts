@@ -43,6 +43,25 @@ export type TmdbTvListItem = {
   adult: boolean
 }
 
+export type TmdbTrendingMediaType = "movie" | "tv" | "person"
+
+export type TmdbTrendingItem = {
+  id: number
+  adult: boolean
+  media_type: TmdbTrendingMediaType
+  title?: string
+  name?: string
+  original_title?: string
+  original_name?: string
+  overview?: string
+  poster_path: string | null
+  backdrop_path: string | null
+  release_date?: string
+  first_air_date?: string
+  popularity: number
+  vote_average?: number
+}
+
 export type TmdbGenre = {
   id: number
   name: string

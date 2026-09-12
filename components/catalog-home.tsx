@@ -10,6 +10,8 @@ import { HeroCarousel } from "@/components/hero-carousel"
 import { StatusPanel } from "@/components/status-panel"
 import { GUEST_PREFERENCES } from "@/lib/account/types"
 import { fetchCatalog, fetchMeta, fetchProviders } from "@/lib/api"
+import { heroCatalogParams } from "@/lib/catalog/hero-params"
+import { pickHeroItems } from "@/lib/catalog/trending"
 import { dedupeItems } from "@/lib/catalog/merge"
 import type { CatalogItem, MergedGenre, WatchProvider } from "@/lib/catalog/types"
 import { cn } from "@/lib/cn"
@@ -46,20 +48,47 @@ export const CatalogHome = () => {
   const [genres, setGenres] = useState<MergedGenre[]>([])
   const [providers, setProviders] = useState<WatchProvider[]>([])
   const [items, setItems] = useState<CatalogItem[]>([])
+  const [featured, setFeatured] = useState<CatalogItem[]>([])
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(true)
+  const [heroLoading, setHeroLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const queryKey = searchParams.toString()
   const region = catalogPreferences.country
   const providerKey = catalogPreferences.providerIds.join(",")
-  const featured = items.slice(0, 5)
 
   const ownProviders = useMemo(() => {
     const allowed = new Set(catalogPreferences.providerIds)
     return providers.filter((provider) => allowed.has(provider.id))
   }, [catalogPreferences.providerIds, providers])
+
+  useEffect(() => {
+    let cancelled = false
+
+    const loadHero = async () => {
+      setHeroLoading(true)
+
+      try {
+        const data = await fetchCatalog(
+          { country: region, providerIds: [] },
+          heroCatalogParams(),
+        )
+        if (cancelled) return
+        setFeatured(pickHeroItems(data.items))
+      } catch {
+        if (!cancelled) setFeatured([])
+      } finally {
+        if (!cancelled) setHeroLoading(false)
+      }
+    }
+
+    void loadHero()
+    return () => {
+      cancelled = true
+    }
+  }, [region])
 
   useEffect(() => {
     let cancelled = false
@@ -140,12 +169,14 @@ export const CatalogHome = () => {
     }
   }
 
-  const showHero = !loading && featured.length > 0
-  const needsNavOffset = !loading && featured.length === 0
+  const showHero = featured.length > 0
+  const needsNavOffset = !heroLoading && featured.length === 0
 
   return (
     <div className={cn(needsNavOffset && "pt-[110px]")}>
-      {loading ? <div className="h-[64vh] min-h-[520px] bg-white/4" aria-hidden /> : null}
+      {heroLoading && featured.length === 0 ? (
+        <div className="h-[64vh] min-h-[520px] bg-white/4" aria-hidden />
+      ) : null}
       {showHero ? (
         <HeroCarousel
           key={featured.map((item) => `${item.mediaType}-${item.tmdbId}`).join("|")}

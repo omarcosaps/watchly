@@ -11,6 +11,7 @@ import type {
   TmdbPaginated,
   TmdbProvider,
   TmdbTvDetails,
+  TmdbTrendingItem,
   TmdbTvListItem,
   TmdbVideosResponse,
   TmdbWatchProvidersResponse,
@@ -69,6 +70,14 @@ export const discoverMovies = (query: Record<string, string>) => {
 
 export const discoverTv = (query: Record<string, string>) => {
   return tmdbFetch<TmdbPaginated<TmdbTvListItem>>("/discover/tv", query, CACHE.discover)
+}
+
+export const getTrendingAll = (window: "day" | "week" = "week") => {
+  return tmdbFetch<TmdbPaginated<TmdbTrendingItem>>(
+    `/trending/all/${window}`,
+    {},
+    CACHE.discover,
+  )
 }
 
 export const searchMovies = (query: string, page: number) => {
