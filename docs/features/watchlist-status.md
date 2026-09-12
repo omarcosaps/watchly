@@ -1,8 +1,13 @@
-# Spec — Status visual na Watchlist e no detalhe
+# Feature Spec — Watchlist Status
+
+Status: Done
+
+PRD: ../PRD.md
+SSD: ../SSD.md
 
 Última atualização: 1 de setembro de 2026
 
-Fonte de produto: `docs/prd.md`. Esta spec não redefine a decisão de produto.
+Esta spec não redefine a decisão de produto. É o registro da evolução que adicionou o status visual de assistido.
 
 ## Summary
 
@@ -12,7 +17,7 @@ Cada título guardado tem um status visual binário — **Ainda não assistir** 
 
 A Watchlist da conta guarda `tipo + id TMDB`, título, pôster, ano, `createdAt` e `watched`. Dá para adicionar, remover, listar e alterar o status.
 
-A página `/watchlist` mostra o status em selo no pôster. O detalhe já tem `WatchlistToggle`, mas ainda não mostra o status de assistido.
+A página `/watchlist` mostra o status em selo no pôster. No detalhe, `WatchStatusToggle` (variant `pill`) aparece no grupo de CTAs somente se o título estiver na Watchlist.
 
 Home, busca e o atalho da Watchlist na home não têm registro de assistido.
 
@@ -31,7 +36,7 @@ Home, busca e o atalho da Watchlist na home não têm registro de assistido.
 
 ## Technical Approach
 
-Contrato de conta já existente (Fase A / mock). Sem API nova e sem schema Supabase nesta entrega.
+Contrato de conta já existente (mock em `localStorage`). Sem API nova e sem schema de banco nesta entrega.
 
 **Dados / escrita / leitura.** Mantidos: `watched` em `WatchlistItem`, `setWatchlistWatched`, normalização na leitura, default `false` no add.
 
@@ -41,13 +46,13 @@ Contrato de conta já existente (Fase A / mock). Sem API nova e sem schema Supab
 
 **Rótulos.** Visíveis e `aria-label` usam exatamente **Ainda não assistir** e **Já assistir**.
 
-**Fora desta implementação.** Coluna no `watchlist_items` da Fase B.
+**Fora desta implementação.** Persistência de conta em servidor.
 
 ## Affected Areas
 
 - `components/watch-status-toggle.tsx` — variants `stamp` | `pill`
 - `app/(app)/titulo/[tipo]/[id]/page.tsx` — status no grupo de CTAs
-- `docs/prd.md` / `docs/spec-watchlist-status.md` — regra atualizada
+- `docs/PRD.md` / `docs/features/watchlist-status.md` — regra atualizada
 
 Já existentes e reutilizados: contrato `watched`, `AccountProvider`, selo na Watchlist.
 
@@ -63,7 +68,7 @@ Não afetar: home, busca, `home-aside`, rotas TMDB.
 6. Depois de marcar **Já assistir**, o título continua na lista, na mesma posição relativa (ordem por `createdAt`).
 7. Filme e série com o mesmo `tmdbId` têm status independentes.
 8. Remover e guardar de novo mostra **Ainda não assistir**.
-9. Reload da Fase A (mock) mantém o status escolhido.
+9. Reload com o mock local mantém o status escolhido.
 10. Home, busca e o atalho da Watchlist na home não mostram esse status.
 11. Não existe filtro, ordenação ou contagem por status.
 
@@ -79,6 +84,8 @@ Concluída (selo no pôster).
 
 ### Task 3 — Status no detalhe (condicionado à Watchlist)
 
+Concluída.
+
 **Objective**
 Exibir e alterar o status no detalhe somente quando o título estiver na Watchlist.
 
@@ -90,7 +97,7 @@ Exibir e alterar o status no detalhe somente quando o título estiver na Watchli
 **Affected Areas**
 - `components/watch-status-toggle.tsx`
 - `app/(app)/titulo/[tipo]/[id]/page.tsx`
-- `docs/prd.md`, `docs/spec-watchlist-status.md`
+- `docs/PRD.md`, `docs/features/watchlist-status.md`
 
 **Validation**
 - Detalhe fora da lista: sem status
@@ -99,6 +106,6 @@ Exibir e alterar o status no detalhe somente quando o título estiver na Watchli
 
 ## Risks / Open Questions
 
-- O schema da Fase B em `docs/tech-plan.md` ainda não tem campo de status. Fora desta entrega.
+- Persistência de conta em servidor não faz parte desta entrega. O status vive no mock local (`watched` em `WatchlistItem`).
 - Os rótulos **Já assistir** e **Ainda não assistir** são decisão de produto.
-- Não há pergunta de produto ou de arquitetura da Fase A em aberto.
+- Não há pergunta de produto ou de arquitetura em aberto para esta feature.
