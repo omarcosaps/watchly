@@ -44,3 +44,6 @@ next-env.d.ts
 # superpowers scratch
 .superpowers/
 .worktrees/
+
+# supabase CLI cache
+supabase/.temp/
