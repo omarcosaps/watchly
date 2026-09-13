@@ -1,16 +1,19 @@
 "use client"
 
 import Image from "next/image"
-import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 
 import { useAccount } from "@/components/account-provider"
+import { ScreenLink } from "@/components/screen-link"
 import { useToast } from "@/components/toast-provider"
 import { WatchStatusToggle } from "@/components/watch-status-toggle"
+import { useEnterCascade } from "@/hooks/use-enter-cascade"
 import { PRODUCT_COUNTRIES } from "@/lib/account/types"
 import { fetchJson, preferenceQuery } from "@/lib/api"
 import type { CatalogItem } from "@/lib/catalog/types"
+import { cn } from "@/lib/cn"
 import { mediaLabel, tipoFromMedia } from "@/lib/media"
+import { cardEnterDelay } from "@/lib/motion"
 import { posterUrl } from "@/lib/tmdb/image"
 
 const toCatalogItem = (
@@ -41,6 +44,7 @@ const toCatalogItem = (
 export default function WatchlistPage() {
   const { watchlist, preferences, removeFromWatchlist } = useAccount()
   const { showToast } = useToast()
+  const enter = useEnterCascade()
   const [items, setItems] = useState<CatalogItem[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -126,15 +130,22 @@ export default function WatchlistPage() {
   if (watchlist.length === 0) {
     return (
       <div className="mx-auto max-w-[880px]">
-        <h1 className="mb-1 text-[34px] font-black tracking-[-0.03em]">Minha lista</h1>
-        <div className="py-[60px] text-center text-[14.5px] text-white/50">
+        <h1
+          className={cn("mb-1 text-[34px] font-black tracking-[-0.03em]", enter && "d-in")}
+        >
+          Minha lista
+        </h1>
+        <div
+          className={cn("py-[60px] text-center text-[14.5px] text-white/50", enter && "d-in")}
+          style={enter ? { animationDelay: "0.06s" } : undefined}
+        >
           <p className="mb-4">Sua lista está vazia.</p>
-          <Link
+          <ScreenLink
             href="/"
             className="cta-primary inline-flex items-center rounded-full px-[22px] py-3 text-sm font-bold"
           >
             Explorar o catálogo
-          </Link>
+          </ScreenLink>
         </div>
       </div>
     )
@@ -142,8 +153,13 @@ export default function WatchlistPage() {
 
   return (
     <div className="mx-auto max-w-[880px]">
-      <h1 className="mb-1 text-[34px] font-black tracking-[-0.03em]">Minha lista</h1>
-      <p className="mb-[18px] text-sm text-white/50">
+      <h1 className={cn("mb-1 text-[34px] font-black tracking-[-0.03em]", enter && "d-in")}>
+        Minha lista
+      </h1>
+      <p
+        className={cn("mb-[18px] text-sm text-white/50", enter && "d-in")}
+        style={enter ? { animationDelay: "0.06s" } : undefined}
+      >
         {watchlist.length} {watchlist.length === 1 ? "título salvo" : "títulos salvos"} ·
         disponibilidade em {countryName}
       </p>
@@ -156,7 +172,7 @@ export default function WatchlistPage() {
         <p className="text-[13.5px] text-mute">Carregando disponibilidade…</p>
       ) : null}
       <ul className="flex flex-col gap-3">
-        {visible.map((item) => {
+        {visible.map((item, index) => {
           const src = posterUrl(item.posterPath)
           const href = `/titulo/${tipoFromMedia(item.mediaType)}/${item.tmdbId}`
           const meta = item.year
@@ -167,20 +183,24 @@ export default function WatchlistPage() {
           return (
             <li
               key={`${item.mediaType}-${item.tmdbId}`}
-              className="flex flex-wrap items-center gap-[18px] rounded-[14px] bg-white/4 py-3 pr-4 pl-3 transition-colors duration-[150ms] hover:bg-white/7"
+              className={cn(
+                "flex flex-wrap items-center gap-[18px] rounded-[14px] bg-white/4 py-3 pr-4 pl-3 transition-colors duration-[150ms] hover:bg-white/7",
+                enter && "d-in",
+              )}
+              style={enter ? { animationDelay: cardEnterDelay(index) } : undefined}
             >
-              <Link href={href} className="relative aspect-[2/3] w-[62px] flex-none overflow-hidden rounded-[10px] bg-[#15161c]">
+              <ScreenLink href={href} className="relative aspect-[2/3] w-[62px] flex-none overflow-hidden rounded-[10px] bg-[#15161c]">
                 {src ? (
                   <Image src={src} alt="" fill sizes="62px" className="object-cover" />
                 ) : (
                   <div className="hatch absolute inset-0" />
                 )}
-              </Link>
-              <Link href={href} className="min-w-0 flex-1">
+              </ScreenLink>
+              <ScreenLink href={href} className="min-w-0 flex-1">
                 <p className="text-[15.5px] font-bold">{item.title}</p>
                 <p className="mt-[3px] text-xs text-mute">{meta}</p>
                 <p className={`mt-1.5 text-[12.5px] ${availability.color}`}>{availability.label}</p>
-              </Link>
+              </ScreenLink>
               <WatchStatusToggle
                 mediaType={item.mediaType}
                 tmdbId={item.tmdbId}

@@ -6,15 +6,20 @@ import { Suspense, useEffect, useMemo, useState } from "react"
 import { useAccount } from "@/components/account-provider"
 import { CatalogGrid, CatalogSkeleton } from "@/components/catalog-grid"
 import { StatusPanel } from "@/components/status-panel"
+import { useEnterCascade } from "@/hooks/use-enter-cascade"
+import { useScreenNavigate } from "@/hooks/use-screen-navigate"
 import { GUEST_PREFERENCES } from "@/lib/account/types"
 import { fetchSearch } from "@/lib/api"
 import { dedupeItems } from "@/lib/catalog/merge"
 import type { CatalogItem } from "@/lib/catalog/types"
+import { cn } from "@/lib/cn"
 
 const SearchResults = () => {
   const searchParams = useSearchParams()
   const query = (searchParams.get("q") ?? "").trim()
   const { preferences } = useAccount()
+  const { leaveTo } = useScreenNavigate()
+  const enter = useEnterCascade()
   const catalogPreferences = preferences ?? GUEST_PREFERENCES
   const hasOwnServices = (preferences?.providerIds.length ?? 0) > 0
   const [items, setItems] = useState<CatalogItem[]>([])
@@ -83,29 +88,54 @@ const SearchResults = () => {
 
   return (
     <div className="mx-auto max-w-[1280px]">
-      <SearchBox defaultValue={query} />
+      <SearchBox defaultValue={query} enter={enter} />
       {!query ? (
-        <p className="py-20 text-center text-[14.5px] text-white/40">
+        <p
+          className={cn("py-20 text-center text-[14.5px] text-white/40", enter && "d-in")}
+          style={enter ? { animationDelay: "0.10s" } : undefined}
+        >
           Digite um título para buscar no catálogo.
         </p>
       ) : null}
-      {query && loading && items.length === 0 ? <div className="mt-[34px]"><CatalogSkeleton /></div> : null}
-      {error ? <StatusPanel title="A busca falhou" message={error} /> : null}
+      {query && loading && items.length === 0 ? (
+        <div
+          className={cn("mt-[34px]", enter && "d-in")}
+          style={enter ? { animationDelay: "0.10s" } : undefined}
+        >
+          <CatalogSkeleton />
+        </div>
+      ) : null}
+      {error ? (
+        <div className={enter ? "d-in" : undefined} style={enter ? { animationDelay: "0.10s" } : undefined}>
+          <StatusPanel title="A busca falhou" message={error} />
+        </div>
+      ) : null}
       {query && !loading && !error && items.length === 0 ? (
-        <p className="mt-[34px] text-[13.5px] text-mute">Nenhum título encontrado para essa busca.</p>
+        <p
+          className={cn("mt-[34px] text-[13.5px] text-mute", enter && "d-in")}
+          style={enter ? { animationDelay: "0.10s" } : undefined}
+        >
+          Nenhum título encontrado para essa busca.
+        </p>
       ) : null}
       {items.length > 0 && !hasOwnServices ? (
-        <section className="mt-[34px]">
+        <section
+          className={cn("mt-[34px]", enter && "d-in")}
+          style={enter ? { animationDelay: "0.16s" } : undefined}
+        >
           <h2 className="mb-4 text-xl font-extrabold tracking-[-0.02em]">
             Resultados{" "}
             <span className="text-sm font-semibold text-white/40">{items.length}</span>
           </h2>
-          <CatalogGrid items={items} />
+          <CatalogGrid items={items} stagger={enter} onNavigate={leaveTo} />
         </section>
       ) : null}
       {items.length > 0 && hasOwnServices ? (
         <>
-          <section className="mt-[34px]">
+          <section
+            className={cn("mt-[34px]", enter && "d-in")}
+            style={enter ? { animationDelay: "0.16s" } : undefined}
+          >
             <h2 className="mb-4 text-xl font-extrabold tracking-[-0.02em]">
               Nos seus streamings{" "}
               <span className="text-sm font-semibold text-white/40">{ownItems.length}</span>
@@ -113,10 +143,13 @@ const SearchResults = () => {
             {ownItems.length === 0 ? (
               <p className="text-[13.5px] text-mute">Nenhum título encontrado para essa busca.</p>
             ) : (
-              <CatalogGrid items={ownItems} />
+              <CatalogGrid items={ownItems} stagger={enter} onNavigate={leaveTo} />
             )}
           </section>
-          <section className="mt-[38px]">
+          <section
+            className={cn("mt-[38px]", enter && "d-in")}
+            style={enter ? { animationDelay: "0.21s" } : undefined}
+          >
             <h2 className="mb-4 text-xl font-extrabold tracking-[-0.02em]">
               Fora dos seus streamings{" "}
               <span className="text-sm font-semibold text-white/40">{otherItems.length}</span>
@@ -124,7 +157,13 @@ const SearchResults = () => {
             {otherItems.length === 0 ? (
               <p className="text-[13.5px] text-mute">Nada fora dos seus serviços para essa busca.</p>
             ) : (
-              <CatalogGrid items={otherItems} showOffServiceHint muted />
+              <CatalogGrid
+                items={otherItems}
+                showOffServiceHint
+                muted
+                stagger={enter}
+                onNavigate={leaveTo}
+              />
             )}
           </section>
         </>
@@ -143,7 +182,7 @@ const SearchResults = () => {
   )
 }
 
-const SearchBox = ({ defaultValue }: { defaultValue: string }) => {
+const SearchBox = ({ defaultValue, enter }: { defaultValue: string; enter: boolean }) => {
   return (
     <form action="/busca">
       <label htmlFor="busca-titulo" className="sr-only">
@@ -156,7 +195,7 @@ const SearchBox = ({ defaultValue }: { defaultValue: string }) => {
         defaultValue={defaultValue}
         placeholder="Buscar filmes e séries por título…"
         autoFocus
-        className="field-search"
+        className={cn("field-search", enter && "d-in")}
       />
     </form>
   )

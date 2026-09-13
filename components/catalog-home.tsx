@@ -1,6 +1,6 @@
 "use client"
 
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react"
 
 import { useAccount } from "@/components/account-provider"
@@ -8,60 +8,67 @@ import { CatalogFilters } from "@/components/catalog-filters"
 import { CatalogGrid, CatalogSkeleton } from "@/components/catalog-grid"
 import { HeroCarousel } from "@/components/hero-carousel"
 import { StatusPanel } from "@/components/status-panel"
-import { useLeaveNavigate } from "@/hooks/use-leave-navigate"
+import { useScreenNavigate } from "@/hooks/use-screen-navigate"
 import { GUEST_PREFERENCES } from "@/lib/account/types"
-import { fetchCatalog, fetchMeta, fetchProviders, fetchTitle } from "@/lib/api"
+import {
+  fetchCatalog,
+  fetchMeta,
+  fetchProviders,
+  peekCatalog,
+  peekMeta,
+  peekProviders,
+} from "@/lib/api"
 import { heroCatalogParams } from "@/lib/catalog/hero-params"
+import { homeCatalogParams } from "@/lib/catalog/home-query"
 import { pickHeroItems } from "@/lib/catalog/trending"
 import { dedupeItems } from "@/lib/catalog/merge"
 import type { CatalogItem, MergedGenre, WatchProvider } from "@/lib/catalog/types"
 import { cn } from "@/lib/cn"
 import { HOME_STAGGER_MS, prefersReducedMotion } from "@/lib/motion"
 
-const catalogParams = (
-  searchParams: URLSearchParams,
-  genres: MergedGenre[],
-  page: number,
-) => {
-  const params = new URLSearchParams()
-  params.set("page", String(page))
+const heroPreferences = (region: string) => {
+  return { country: region, providerIds: [] as number[] }
+}
 
-  const media = searchParams.get("media")
-  const filterProviders = searchParams.get("filterProviders")
-  const yearRange = searchParams.get("yearRange")
-  const sort = searchParams.get("sort")
-  const selectedGenre = genres.find((genre) => genre.name === searchParams.get("genre"))
-
-  if (media) params.set("media", media)
-  if (filterProviders) params.set("filterProviders", filterProviders)
-  if (yearRange) params.set("yearRange", yearRange)
-  if (sort) params.set("sort", sort)
-  if (selectedGenre?.movieId) params.set("genreMovie", String(selectedGenre.movieId))
-  if (selectedGenre?.tvId) params.set("genreTv", String(selectedGenre.tvId))
-
-  return params
+const sameItems = (left: CatalogItem[], right: CatalogItem[]) => {
+  if (left.length !== right.length) return false
+  return left.every((item, index) => {
+    const other = right[index]
+    if (!other) return false
+    return item.mediaType === other.mediaType && item.tmdbId === other.tmdbId
+  })
 }
 
 export const CatalogHome = () => {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const { preferences } = useAccount()
-  const { leaving, leaveThen } = useLeaveNavigate()
+  const { leaveTo } = useScreenNavigate()
   const catalogPreferences = preferences ?? GUEST_PREFERENCES
   const hasOwnServices = catalogPreferences.providerIds.length > 0
-  const [genres, setGenres] = useState<MergedGenre[]>([])
-  const [providers, setProviders] = useState<WatchProvider[]>([])
-  const [items, setItems] = useState<CatalogItem[]>([])
-  const [featured, setFeatured] = useState<CatalogItem[]>([])
-  const [page, setPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const [loading, setLoading] = useState(true)
-  const [heroLoading, setHeroLoading] = useState(true)
-  const [loadingMore, setLoadingMore] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const queryKey = searchParams.toString()
   const region = catalogPreferences.country
   const providerKey = catalogPreferences.providerIds.join(",")
+  const cachedMeta = peekMeta()
+  const cachedProviders = peekProviders(region)
+  const cachedHero = peekCatalog(heroPreferences(region), heroCatalogParams())
+  const cachedCatalog = cachedMeta
+    ? peekCatalog(
+        catalogPreferences,
+        homeCatalogParams(new URLSearchParams(queryKey), cachedMeta.genres, 1),
+      )
+    : null
+  const [genres, setGenres] = useState<MergedGenre[]>(cachedMeta?.genres ?? [])
+  const [providers, setProviders] = useState<WatchProvider[]>(cachedProviders?.providers ?? [])
+  const [items, setItems] = useState<CatalogItem[]>(cachedCatalog?.items ?? [])
+  const [featured, setFeatured] = useState<CatalogItem[]>(
+    cachedHero ? pickHeroItems(cachedHero.items) : [],
+  )
+  const [page, setPage] = useState(cachedCatalog?.page ?? 1)
+  const [totalPages, setTotalPages] = useState(cachedCatalog?.totalPages ?? 1)
+  const [loading, setLoading] = useState(!cachedCatalog)
+  const [heroLoading, setHeroLoading] = useState(!cachedHero)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [staggerDone, setStaggerDone] = useState(false)
   const staggerTimerRef = useRef<number | null>(null)
 
@@ -72,19 +79,22 @@ export const CatalogHome = () => {
 
   useEffect(() => {
     let cancelled = false
+    const heroQuery = heroPreferences(region)
 
     const loadHero = async () => {
-      setHeroLoading(true)
+      if (!peekCatalog(heroQuery, heroCatalogParams())) {
+        setHeroLoading(true)
+      }
 
       try {
-        const data = await fetchCatalog(
-          { country: region, providerIds: [] },
-          heroCatalogParams(),
-        )
+        const data = await fetchCatalog(heroQuery, heroCatalogParams())
         if (cancelled) return
-        setFeatured(pickHeroItems(data.items))
+        const next = pickHeroItems(data.items)
+        setFeatured((current) => (sameItems(current, next) ? current : next))
       } catch {
-        if (!cancelled) setFeatured([])
+        if (!cancelled) {
+          setFeatured((current) => (current.length > 0 ? current : []))
+        }
       } finally {
         if (!cancelled) setHeroLoading(false)
       }
@@ -104,7 +114,16 @@ export const CatalogHome = () => {
     }
 
     const load = async () => {
-      setLoading(true)
+      const knownMeta = peekMeta()
+      const knownCatalog = knownMeta
+        ? peekCatalog(
+            catalogQuery,
+            homeCatalogParams(new URLSearchParams(queryKey), knownMeta.genres, 1),
+          )
+        : null
+      if (!knownCatalog) {
+        setLoading(true)
+      }
       setError(null)
 
       try {
@@ -114,22 +133,26 @@ export const CatalogHome = () => {
         ])
         if (cancelled) return
 
-        setGenres(meta.genres)
-        setProviders(providerData.providers)
+        setGenres((current) => (current === meta.genres ? current : meta.genres))
+        setProviders((current) =>
+          current === providerData.providers ? current : providerData.providers,
+        )
 
         const data = await fetchCatalog(
           catalogQuery,
-          catalogParams(new URLSearchParams(queryKey), meta.genres, 1),
+          homeCatalogParams(new URLSearchParams(queryKey), meta.genres, 1),
         )
         if (cancelled) return
 
-        setItems(data.items)
-        setPage(data.page)
-        setTotalPages(data.totalPages)
+        setItems((current) => (sameItems(current, data.items) ? current : data.items))
+        setPage((current) => (current === data.page ? current : data.page))
+        setTotalPages((current) => (current === data.totalPages ? current : data.totalPages))
       } catch (loadError) {
         if (!cancelled) {
-          setItems([])
-          setError(loadError instanceof Error ? loadError.message : "Não deu para carregar o catálogo")
+          setItems((current) => (current.length > 0 ? current : []))
+          if (!knownCatalog) {
+            setError(loadError instanceof Error ? loadError.message : "Não deu para carregar o catálogo")
+          }
         }
       } finally {
         if (!cancelled) setLoading(false)
@@ -164,24 +187,13 @@ export const CatalogHome = () => {
     }
   }, [staggerDone])
 
-  const handleNavigate = (href: string) => {
-    router.prefetch(href)
-    const [, , tipo, id] = href.split("/")
-    if (tipo && id) {
-      void fetchTitle(catalogPreferences, tipo, id)
-    }
-    leaveThen(() => {
-      router.push(href)
-    })
-  }
-
   const handleLoadMore = async () => {
     setLoadingMore(true)
     setError(null)
     try {
       const data = await fetchCatalog(
         catalogPreferences,
-        catalogParams(searchParams, genres, page + 1),
+        homeCatalogParams(searchParams, genres, page + 1),
       )
       setItems((current) => dedupeItems([...current, ...data.items]))
       setPage(data.page)
@@ -197,7 +209,7 @@ export const CatalogHome = () => {
     setLoading(true)
     setError(null)
     try {
-      const data = await fetchCatalog(catalogPreferences, catalogParams(searchParams, genres, 1))
+      const data = await fetchCatalog(catalogPreferences, homeCatalogParams(searchParams, genres, 1))
       setItems(data.items)
       setPage(data.page)
       setTotalPages(data.totalPages)
@@ -212,7 +224,7 @@ export const CatalogHome = () => {
   const needsNavOffset = !heroLoading && featured.length === 0
 
   return (
-    <div className={cn(needsNavOffset && "pt-[110px]", leaving && "d-leaving")}>
+    <div className={cn(needsNavOffset && "pt-[110px]")}>
       {heroLoading && featured.length === 0 ? (
         <div className="h-[64vh] min-h-[520px] bg-white/4" aria-hidden />
       ) : null}
@@ -220,7 +232,7 @@ export const CatalogHome = () => {
         <HeroCarousel
           key={featured.map((item) => `${item.mediaType}-${item.tmdbId}`).join("|")}
           items={featured}
-          onNavigate={handleNavigate}
+          onNavigate={leaveTo}
         />
       ) : null}
 
@@ -265,7 +277,7 @@ export const CatalogHome = () => {
               items={items}
               showOffServiceHint={hasOwnServices}
               stagger={stagger}
-              onNavigate={handleNavigate}
+              onNavigate={leaveTo}
             />
             {page < totalPages ? (
               <button
