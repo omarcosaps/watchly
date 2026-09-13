@@ -8,8 +8,9 @@ import { useAccount } from "@/components/account-provider"
 import { StatusPanel } from "@/components/status-panel"
 import { WatchlistToggle } from "@/components/watchlist-toggle"
 import { WatchStatusToggle } from "@/components/watch-status-toggle"
+import { useLeaveNavigate } from "@/hooks/use-leave-navigate"
 import { GUEST_PREFERENCES, PRODUCT_COUNTRIES } from "@/lib/account/types"
-import { fetchTitle } from "@/lib/api"
+import { fetchTitle, peekTitle } from "@/lib/api"
 import { MONETIZATION_LABEL, type Offer, type TitleDetails } from "@/lib/catalog/types"
 import { mediaFromTipo, mediaLabel } from "@/lib/media"
 import { atmosphereUrl, logoUrl, posterUrl, profileUrl } from "@/lib/tmdb/image"
@@ -31,8 +32,11 @@ export default function TitlePage() {
   const router = useRouter()
   const params = useParams<{ tipo: string; id: string }>()
   const { preferences } = useAccount()
+  const { leaving, leaveThen } = useLeaveNavigate()
   const catalogPreferences = preferences ?? GUEST_PREFERENCES
-  const [details, setDetails] = useState<TitleDetails | null>(null)
+  const [details, setDetails] = useState<TitleDetails | null>(() =>
+    peekTitle(catalogPreferences, params.tipo, params.id),
+  )
   const [error, setError] = useState<string | null>(null)
   const mediaType = mediaFromTipo(params.tipo)
   const region = catalogPreferences.country
@@ -114,9 +118,16 @@ export default function TitlePage() {
     .filter(Boolean)
     .join(" · ")
 
+  const handleBack = () => {
+    router.prefetch("/")
+    leaveThen(() => {
+      router.back()
+    })
+  }
+
   return (
-    <article>
-      <div className="relative h-[44vh] min-h-[340px] overflow-hidden bg-[#15161c]">
+    <article className={leaving ? "d-leaving" : undefined}>
+      <div className="d-back relative h-[44vh] min-h-[340px] overflow-hidden bg-[#15161c]">
         {still ? (
           <Image src={still} alt="" fill priority sizes="100vw" className="object-cover" />
         ) : null}
@@ -127,14 +138,18 @@ export default function TitlePage() {
       <div className="relative mx-auto mt-[-170px] max-w-[1080px] px-5 pb-[70px] sm:px-12">
         <button
           type="button"
-          onClick={() => router.back()}
-          className="cta-secondary mb-[22px] rounded-full px-4 py-[9px] text-[13px] font-semibold backdrop-blur-[8px]"
+          onClick={handleBack}
+          className="d-in cta-secondary mb-[22px] rounded-full px-4 py-[9px] text-[13px] font-semibold backdrop-blur-[8px]"
+          style={{ animationDelay: "0.06s" }}
         >
           ← Voltar
         </button>
 
         <div className="flex flex-wrap items-start gap-9">
-          <div className="relative aspect-[2/3] w-[230px] flex-none overflow-hidden rounded-[14px] border border-white/12 bg-[#15161c] shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
+          <div
+            className="d-in relative aspect-[2/3] w-[230px] flex-none overflow-hidden rounded-[14px] border border-white/12 bg-[#15161c] shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
+            style={{ animationDelay: "0.10s" }}
+          >
             {poster ? (
               <Image src={poster} alt="" fill sizes="230px" className="object-cover" priority />
             ) : (
@@ -154,27 +169,43 @@ export default function TitlePage() {
           </div>
 
           <div className="min-w-0 flex-1">
-            <h1 className="mt-1.5 mb-2.5 text-[42px] leading-[1.05] font-black tracking-[-0.03em]">
+            <h1
+              className="d-in mt-1.5 mb-2.5 text-[42px] leading-[1.05] font-black tracking-[-0.03em]"
+              style={{ animationDelay: "0.16s" }}
+            >
               {details.title}
             </h1>
-            <p className="mb-4 text-sm font-medium text-white/65">{meta}</p>
+            <p
+              className="d-in mb-4 text-sm font-medium text-white/65"
+              style={{ animationDelay: "0.21s" }}
+            >
+              {meta}
+            </p>
             {details.overview ? (
-              <p className="mb-[26px] max-w-[600px] text-pretty text-[15px] leading-[1.6] text-white/85">
+              <p
+                className="d-in mb-[26px] max-w-[600px] text-pretty text-[15px] leading-[1.6] text-white/85"
+                style={{ animationDelay: "0.26s" }}
+              >
                 {details.overview}
               </p>
             ) : (
-              <p className="mb-[26px] max-w-[600px] text-[15px] leading-[1.6] text-mute">
+              <p
+                className="d-in mb-[26px] max-w-[600px] text-[15px] leading-[1.6] text-mute"
+                style={{ animationDelay: "0.26s" }}
+              >
                 Sem sinopse em português.
               </p>
             )}
 
-            <WatchStatusToggle
-              mediaType={details.mediaType}
-              tmdbId={details.tmdbId}
-              variant="detail"
-            />
+            <div className="d-in" style={{ animationDelay: "0.31s" }}>
+              <WatchStatusToggle
+                mediaType={details.mediaType}
+                tmdbId={details.tmdbId}
+                variant="detail"
+              />
+            </div>
 
-            <div className="mb-9">
+            <div className="d-in mb-9" style={{ animationDelay: "0.34s" }}>
               <WatchlistToggle
                 tmdbId={details.tmdbId}
                 mediaType={details.mediaType}
@@ -185,15 +216,21 @@ export default function TitlePage() {
               />
             </div>
 
-            <h2 className="mb-4 text-xl font-extrabold tracking-[-0.02em]">
+            <h2
+              className="d-in mb-4 text-xl font-extrabold tracking-[-0.02em]"
+              style={{ animationDelay: "0.40s" }}
+            >
               Onde assistir · {regionName}
             </h2>
             {!details.availableInRegion ? (
-              <p className="max-w-[600px] rounded-xl bg-white/5 px-5 py-[18px] text-sm text-white/65">
+              <p
+                className="d-in max-w-[600px] rounded-xl bg-white/5 px-5 py-[18px] text-sm text-white/65"
+                style={{ animationDelay: "0.45s" }}
+              >
                 Este título não está disponível em nenhum serviço em {regionName} no momento.
               </p>
             ) : (
-              <div>
+              <div className="d-in" style={{ animationDelay: "0.45s" }}>
                 {hasOwnServices && ownOffers.length > 0 ? (
                   <OfferGroup title="Nos seus streamings" offers={ownOffers} emphasized />
                 ) : null}
@@ -208,8 +245,16 @@ export default function TitlePage() {
 
             {details.credits.length > 0 ? (
               <section>
-                <h2 className="mt-9 mb-4 text-xl font-extrabold tracking-[-0.02em]">Elenco</h2>
-                <ul className="grid max-w-[600px] grid-cols-[repeat(auto-fill,minmax(104px,1fr))] gap-x-4 gap-y-5">
+                <h2
+                  className="d-in mt-9 mb-4 text-xl font-extrabold tracking-[-0.02em]"
+                  style={{ animationDelay: "0.50s" }}
+                >
+                  Elenco
+                </h2>
+                <ul
+                  className="d-in grid max-w-[600px] grid-cols-[repeat(auto-fill,minmax(104px,1fr))] gap-x-4 gap-y-5"
+                  style={{ animationDelay: "0.55s" }}
+                >
                   {details.credits.slice(0, 8).map((person) => {
                     const src = profileUrl(person.profilePath)
                     const initials = person.name

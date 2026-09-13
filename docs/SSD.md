@@ -61,6 +61,7 @@ app/
   (setup)/                   onboarding isolado, sem nav, com atribuição
   api/                       catalog, search, title, meta, watch-providers
 components/                  UI e guards
+hooks/                       motion de tela (leave-then-navigate)
 lib/
   account/                   contrato público → mock/
   catalog/                   discover, merge, hydrate, detalhe
@@ -68,11 +69,14 @@ lib/
   api.ts                     fetch helpers do browser
   http.ts                    erros e região obrigatória nas APIs
   media.ts                   filme/serie ↔ movie/tv
+  motion.ts                  tokens e helpers de entrada/saída
 ```
 
 Grupos de rota: `app/(browse)` público com nav pill flutuante; `app/(app)` autenticado (watchlist, perfil) com o mesmo chrome; `app/(setup)` autenticado sem nav (onboarding), com atribuição; `app/(auth)` para visitante, sem wordmark no header. A home e o detalhe ocupam a largura toda (hero/backdrop edge-to-edge); as demais telas do shell usam padding-top ~110px. A Home busca o Hero à parte da grade (`sort=trending`, página 1, sem filtros da URL); só o país de referência entra. `sort=trending` usa `/trending/all/week`, descarta pessoa e adulto, hidrata ofertas e fica só com título que tem still e oferta no país. O Hero mede o parágrafo da sinopse no client e escolhe um candidato extrativo que caiba em 3 linhas. Sem hero (erro ou lista vazia), a Home aplica o mesmo offset para não ficar sob a pill. Não existe `middleware.ts`. `/verificar-email` redireciona para `/login`. Logout volta para `/`.
 
 Tokens visuais em `app/globals.css`: fundo `#0b0c10`, texto `#f2f3f5`, positivo/alerta em oklch, sem ember como accent. Nav: pill fixa centrada, `rgba(16,17,23,.7)` + blur 20. Auth: card 404px com gradiente `#191c22 → #101216` e atmosphere azul. Toast de watchlist é efêmero no client.
+
+Movimento de tela só no eixo Home↔detalhe: classes `.d-back`, `.d-in` e `.d-leaving` em `globals.css` (entrada 400ms / `translateY(14px)`, saída 260ms / `translateY(8px)`). `useLeaveNavigate` intercepta o clique no card, em **Ver Detalhes** e em **Voltar**, aplica a saída e só então chama `router.push` ou `router.back`. A classe de saída permanece até o unmount para não inverter o fade. Durante os 260ms a Home faz `prefetch` da rota e `fetchTitle` (cache in-flight em `lib/api.ts`); o Voltar faz `prefetch` de `/`. O guard de reentrada é um ref, não estado. Depois de 1100ms o Hero tira `.d-in` dos filhos para a troca de slide não re-animar o texto. Busca e watchlist continuam com `Link` imediato. `prefers-reduced-motion: reduce` desliga a cascata e o atraso de saída.
 
 ## Domínios e módulos principais
 

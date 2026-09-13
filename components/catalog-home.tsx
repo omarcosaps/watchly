@@ -1,20 +1,22 @@
 "use client"
 
-import { useSearchParams } from "next/navigation"
-import { useEffect, useMemo, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useEffect, useMemo, useRef, useState } from "react"
 
 import { useAccount } from "@/components/account-provider"
 import { CatalogFilters } from "@/components/catalog-filters"
 import { CatalogGrid, CatalogSkeleton } from "@/components/catalog-grid"
 import { HeroCarousel } from "@/components/hero-carousel"
 import { StatusPanel } from "@/components/status-panel"
+import { useLeaveNavigate } from "@/hooks/use-leave-navigate"
 import { GUEST_PREFERENCES } from "@/lib/account/types"
-import { fetchCatalog, fetchMeta, fetchProviders } from "@/lib/api"
+import { fetchCatalog, fetchMeta, fetchProviders, fetchTitle } from "@/lib/api"
 import { heroCatalogParams } from "@/lib/catalog/hero-params"
 import { pickHeroItems } from "@/lib/catalog/trending"
 import { dedupeItems } from "@/lib/catalog/merge"
 import type { CatalogItem, MergedGenre, WatchProvider } from "@/lib/catalog/types"
 import { cn } from "@/lib/cn"
+import { HOME_STAGGER_MS, prefersReducedMotion } from "@/lib/motion"
 
 const catalogParams = (
   searchParams: URLSearchParams,
@@ -41,8 +43,10 @@ const catalogParams = (
 }
 
 export const CatalogHome = () => {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const { preferences } = useAccount()
+  const { leaving, leaveThen } = useLeaveNavigate()
   const catalogPreferences = preferences ?? GUEST_PREFERENCES
   const hasOwnServices = catalogPreferences.providerIds.length > 0
   const [genres, setGenres] = useState<MergedGenre[]>([])
@@ -58,6 +62,8 @@ export const CatalogHome = () => {
   const queryKey = searchParams.toString()
   const region = catalogPreferences.country
   const providerKey = catalogPreferences.providerIds.join(",")
+  const [staggerDone, setStaggerDone] = useState(false)
+  const staggerTimerRef = useRef<number | null>(null)
 
   const ownProviders = useMemo(() => {
     const allowed = new Set(catalogPreferences.providerIds)
@@ -136,6 +142,39 @@ export const CatalogHome = () => {
     }
   }, [providerKey, queryKey, region])
 
+  const stagger = !staggerDone
+
+  useEffect(() => {
+    if (staggerDone) return
+    if (prefersReducedMotion()) {
+      setStaggerDone(true)
+      return
+    }
+
+    staggerTimerRef.current = window.setTimeout(() => {
+      staggerTimerRef.current = null
+      setStaggerDone(true)
+    }, HOME_STAGGER_MS)
+
+    return () => {
+      if (staggerTimerRef.current !== null) {
+        window.clearTimeout(staggerTimerRef.current)
+        staggerTimerRef.current = null
+      }
+    }
+  }, [staggerDone])
+
+  const handleNavigate = (href: string) => {
+    router.prefetch(href)
+    const [, , tipo, id] = href.split("/")
+    if (tipo && id) {
+      void fetchTitle(catalogPreferences, tipo, id)
+    }
+    leaveThen(() => {
+      router.push(href)
+    })
+  }
+
   const handleLoadMore = async () => {
     setLoadingMore(true)
     setError(null)
@@ -173,7 +212,7 @@ export const CatalogHome = () => {
   const needsNavOffset = !heroLoading && featured.length === 0
 
   return (
-    <div className={cn(needsNavOffset && "pt-[110px]")}>
+    <div className={cn(needsNavOffset && "pt-[110px]", leaving && "d-leaving")}>
       {heroLoading && featured.length === 0 ? (
         <div className="h-[64vh] min-h-[520px] bg-white/4" aria-hidden />
       ) : null}
@@ -181,6 +220,7 @@ export const CatalogHome = () => {
         <HeroCarousel
           key={featured.map((item) => `${item.mediaType}-${item.tmdbId}`).join("|")}
           items={featured}
+          onNavigate={handleNavigate}
         />
       ) : null}
 
@@ -190,6 +230,7 @@ export const CatalogHome = () => {
           providers={ownProviders}
           showProviderFilter={hasOwnServices}
           resultCount={loading ? undefined : items.length}
+          enter={stagger}
         />
         {loading ? <CatalogSkeleton /> : null}
 
@@ -216,8 +257,16 @@ export const CatalogHome = () => {
         ) : null}
 
         {!loading && items.length > 0 ? (
-          <div>
-            <CatalogGrid items={items} showOffServiceHint={hasOwnServices} />
+          <div
+            className={stagger ? "d-in" : undefined}
+            style={stagger ? { animationDelay: "0.42s" } : undefined}
+          >
+            <CatalogGrid
+              items={items}
+              showOffServiceHint={hasOwnServices}
+              stagger={stagger}
+              onNavigate={handleNavigate}
+            />
             {page < totalPages ? (
               <button
                 type="button"

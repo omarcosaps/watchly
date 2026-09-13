@@ -1,23 +1,33 @@
 import Image from "next/image"
 import Link from "next/link"
+import type { MouseEvent } from "react"
 
 import { cn } from "@/lib/cn"
 import type { CatalogItem } from "@/lib/catalog/types"
 import { mediaLabel, tipoFromMedia } from "@/lib/media"
+import { isModifiedClick } from "@/lib/motion"
 import { posterUrl } from "@/lib/tmdb/image"
 
 type TitleCardProps = {
   item: CatalogItem
   showOffServiceHint?: boolean
   muted?: boolean
+  onNavigate?: (href: string) => void
 }
 
 export const TitleCard = ({
   item,
   showOffServiceHint = false,
   muted = false,
+  onNavigate,
 }: TitleCardProps) => {
   const href = `/titulo/${tipoFromMedia(item.mediaType)}/${item.tmdbId}`
+
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!onNavigate || isModifiedClick(event)) return
+    event.preventDefault()
+    onNavigate(href)
+  }
   const src = posterUrl(item.posterPath)
   const meta = item.year
     ? `${item.year} · ${mediaLabel(item.mediaType)}`
@@ -40,6 +50,7 @@ export const TitleCard = ({
     >
       <Link
         href={href}
+        onClick={handleClick}
         className="block"
         aria-label={`${item.title}, ${mediaLabel(item.mediaType)}`}
       >

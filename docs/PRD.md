@@ -195,6 +195,8 @@ O visitante vê disponibilidade no Brasil. Quem está autenticado vê disponibil
 
 Hero: carrossel com as 5 tendências da semana no país de referência, consultadas na TMDB a cada carga. Entra só título com oferta no país e com backdrop ou pôster. A regra não acompanha tipo, gênero, ano, provedor nem a ordenação da grade. Quando a fonte muda o que está em evidência, o Hero muda. Avança a cada 7 segundos. Kicker **Novo filme** / **Filme** / **Nova série** / **Série** (ano ≥ 2024 usa “Novo/Nova”). Texto de apoio: sinopse em até 3 linhas. Se a original não couber, o Hero mostra um resumo que preserva a ideia principal, o contexto e o tom; a sinopse completa fica só no detalhe. Sem corte com reticências e sem reduzir fonte ou largura só para caber. CTAs: **Ver Detalhes** e adicionar/remover da lista (**Adicionar à minha lista** / **Na minha lista**).
 
+Na primeira visita, a Home entra em cascata: o fundo do hero em fade e o conteúdo subindo em sequência (kicker, título, sinopse, botões, filtros, indicadores, grade). Trocar de slide só faz crossfade no fundo; o texto não re-anima. Abrir um título (card ou **Ver Detalhes**) faz a Home descer e desvanecer antes de ir ao detalhe. Com `prefers-reduced-motion: reduce`, não há animação e a navegação é imediata.
+
 A navegação é uma pill flutuante: **Watchly**, **Início**, **Filmes**, **Séries**, **Watchlist**, busca e, se autenticada, o atalho de perfil (avatar + nome) para `/preferencias`. Filmes e Séries aplicam o filtro de tipo na Home. Logout fica só no Perfil.
 
 Filtros:
@@ -245,6 +247,8 @@ Página pública. Mostra:
 Sem disponibilidade: “Este título não está disponível em nenhum serviço em {País} no momento.”
 
 Ações: voltar; adicionar ou remover da lista (**Add a minha lista** / **Na minha lista**). Se o título estiver na lista, a seção **Meu status** permite alternar entre **Ainda não assistido** e **Já assistido**.
+
+O detalhe entra na mesma linguagem de movimento da Home: backdrop em fade, depois conteúdo em cascata. **Voltar** desce e desvanece a tela antes de retornar. Com `prefers-reduced-motion: reduce`, a navegação é imediata.
 
 Não há trailer, link para a página do título na TMDB nem botão que prometa abrir o app do streaming.
 

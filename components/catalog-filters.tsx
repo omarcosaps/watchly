@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation"
 
+import { cn } from "@/lib/cn"
 import type { MergedGenre, WatchProvider } from "@/lib/catalog/types"
 
 type CatalogFiltersProps = {
@@ -9,6 +10,7 @@ type CatalogFiltersProps = {
   providers: WatchProvider[]
   showProviderFilter?: boolean
   resultCount?: number
+  enter?: boolean
 }
 
 export const CatalogFilters = ({
@@ -16,6 +18,7 @@ export const CatalogFilters = ({
   providers,
   showProviderFilter = false,
   resultCount,
+  enter = false,
 }: CatalogFiltersProps) => {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -32,7 +35,8 @@ export const CatalogFilters = ({
 
   return (
     <form
-      className="mb-[22px] flex flex-wrap items-center gap-2.5"
+      className={cn("mb-[22px] flex flex-wrap items-center gap-2.5", enter && "d-in")}
+      style={enter ? { animationDelay: "0.34s" } : undefined}
       aria-label="Filtros do catálogo"
       onSubmit={(event) => event.preventDefault()}
     >
