@@ -1,91 +1,87 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
-import { STORAGE_KEY } from "@/lib/account/mock/storage"
-import { signIn, signOut, signUp } from "@/lib/account/session"
+import { resetAccountSnapshot } from "@/lib/account/store"
+import { createAccountTestDouble } from "@/lib/account/test-double"
 import { AccountError } from "@/lib/account/types"
+
+const testDouble = createAccountTestDouble()
+
+vi.mock("@/lib/account/supabase/client", () => ({
+  getAccountClient: () => testDouble,
+}))
+
+import { requestPasswordReset, signIn, signOut, signUp } from "@/lib/account/session"
 import { addToWatchlist, listWatchlist } from "@/lib/account/watchlist"
 import { savePreferences } from "@/lib/account/preferences"
 
-const createMemoryStorage = () => {
-  const data = new Map<string, string>()
-
-  return {
-    getItem: (key: string) => data.get(key) ?? null,
-    setItem: (key: string, value: string) => {
-      data.set(key, value)
-    },
-    removeItem: (key: string) => {
-      data.delete(key)
-    },
-    clear: () => {
-      data.clear()
-    },
-  }
-}
-
 beforeEach(() => {
-  vi.stubGlobal("window", { localStorage: createMemoryStorage() })
+  resetAccountSnapshot()
+  Object.assign(testDouble, createAccountTestDouble())
 })
 
 afterEach(() => {
-  vi.unstubAllGlobals()
+  resetAccountSnapshot()
 })
 
 describe("signUp", () => {
-  it("exige origem de aquisição", () => {
-    expect(() => signUp("a@watchly.app", "123456", "")).toThrow(AccountError)
-    expect(() => signUp("a@watchly.app", "123456", "")).toThrow(
+  it("exige origem de aquisição", async () => {
+    await expect(signUp("a@watchly.app", "123456", "")).rejects.toBeInstanceOf(AccountError)
+    await expect(signUp("a@watchly.app", "123456", "")).rejects.toThrow(
       "Conte onde você conheceu o Watchly.",
     )
   })
 
-  it("bloqueia email já usado", () => {
-    signUp("a@watchly.app", "123456", "amigo")
-    signOut()
+  it("bloqueia email já usado", async () => {
+    await signUp("a@watchly.app", "123456", "amigo")
+    await signOut()
 
-    expect(() => signUp("a@watchly.app", "654321", "redes")).toThrow(
+    await expect(signUp("a@watchly.app", "654321", "redes")).rejects.toThrow(
       "Já existe uma conta com esse email. Use Entrar.",
     )
   })
 })
 
 describe("signIn", () => {
-  it("não encontra conta que ainda não foi criada", () => {
-    expect(() => signIn("nova@watchly.app", "123456")).toThrow(
+  it("não encontra conta que ainda não foi criada", async () => {
+    await expect(signIn("nova@watchly.app", "123456")).rejects.toThrow(
       "Conta não encontrada. Crie uma conta primeiro.",
     )
   })
 
-  it("rejeita senha errada", () => {
-    signUp("a@watchly.app", "123456", "amigo")
-    signOut()
+  it("rejeita senha errada", async () => {
+    await signUp("a@watchly.app", "123456", "amigo")
+    await signOut()
 
-    expect(() => signIn("a@watchly.app", "errada")).toThrow("Senha incorreta.")
+    await expect(signIn("a@watchly.app", "errada")).rejects.toThrow("Senha incorreta.")
+  })
+})
+
+describe("requestPasswordReset", () => {
+  it("não revela se a conta existe", async () => {
+    await expect(requestPasswordReset("nova@watchly.app")).resolves.toBeUndefined()
   })
 })
 
 describe("isolamento por conta", () => {
-  it("mantém watchlist e preferências de cada email", () => {
-    signUp("um@watchly.app", "123456", "amigo")
-    savePreferences({ country: "BR", providerIds: [8] })
-    addToWatchlist({
+  it("mantém watchlist e preferências de cada email", async () => {
+    await signUp("um@watchly.app", "123456", "amigo")
+    await savePreferences({ country: "BR", providerIds: [8] })
+    await addToWatchlist({
       tmdbId: 1,
       mediaType: "movie",
       title: "Duna",
       posterPath: null,
       year: 2021,
     })
-    signOut()
+    await signOut()
 
-    signUp("dois@watchly.app", "123456", "google")
+    await signUp("dois@watchly.app", "123456", "google")
     expect(listWatchlist()).toEqual([])
-    savePreferences({ country: "US", providerIds: [9] })
-    signOut()
+    await savePreferences({ country: "US", providerIds: [9] })
+    await signOut()
 
-    signIn("um@watchly.app", "123456")
+    await signIn("um@watchly.app", "123456")
     expect(listWatchlist()).toHaveLength(1)
-    expect(JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? "{}").session.email).toBe(
-      "um@watchly.app",
-    )
+    expect(listWatchlist()[0]?.title).toBe("Duna")
   })
 })

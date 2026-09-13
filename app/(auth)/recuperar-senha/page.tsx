@@ -17,8 +17,8 @@ export default function RecuperarSenhaPage() {
         submitLabel="Enviar link de redefinição"
         success={success}
         fields={[{ name: "email", label: "E-mail", type: "email", autoComplete: "email" }]}
-        onSubmit={(values) => {
-          requestPasswordReset(values.email)
+        onSubmit={async (values) => {
+          await requestPasswordReset(values.email)
           setSuccess(
             `Se existir uma conta para ${values.email.trim().toLowerCase()}, enviamos um link de redefinição de senha.`,
           )

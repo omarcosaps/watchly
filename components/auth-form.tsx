@@ -22,7 +22,7 @@ type AuthFormProps = {
   subtitle?: string
   submitLabel: string
   fields: AuthField[]
-  onSubmit: (values: Record<string, string>) => void
+  onSubmit: (values: Record<string, string>) => void | Promise<void>
   notice?: React.ReactNode
   beforeSubmit?: React.ReactNode
   footer?: React.ReactNode
@@ -41,8 +41,9 @@ export const AuthForm = ({
   success,
 }: AuthFormProps) => {
   const [error, setError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError(null)
     const form = new FormData(event.currentTarget)
@@ -51,14 +52,17 @@ export const AuthForm = ({
       values[field.name] = String(form.get(field.name) ?? "")
     })
 
+    setSubmitting(true)
     try {
-      onSubmit(values)
+      await onSubmit(values)
     } catch (submitError) {
       if (submitError instanceof AccountError) {
         setError(ACCOUNT_ERROR_COPY[submitError.code])
         return
       }
       setError("Não deu para continuar")
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -78,6 +82,7 @@ export const AuthForm = ({
                 name={field.name}
                 required={field.required !== false}
                 defaultValue=""
+                disabled={submitting}
                 className="field-select"
               >
                 <option value="" className="bg-panel text-mute">
@@ -95,6 +100,7 @@ export const AuthForm = ({
                 type={field.type ?? "text"}
                 autoComplete={field.autoComplete}
                 required={field.required !== false}
+                disabled={submitting}
                 className="field-input"
               />
             )}
@@ -111,8 +117,13 @@ export const AuthForm = ({
             {success}
           </p>
         ) : null}
-        <button type="submit" className="cta-primary mt-[3px] w-full rounded-full py-3.5 text-[15px] font-bold">
-          {submitLabel}
+        <button
+          type="submit"
+          disabled={submitting}
+          aria-busy={submitting}
+          className="cta-primary mt-[3px] w-full rounded-full py-3.5 text-[15px] font-bold disabled:cursor-not-allowed disabled:opacity-55"
+        >
+          {submitting ? "Aguarde…" : submitLabel}
         </button>
       </form>
       {footer ? <div className="mt-4 text-center text-[13.5px] text-white/48">{footer}</div> : null}

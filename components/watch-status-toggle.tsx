@@ -45,7 +45,9 @@ export const WatchStatusToggle = ({
             <button
               key={label}
               type="button"
-              onClick={() => setWatchlistWatched(mediaType, tmdbId, watched)}
+              onClick={() => {
+                void setWatchlistWatched(mediaType, tmdbId, watched)
+              }}
               aria-pressed={active}
               className={cn(
                 "inline-flex items-center gap-1.5 rounded-full whitespace-nowrap transition-colors duration-[180ms]",
