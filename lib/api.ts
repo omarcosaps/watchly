@@ -46,14 +46,47 @@ export const fetchSearch = (
   return fetchJson<CatalogPage>(`/api/search?${params.toString()}`)
 }
 
+const titleRequests = new Map<string, Promise<TitleDetails>>()
+const titleResults = new Map<string, TitleDetails>()
+
+const titleRequestKey = (preferences: Preferences, tipo: string, id: string) => {
+  return `${preferences.country}:${preferences.providerIds.join(",")}:${tipo}:${id}`
+}
+
+export const peekTitle = (
+  preferences: Preferences,
+  tipo: string,
+  id: string,
+) => {
+  return titleResults.get(titleRequestKey(preferences, tipo, id)) ?? null
+}
+
 export const fetchTitle = (
   preferences: Preferences,
   tipo: string,
   id: string,
 ) => {
-  return fetchJson<TitleDetails>(
+  const key = titleRequestKey(preferences, tipo, id)
+  const resolved = titleResults.get(key)
+  if (resolved) return Promise.resolve(resolved)
+
+  const cached = titleRequests.get(key)
+  if (cached) return cached
+
+  const request = fetchJson<TitleDetails>(
     `/api/title/${tipo}/${id}?${preferenceQuery(preferences)}`,
   )
+    .then((data) => {
+      titleResults.set(key, data)
+      return data
+    })
+    .catch((error: unknown) => {
+      titleRequests.delete(key)
+      throw error
+    })
+
+  titleRequests.set(key, request)
+  return request
 }
 
 export const fetchProviders = (region: string) => {

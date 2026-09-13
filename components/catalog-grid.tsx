@@ -1,18 +1,36 @@
 import { TitleCard } from "@/components/title-card"
 import type { CatalogItem } from "@/lib/catalog/types"
+import { cardEnterDelay } from "@/lib/motion"
 
 type CatalogGridProps = {
   items: CatalogItem[]
   showOffServiceHint?: boolean
   muted?: boolean
+  stagger?: boolean
+  onNavigate?: (href: string) => void
 }
 
-export const CatalogGrid = ({ items, showOffServiceHint, muted = false }: CatalogGridProps) => {
+export const CatalogGrid = ({
+  items,
+  showOffServiceHint,
+  muted = false,
+  stagger = false,
+  onNavigate,
+}: CatalogGridProps) => {
   return (
     <ul className="grid grid-cols-[repeat(auto-fill,minmax(176px,1fr))] gap-x-4 gap-y-5">
-      {items.map((item) => (
-        <li key={`${item.mediaType}-${item.tmdbId}`}>
-          <TitleCard item={item} showOffServiceHint={showOffServiceHint} muted={muted} />
+      {items.map((item, index) => (
+        <li
+          key={`${item.mediaType}-${item.tmdbId}`}
+          className={stagger ? "d-in" : undefined}
+          style={stagger ? { animationDelay: cardEnterDelay(index) } : undefined}
+        >
+          <TitleCard
+            item={item}
+            showOffServiceHint={showOffServiceHint}
+            muted={muted}
+            onNavigate={onNavigate}
+          />
         </li>
       ))}
     </ul>

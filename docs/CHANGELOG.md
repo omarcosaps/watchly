@@ -9,6 +9,7 @@
 
 ### Changed
 
+- Home e detalhe entram em cascata e saem com fade + descida de 260ms; o carrossel do Hero não re-anima o texto.
 - O Hero da Home mostra as 5 tendências da semana no país, com oferta e still; independente da listagem.
 - O Hero da Home resume a sinopse para no máximo 3 linhas; o detalhe mantém o texto completo.
 - Onboarding e Perfil usam os mesmos streamings principais e o mesmo formato de pills em grade 2×4.

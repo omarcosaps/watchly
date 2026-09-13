@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { useEffect, useLayoutEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from "react"
 
 import { useAccount } from "@/components/account-provider"
 import { WatchlistToggle } from "@/components/watchlist-toggle"
@@ -13,13 +13,15 @@ import { cn } from "@/lib/cn"
 import type { CatalogItem } from "@/lib/catalog/types"
 import type { MediaType } from "@/lib/media"
 import { tipoFromMedia } from "@/lib/media"
+import { HERO_SEEN_MS, isModifiedClick, prefersReducedMotion } from "@/lib/motion"
 import { atmosphereUrl } from "@/lib/tmdb/image"
 
 type HeroCarouselProps = {
   items: CatalogItem[]
+  onNavigate?: (href: string) => void
 }
 
-export const HeroCarousel = ({ items }: HeroCarouselProps) => {
+export const HeroCarousel = ({ items, onNavigate }: HeroCarouselProps) => {
   const slides = items.slice(0, 5)
   const slideKey = slides.map((slide) => `${slide.mediaType}-${slide.tmdbId}`).join("|")
   const { preferences } = useAccount()
@@ -29,8 +31,12 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
   const [overviews, setOverviews] = useState<Record<string, string>>({})
   const [heroSynopsis, setHeroSynopsis] = useState("")
   const measureRef = useRef<HTMLParagraphElement>(null)
+  const heroSeenRef = useRef(false)
+  const heroSeenTimerRef = useRef<number | null>(null)
+  const [heroSeen, setHeroSeen] = useState(false)
   const safeIndex = slides.length === 0 ? 0 : Math.min(index, slides.length - 1)
   const current = slides[safeIndex]
+  const heroEnter = !heroSeen
 
   useEffect(() => {
     if (slides.length < 2) return
@@ -42,6 +48,28 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
 
     return () => window.clearInterval(timer)
   }, [slides.length])
+
+  useEffect(() => {
+    if (heroSeenRef.current || heroSeenTimerRef.current !== null) return
+    if (prefersReducedMotion()) {
+      heroSeenRef.current = true
+      setHeroSeen(true)
+      return
+    }
+
+    heroSeenTimerRef.current = window.setTimeout(() => {
+      heroSeenRef.current = true
+      heroSeenTimerRef.current = null
+      setHeroSeen(true)
+    }, HERO_SEEN_MS)
+
+    return () => {
+      if (heroSeenTimerRef.current !== null) {
+        window.clearTimeout(heroSeenTimerRef.current)
+        heroSeenTimerRef.current = null
+      }
+    }
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -113,40 +141,60 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
 
   const href = `/titulo/${tipoFromMedia(current.mediaType)}/${current.tmdbId}`
 
+  const handleDetailsClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!onNavigate || isModifiedClick(event)) return
+    event.preventDefault()
+    onNavigate(href)
+  }
+
   return (
     <section
       className="relative h-[64vh] min-h-[520px] overflow-hidden bg-void"
       aria-roledescription="carrossel"
     >
-      {slides.map((slide, slideIndex) => {
-        const still = atmosphereUrl(slide.backdropPath, slide.posterPath)
-        return (
-          <div
-            key={`${slide.mediaType}-${slide.tmdbId}`}
-            className="absolute inset-0 bg-void transition-opacity duration-1000 ease"
-            style={{ opacity: slideIndex === index ? 1 : 0 }}
-          >
-            {still ? (
-              <Image
-                src={still}
-                alt=""
-                fill
-                priority={slideIndex === 0}
-                sizes="100vw"
-                className="object-cover"
-              />
-            ) : null}
-          </div>
-        )
-      })}
+      <div className="d-back absolute inset-0">
+        {slides.map((slide, slideIndex) => {
+          const still = atmosphereUrl(slide.backdropPath, slide.posterPath)
+          return (
+            <div
+              key={`${slide.mediaType}-${slide.tmdbId}`}
+              className="absolute inset-0 bg-void transition-opacity duration-1000 ease"
+              style={{ opacity: slideIndex === index ? 1 : 0 }}
+            >
+              {still ? (
+                <Image
+                  src={still}
+                  alt=""
+                  fill
+                  priority={slideIndex === 0}
+                  sizes="100vw"
+                  className="object-cover"
+                />
+              ) : null}
+            </div>
+          )
+        })}
+      </div>
       <div className="hatch-hero pointer-events-none absolute inset-0" />
       <div className="scrim-hero pointer-events-none absolute inset-0" />
 
       <div className="absolute inset-x-0 bottom-0 mx-auto max-w-[1280px] px-5 pb-[60px] sm:px-12">
-        <span className="inline-block rounded-full border border-white/12 bg-[rgba(18,20,26,0.85)] px-[13px] py-[7px] text-[11px] font-bold tracking-[0.06em] text-paper uppercase">
+        <span
+          className={cn(
+            "inline-block rounded-full border border-white/12 bg-[rgba(18,20,26,0.85)] px-[13px] py-[7px] text-[11px] font-bold tracking-[0.06em] text-paper uppercase",
+            heroEnter && "d-in",
+          )}
+          style={heroEnter ? { animationDelay: "0.10s" } : undefined}
+        >
           {heroKicker(current.mediaType, current.year)}
         </span>
-        <h1 className="mt-5 mb-4 text-[clamp(38px,4.6vw,60px)] font-extrabold leading-none tracking-[-0.035em] text-shadow-[0_2px_30px_rgba(0,0,0,0.55)]">
+        <h1
+          className={cn(
+            "mt-5 mb-4 text-[clamp(38px,4.6vw,60px)] font-extrabold leading-none tracking-[-0.035em] text-shadow-[0_2px_30px_rgba(0,0,0,0.55)]",
+            heroEnter && "d-in",
+          )}
+          style={heroEnter ? { animationDelay: "0.16s" } : undefined}
+        >
           {current.title}
         </h1>
         <p
@@ -158,15 +206,22 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
           )}
         />
         {heroSynopsis ? (
-          <p className={cn(HERO_SYNOPSIS_CLASS, "mb-[26px] text-white/82")}>
+          <p
+            className={cn(HERO_SYNOPSIS_CLASS, "mb-[26px] text-white/82", heroEnter && "d-in")}
+            style={heroEnter ? { animationDelay: "0.22s" } : undefined}
+          >
             {heroSynopsis}
           </p>
         ) : (
           <div className="mb-[26px]" />
         )}
-        <div className="flex flex-wrap gap-3">
+        <div
+          className={cn("flex flex-wrap gap-3", heroEnter && "d-in")}
+          style={heroEnter ? { animationDelay: "0.28s" } : undefined}
+        >
           <Link
             href={href}
+            onClick={handleDetailsClick}
             className="cta-primary inline-flex items-center rounded-full px-[26px] py-3.5 text-[15px] font-bold"
           >
             ▶&nbsp; Ver Detalhes
@@ -182,7 +237,11 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
         </div>
         {slides.length > 1 ? (
           <div
-            className="absolute right-5 bottom-[60px] flex items-center gap-[9px] sm:right-12"
+            className={cn(
+              "absolute right-5 bottom-[60px] flex items-center gap-[9px] sm:right-12",
+              heroEnter && "d-in",
+            )}
+            style={heroEnter ? { animationDelay: "0.36s" } : undefined}
             aria-label="Slides em destaque"
           >
             {slides.map((slide, slideIndex) => (
