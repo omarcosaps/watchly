@@ -24,8 +24,8 @@ const LoginForm = () => {
           { name: "email", label: "E-mail", type: "email", autoComplete: "email" },
           { name: "password", label: "Senha", type: "password", autoComplete: "current-password" },
         ]}
-        onSubmit={(values) => {
-          signIn(values.email, values.password)
+        onSubmit={async (values) => {
+          await signIn(values.email, values.password)
           router.replace("/onboarding")
         }}
         beforeSubmit={

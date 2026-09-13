@@ -66,10 +66,8 @@ Login ou cadastro não bloqueiam a exploração. A conta passa a ser exigida qua
 
 ## Fora do escopo
 
-- Persistência em servidor (incluindo Supabase)
-- Conta compartilhada entre dispositivos ou navegadores
 - Verificação de e-mail
-- Envio real de e-mail (a recuperação descreve o comportamento esperado; a implementação atual não envia mensagem)
+- Envio de e-mail além da recuperação de senha
 - Login social (Google, GitHub, etc.)
 - Magic link
 - Watchlist anônima
@@ -352,8 +350,8 @@ Não há instrumentação de produto. O recorte é uso pessoal e portfólio. Nã
 
 ## Limitações
 
-- Conta, preferências e watchlist existem só neste navegador até haver persistência em servidor. Limpar o armazenamento local apaga a sessão e os dados.
-- A recuperação de senha descreve o comportamento esperado de envio de link. A implementação atual não envia mensagem.
+- Conta, preferências e watchlist dependem do Supabase. Sem o serviço, não há sessão persistida.
+- A recuperação de senha envia o link pelo e-mail do Supabase Auth. O template e o SMTP são configuração do projeto, não do app.
 - A disponibilidade é por país e pode estar desatualizada em relação ao app real do streaming.
 - A API da TMDB não devolve deep links completos para Netflix, Prime e similares.
 - “Tudo o que está disponível agora” é inexato: a listagem depende da região e da fonte externa.
@@ -365,12 +363,11 @@ Não há instrumentação de produto. O recorte é uso pessoal e portfólio. Nã
 - A pessoa pode decidir com base em disponibilidade desatualizada.
 - Sem deep link, o último passo ainda é abrir o app certo na mão.
 - O primeiro pedido de autenticação acontece quando a pessoa tenta guardar um título. Perder o contexto entre o gate e o retorno à ação reduz a conversão.
-- Perder o armazenamento local equivale a perder a conta neste dispositivo.
+- Sem o Supabase, cadastro, login, preferências e watchlist ficam indisponíveis.
 
 ## Decisões de produto em aberto
 
-- Se e quando existir conta persistida entre dispositivos (e como isso muda sessão, preferências e watchlist)
-- Se a recuperação de senha passará a enviar e-mail de verdade
+- Se o template do e-mail de recuperação será customizado em português no dashboard do Supabase
 
 ## Como atualizar
 

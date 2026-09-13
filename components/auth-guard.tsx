@@ -7,12 +7,13 @@ import { useAccount } from "@/components/account-provider"
 import { loginHref } from "@/lib/account/pending-watchlist"
 
 export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
-  const { ready, session, preferences } = useAccount()
+  const { ready, accountReady, loadError, retryAccount, session, preferences } = useAccount()
   const pathname = usePathname()
   const router = useRouter()
 
   useEffect(() => {
     if (!ready) return
+    if (session && !accountReady) return
 
     if (!session) {
       router.replace(loginHref(pathname === "/watchlist" ? "watchlist" : "save"))
@@ -27,12 +28,29 @@ export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
     if (preferences && pathname === "/onboarding") {
       router.replace("/")
     }
-  }, [pathname, preferences, ready, router, session])
+  }, [accountReady, pathname, preferences, ready, router, session])
 
-  if (!ready) {
+  if (!ready || (session && !accountReady && !loadError)) {
     return (
       <div className="flex min-h-dvh items-center justify-center text-mist" role="status">
         Carregando a sessão
+      </div>
+    )
+  }
+
+  if (session && !accountReady && loadError) {
+    return (
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-3 px-6 text-center" role="alert">
+        <p className="text-mist">Não deu para carregar a conta.</p>
+        <button
+          type="button"
+          onClick={() => {
+            void retryAccount()
+          }}
+          className="cta-primary rounded-full px-[22px] py-3 text-sm font-bold"
+        >
+          Tentar de novo
+        </button>
       </div>
     )
   }

@@ -40,6 +40,7 @@ export const PreferencesForm = ({
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [loadedCountry, setLoadedCountry] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
   const loading = loadedCountry !== country
 
   useEffect(() => {
@@ -68,13 +69,14 @@ export const PreferencesForm = ({
     }
   }, [country])
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError(null)
     setSuccess(null)
+    setSaving(true)
 
     try {
-      account.savePreferences({ country, providerIds: selectedIds })
+      await account.savePreferences({ country, providerIds: selectedIds })
       if (onSaved) {
         onSaved()
         return
@@ -90,19 +92,23 @@ export const PreferencesForm = ({
         return
       }
       setError("Não deu para salvar as preferências")
+    } finally {
+      setSaving(false)
     }
   }
 
   const handleSignOut = () => {
-    const goHome = () => {
-      account.signOut()
+    const goHome = async () => {
+      await account.signOut()
       router.replace("/")
     }
     if (pageMotion) {
-      pageMotion.leaveThen(goHome)
+      pageMotion.leaveThen(() => {
+        void goHome()
+      })
       return
     }
-    goHome()
+    void goHome()
   }
 
   return (
@@ -183,17 +189,18 @@ export const PreferencesForm = ({
       >
         <button
           type="submit"
-          disabled={selectedIds.length < 1 || loading}
+          disabled={selectedIds.length < 1 || loading || saving}
+          aria-busy={saving}
           className={cn(
             "rounded-full font-bold transition-colors duration-[150ms]",
             layout === "onboarding"
-              ? selectedIds.length < 1 || loading
+              ? selectedIds.length < 1 || loading || saving
                 ? "cursor-not-allowed bg-white/10 px-[26px] py-3.5 text-[15px] text-white/40 opacity-55"
                 : "cta-primary px-[26px] py-3.5 text-[15px]"
               : "cta-primary px-[22px] py-3 text-sm disabled:cursor-not-allowed disabled:opacity-55",
           )}
         >
-          {submitLabel}
+          {saving ? "Salvando…" : submitLabel}
         </button>
         {showLogout ? (
           <button

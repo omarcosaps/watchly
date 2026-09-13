@@ -4,6 +4,8 @@
 
 ### Added
 
+- Persistência de conta, preferências e watchlist no Supabase, com sync entre dispositivos.
+- Recuperação de senha com e-mail real do Supabase Auth.
 - Exploração pública da Home, busca e detalhe, com autenticação só na watchlist e no perfil.
 - Cadastro com origem de aquisição e persistência mock isolada por e-mail.
 

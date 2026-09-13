@@ -26,11 +26,15 @@ export const PendingWatchlistResume = () => {
 
     resumedForEmail = session.email
 
-    if (!isSaved(pending.mediaType, pending.tmdbId)) {
-      addToWatchlist(pending)
+    const resume = async () => {
+      if (!isSaved(pending.mediaType, pending.tmdbId)) {
+        await addToWatchlist(pending)
+      }
+
+      router.replace(`/titulo/${tipoFromMedia(pending.mediaType)}/${pending.tmdbId}`)
     }
 
-    router.replace(`/titulo/${tipoFromMedia(pending.mediaType)}/${pending.tmdbId}`)
+    void resume()
   }, [addToWatchlist, isSaved, preferences, router, session])
 
   return null

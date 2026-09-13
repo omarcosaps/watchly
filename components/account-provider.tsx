@@ -4,12 +4,12 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useSyncExternalStore,
   type ReactNode,
 } from "react"
 
-import { readAccount } from "@/lib/account/mock/storage"
 import { applyCountryChange, savePreferences } from "@/lib/account/preferences"
 import {
   confirmEmail,
@@ -19,43 +19,30 @@ import {
   signUp,
   updatePassword,
 } from "@/lib/account/session"
+import {
+  getAccountSnapshot,
+  getServerAccountSnapshot,
+  patchAccountSnapshot,
+  subscribeAccount,
+} from "@/lib/account/store"
+import { hydrateAccount, listenAccountAuth } from "@/lib/account/supabase/load"
 import type { Preferences, Session, WatchlistItem } from "@/lib/account/types"
 import {
   addToWatchlist,
-  isSaved,
+  isSaved as isWatchlistSaved,
   removeFromWatchlist,
   setWatchlistWatched,
 } from "@/lib/account/watchlist"
 import type { MediaType } from "@/lib/media"
 
-const subscribe = (onStoreChange: () => void) => {
-  const handleStorage = (event: StorageEvent) => {
-    if (event.key === "watchly-account-v2") onStoreChange()
-  }
-
-  window.addEventListener("watchly-account", onStoreChange)
-  window.addEventListener("storage", handleStorage)
-  return () => {
-    window.removeEventListener("watchly-account", onStoreChange)
-    window.removeEventListener("storage", handleStorage)
-  }
-}
-
-const getSnapshot = () => JSON.stringify(readAccount())
-
-const getServerSnapshot = () => {
-  return JSON.stringify({ session: null, preferences: null, watchlist: [] })
-}
-
-const emit = () => {
-  window.dispatchEvent(new Event("watchly-account"))
-}
-
 type AccountContextValue = {
   ready: boolean
+  accountReady: boolean
+  loadError: string | null
   session: Session | null
   preferences: Preferences | null
   watchlist: WatchlistItem[]
+  retryAccount: () => Promise<void>
   signUp: typeof signUp
   signIn: typeof signIn
   signOut: typeof signOut
@@ -73,44 +60,69 @@ type AccountContextValue = {
 const AccountContext = createContext<AccountContextValue | null>(null)
 
 export const AccountProvider = ({ children }: { children: ReactNode }) => {
-  const ready = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
+  const account = useSyncExternalStore(
+    subscribeAccount,
+    getAccountSnapshot,
+    getServerAccountSnapshot,
   )
-  const snapshot = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
-  const account = useMemo(() => JSON.parse(snapshot) as ReturnType<typeof readAccount>, [snapshot])
 
-  const wrap = useCallback(<T extends unknown[], R>(fn: (...args: T) => R) => {
-    return (...args: T) => {
-      const result = fn(...args)
-      emit()
-      return result
+  useEffect(() => {
+    let cancelled = false
+    let unsubscribe = () => {}
+
+    const start = async () => {
+      try {
+        await hydrateAccount()
+        if (cancelled) return
+        unsubscribe = listenAccountAuth()
+      } catch (error) {
+        if (cancelled) return
+        patchAccountSnapshot({
+          session: null,
+          preferences: null,
+          watchlist: [],
+          ready: true,
+          accountReady: true,
+          loadError: error instanceof Error ? error.message : "Supabase não configurado",
+        })
+      }
+    }
+
+    void start()
+
+    return () => {
+      cancelled = true
+      unsubscribe()
     }
   }, [])
 
-  const value = useMemo<AccountContextValue>(() => {
-    const watchlist = [...account.watchlist].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+  const retryAccount = useCallback(async () => {
+    await hydrateAccount()
+  }, [])
 
+  const value = useMemo<AccountContextValue>(() => {
     return {
-      ready,
+      ready: account.ready,
+      accountReady: account.accountReady,
+      loadError: account.loadError,
       session: account.session,
       preferences: account.preferences,
-      watchlist,
-      signUp: wrap(signUp),
-      signIn: wrap(signIn),
-      signOut: wrap(signOut),
-      confirmEmail: wrap(confirmEmail),
-      requestPasswordReset: wrap(requestPasswordReset),
-      updatePassword: wrap(updatePassword),
-      savePreferences: wrap(savePreferences),
-      applyCountryChange: wrap(applyCountryChange),
-      addToWatchlist: wrap(addToWatchlist),
-      removeFromWatchlist: wrap(removeFromWatchlist),
-      setWatchlistWatched: wrap(setWatchlistWatched),
-      isSaved,
+      watchlist: account.watchlist,
+      retryAccount,
+      signUp,
+      signIn,
+      signOut,
+      confirmEmail,
+      requestPasswordReset,
+      updatePassword,
+      savePreferences,
+      applyCountryChange,
+      addToWatchlist,
+      removeFromWatchlist,
+      setWatchlistWatched,
+      isSaved: isWatchlistSaved,
     }
-  }, [account.preferences, account.session, account.watchlist, ready, wrap])
+  }, [account, retryAccount])
 
   return <AccountContext.Provider value={value}>{children}</AccountContext.Provider>
 }

@@ -54,7 +54,9 @@ export const HomeAside = ({ items, genres }: HomeAsideProps) => {
                       <div className="mt-2 flex gap-2">
                         <button
                           type="button"
-                          onClick={() => removeFromWatchlist(item.mediaType, item.tmdbId)}
+                          onClick={() => {
+                            void removeFromWatchlist(item.mediaType, item.tmdbId)
+                          }}
                           className="cta-ghost h-8 rounded-full px-3 text-xs font-semibold"
                         >
                           Tirar

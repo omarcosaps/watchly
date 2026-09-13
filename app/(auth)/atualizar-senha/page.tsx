@@ -25,8 +25,8 @@ export default function AtualizarSenhaPage() {
             autoComplete: "new-password",
           },
         ]}
-        onSubmit={(values) => {
-          updatePassword(values.password)
+        onSubmit={async (values) => {
+          await updatePassword(values.password)
           setSuccess("Senha atualizada. Entre de novo com a nova senha.")
           window.setTimeout(() => router.replace("/login"), 800)
         }}

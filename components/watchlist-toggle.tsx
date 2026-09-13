@@ -34,7 +34,7 @@ export const WatchlistToggle = ({
     return item.mediaType === mediaType && item.tmdbId === tmdbId
   })
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault()
     event.stopPropagation()
 
@@ -46,10 +46,10 @@ export const WatchlistToggle = ({
 
     try {
       if (saved) {
-        account.removeFromWatchlist(mediaType, tmdbId)
+        await account.removeFromWatchlist(mediaType, tmdbId)
         showToast(`Removido da minha lista: ${title}`)
       } else {
-        account.addToWatchlist({
+        await account.addToWatchlist({
           tmdbId,
           mediaType,
           title,
@@ -59,7 +59,7 @@ export const WatchlistToggle = ({
         showToast(`Adicionado a minha lista: ${title}`)
       }
     } catch {
-      return
+      showToast("Não deu para atualizar a lista")
     }
   }
 

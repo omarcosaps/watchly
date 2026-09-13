@@ -9,6 +9,7 @@ export const GuestGuard = ({ children }: { children: React.ReactNode }) => {
   const { ready, session, preferences } = useAccount()
   const pathname = usePathname()
   const router = useRouter()
+  const allowAuthenticated = pathname === "/atualizar-senha"
 
   useEffect(() => {
     if (!ready) return
@@ -18,10 +19,10 @@ export const GuestGuard = ({ children }: { children: React.ReactNode }) => {
       return
     }
 
-    if (session) {
+    if (session && !allowAuthenticated) {
       router.replace(preferences ? "/" : "/onboarding")
     }
-  }, [pathname, preferences, ready, router, session])
+  }, [allowAuthenticated, pathname, preferences, ready, router, session])
 
   if (!ready) {
     return (
@@ -32,7 +33,7 @@ export const GuestGuard = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (pathname === "/verificar-email") return null
-  if (session) return null
+  if (session && !allowAuthenticated) return null
 
   return <>{children}</>
 }

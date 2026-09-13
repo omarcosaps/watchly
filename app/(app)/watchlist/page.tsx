@@ -122,9 +122,13 @@ export default function WatchlistPage() {
 
   const visible = items.length > 0 ? items : watchlist.map((saved) => toCatalogItem(saved))
 
-  const handleRemove = (item: CatalogItem) => {
-    removeFromWatchlist(item.mediaType, item.tmdbId)
-    showToast(`Removido da minha lista: ${item.title}`)
+  const handleRemove = async (item: CatalogItem) => {
+    try {
+      await removeFromWatchlist(item.mediaType, item.tmdbId)
+      showToast(`Removido da minha lista: ${item.title}`)
+    } catch {
+      showToast("Não deu para remover da lista")
+    }
   }
 
   if (watchlist.length === 0) {
@@ -208,7 +212,9 @@ export default function WatchlistPage() {
               />
               <button
                 type="button"
-                onClick={() => handleRemove(item)}
+                onClick={() => {
+                  void handleRemove(item)
+                }}
                 title="Remover"
                 aria-label={`Remover ${item.title} da lista`}
                 className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-white/7 text-[15px] leading-none text-white/70 transition-colors duration-[150ms] hover:bg-[oklch(0.5_0.14_25/0.35)] hover:text-white"

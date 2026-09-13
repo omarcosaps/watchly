@@ -26,8 +26,8 @@ export default function CadastroPage() {
             options: ACQUISITION_SOURCE_OPTIONS,
           },
         ]}
-        onSubmit={(values) => {
-          signUp(values.email, values.password, values.acquisitionSource)
+        onSubmit={async (values) => {
+          await signUp(values.email, values.password, values.acquisitionSource)
           router.replace("/onboarding")
         }}
         footer={<AuthSwitch prompt="Já tem conta?" href="/login" label="Entrar" />}
