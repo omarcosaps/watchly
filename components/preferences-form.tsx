@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 import { useAccount } from "@/components/account-provider"
+import { usePageMotionOptional } from "@/components/page-motion"
 import { ProviderPicker } from "@/components/provider-picker"
 import { fetchProviders } from "@/lib/api"
 import { AccountError, ACCOUNT_ERROR_COPY, PRODUCT_COUNTRIES } from "@/lib/account/types"
@@ -17,6 +18,7 @@ type PreferencesFormProps = {
   showAccount?: boolean
   showLogout?: boolean
   layout?: "default" | "onboarding"
+  enter?: boolean
   onSaved?: () => void
 }
 
@@ -26,10 +28,12 @@ export const PreferencesForm = ({
   showAccount = false,
   showLogout = false,
   layout = "default",
+  enter = false,
   onSaved,
 }: PreferencesFormProps) => {
   const router = useRouter()
   const account = useAccount()
+  const pageMotion = usePageMotionOptional()
   const [providers, setProviders] = useState<WatchProvider[]>([])
   const [country, setCountry] = useState(account.preferences?.country ?? "BR")
   const [selectedIds, setSelectedIds] = useState<number[]>(account.preferences?.providerIds ?? [])
@@ -90,20 +94,30 @@ export const PreferencesForm = ({
   }
 
   const handleSignOut = () => {
-    account.signOut()
-    router.replace("/")
+    const goHome = () => {
+      account.signOut()
+      router.replace("/")
+    }
+    if (pageMotion) {
+      pageMotion.leaveThen(goHome)
+      return
+    }
+    goHome()
   }
 
   return (
     <form onSubmit={handleSubmit}>
       {showAccount && account.session ? (
-        <p className="mb-[30px] text-sm text-white/50">
+        <p
+          className={cn("mb-[30px] text-sm text-white/50", enter && "d-in")}
+          style={enter ? { animationDelay: "0.06s" } : undefined}
+        >
           Conectado como{" "}
           <strong className="font-semibold text-white/80">{account.session.email}</strong>. Trocar
           país ou streamings não apaga sua watchlist.
         </p>
       ) : null}
-      <fieldset>
+      <fieldset className={enter ? "d-in" : undefined} style={enter ? { animationDelay: "0.10s" } : undefined}>
         <legend className="mb-2.5 text-[11px] font-bold tracking-[0.09em] text-mute uppercase">
           País
         </legend>
@@ -132,7 +146,7 @@ export const PreferencesForm = ({
           })}
         </div>
       </fieldset>
-      <fieldset>
+      <fieldset className={enter ? "d-in" : undefined} style={enter ? { animationDelay: "0.16s" } : undefined}>
         <legend className="mb-2.5 text-[11px] font-bold tracking-[0.09em] text-mute uppercase">
           Seus streamings
         </legend>
@@ -159,7 +173,14 @@ export const PreferencesForm = ({
           {success}
         </p>
       ) : null}
-      <div className={cn("flex items-center gap-4", layout === "onboarding" ? "mt-7" : "mt-6")}>
+      <div
+        className={cn(
+          "flex items-center gap-4",
+          layout === "onboarding" ? "mt-7" : "mt-6",
+          enter && "d-in",
+        )}
+        style={enter ? { animationDelay: "0.22s" } : undefined}
+      >
         <button
           type="submit"
           disabled={selectedIds.length < 1 || loading}

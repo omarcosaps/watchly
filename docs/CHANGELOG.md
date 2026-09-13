@@ -9,6 +9,7 @@
 
 ### Changed
 
+- A linguagem de movimento vale em toda troca entre Home, busca, detalhe, Watchlist e Perfil, inclusive pela nav pill; Início, Filmes e Séries também saem e entram com o mesmo gesto.
 - Home e detalhe entram em cascata e saem com fade + descida de 260ms; o carrossel do Hero não re-anima o texto.
 - O Hero da Home mostra as 5 tendências da semana no país, com oferta e still; independente da listagem.
 - O Hero da Home resume a sinopse para no máximo 3 linhas; o detalhe mantém o texto completo.

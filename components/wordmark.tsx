@@ -1,5 +1,6 @@
-import Link from "next/link"
+"use client"
 
+import { ScreenLink } from "@/components/screen-link"
 import { cn } from "@/lib/cn"
 
 type WordmarkProps = {
@@ -9,7 +10,7 @@ type WordmarkProps = {
 
 export const Wordmark = ({ href = "/", className }: WordmarkProps) => {
   return (
-    <Link
+    <ScreenLink
       href={href}
       className={cn(
         "shrink-0 px-2.5 text-base font-bold tracking-[-0.02em] text-white",
@@ -18,6 +19,6 @@ export const Wordmark = ({ href = "/", className }: WordmarkProps) => {
       aria-label="Watchly, início"
     >
       Watchly
-    </Link>
+    </ScreenLink>
   )
 }

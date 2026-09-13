@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation"
 
+import { useScreenNavigate } from "@/hooks/use-screen-navigate"
 import { cn } from "@/lib/cn"
 import type { MergedGenre, WatchProvider } from "@/lib/catalog/types"
 
@@ -22,6 +23,7 @@ export const CatalogFilters = ({
 }: CatalogFiltersProps) => {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { leaveTo } = useScreenNavigate()
 
   const handleChange = (name: string, value: string) => {
     const next = new URLSearchParams(searchParams.toString())
@@ -30,7 +32,12 @@ export const CatalogFilters = ({
     } else {
       next.set(name, value)
     }
-    router.replace(`/?${next.toString()}`)
+    const href = next.toString() ? `/?${next.toString()}` : "/"
+    if (name === "media") {
+      leaveTo(href)
+      return
+    }
+    router.replace(href)
   }
 
   return (

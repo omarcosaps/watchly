@@ -1,7 +1,10 @@
 import type { Preferences } from "@/lib/account/types"
+import { homeCatalogParams } from "@/lib/catalog/home-query"
+import { heroCatalogParams } from "@/lib/catalog/hero-params"
 import type { CatalogPage } from "@/lib/catalog/types"
 import type { TitleDetails } from "@/lib/catalog/types"
 import type { CountryOption, MergedGenre, WatchProvider } from "@/lib/catalog/types"
+import { hrefSearch } from "@/lib/motion"
 
 export const fetchJson = async <T>(url: string): Promise<T> => {
   const response = await fetch(url)
@@ -20,16 +23,69 @@ export const preferenceQuery = (preferences: Preferences) => {
   return params.toString()
 }
 
-export const fetchCatalog = (
-  preferences: Preferences,
-  search: URLSearchParams,
-) => {
+type MetaPayload = { countries: CountryOption[]; genres: MergedGenre[] }
+type ProvidersPayload = { providers: WatchProvider[] }
+
+const catalogRequests = new Map<string, Promise<CatalogPage>>()
+const catalogResults = new Map<string, CatalogPage>()
+const titleRequests = new Map<string, Promise<TitleDetails>>()
+const titleResults = new Map<string, TitleDetails>()
+const providerRequests = new Map<string, Promise<ProvidersPayload>>()
+const providerResults = new Map<string, ProvidersPayload>()
+let metaRequest: Promise<MetaPayload> | null = null
+let metaResult: MetaPayload | null = null
+
+const catalogUrl = (preferences: Preferences, search: URLSearchParams) => {
   const params = new URLSearchParams(search)
   params.set("region", preferences.country)
   if (preferences.providerIds.length > 0) {
     params.set("providers", preferences.providerIds.join(","))
   }
-  return fetchJson<CatalogPage>(`/api/catalog?${params.toString()}`)
+  return `/api/catalog?${params.toString()}`
+}
+
+const titleRequestKey = (preferences: Preferences, tipo: string, id: string) => {
+  return `${preferences.country}:${preferences.providerIds.join(",")}:${tipo}:${id}`
+}
+
+export const resetClientApiCache = () => {
+  catalogRequests.clear()
+  catalogResults.clear()
+  titleRequests.clear()
+  titleResults.clear()
+  providerRequests.clear()
+  providerResults.clear()
+  metaRequest = null
+  metaResult = null
+}
+
+export const peekCatalog = (preferences: Preferences, search: URLSearchParams) => {
+  return catalogResults.get(catalogUrl(preferences, search)) ?? null
+}
+
+export const fetchCatalog = (
+  preferences: Preferences,
+  search: URLSearchParams,
+) => {
+  const key = catalogUrl(preferences, search)
+  const resolved = catalogResults.get(key)
+  if (resolved) return Promise.resolve(resolved)
+
+  const cached = catalogRequests.get(key)
+  if (cached) return cached
+
+  const request = fetchJson<CatalogPage>(key)
+    .then((data) => {
+      catalogResults.set(key, data)
+      return data
+    })
+    .catch((error: unknown) => {
+      catalogRequests.delete(key)
+      throw error
+    })
+
+  catalogRequests.set(key, request)
+  return request
 }
 
 export const fetchSearch = (
@@ -44,13 +100,6 @@ export const fetchSearch = (
     providers: preferences.providerIds.join(","),
   })
   return fetchJson<CatalogPage>(`/api/search?${params.toString()}`)
-}
-
-const titleRequests = new Map<string, Promise<TitleDetails>>()
-const titleResults = new Map<string, TitleDetails>()
-
-const titleRequestKey = (preferences: Preferences, tipo: string, id: string) => {
-  return `${preferences.country}:${preferences.providerIds.join(",")}:${tipo}:${id}`
 }
 
 export const peekTitle = (
@@ -89,12 +138,65 @@ export const fetchTitle = (
   return request
 }
 
+export const peekProviders = (region: string) => {
+  return providerResults.get(region) ?? null
+}
+
 export const fetchProviders = (region: string) => {
-  return fetchJson<{ providers: WatchProvider[] }>(
+  const resolved = providerResults.get(region)
+  if (resolved) return Promise.resolve(resolved)
+
+  const cached = providerRequests.get(region)
+  if (cached) return cached
+
+  const request = fetchJson<ProvidersPayload>(
     `/api/watch-providers?region=${region}`,
   )
+    .then((data) => {
+      providerResults.set(region, data)
+      return data
+    })
+    .catch((error: unknown) => {
+      providerRequests.delete(region)
+      throw error
+    })
+
+  providerRequests.set(region, request)
+  return request
+}
+
+export const peekMeta = () => {
+  return metaResult
 }
 
 export const fetchMeta = () => {
-  return fetchJson<{ countries: CountryOption[]; genres: MergedGenre[] }>("/api/meta")
+  if (metaResult) return Promise.resolve(metaResult)
+  if (metaRequest) return metaRequest
+
+  metaRequest = fetchJson<MetaPayload>("/api/meta")
+    .then((data) => {
+      metaResult = data
+      return data
+    })
+    .catch((error: unknown) => {
+      metaRequest = null
+      throw error
+    })
+
+  return metaRequest
+}
+
+export const warmHome = (preferences: Preferences, href = "/") => {
+  const search = hrefSearch(href)
+  const heroPreferences = { country: preferences.country, providerIds: [] as number[] }
+  const metaPromise = fetchMeta()
+
+  return Promise.all([
+    metaPromise,
+    fetchProviders(preferences.country),
+    fetchCatalog(heroPreferences, heroCatalogParams()),
+    metaPromise.then((meta) =>
+      fetchCatalog(preferences, homeCatalogParams(search, meta.genres, 1)),
+    ),
+  ])
 }

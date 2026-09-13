@@ -8,9 +8,9 @@ import { useAccount } from "@/components/account-provider"
 import { StatusPanel } from "@/components/status-panel"
 import { WatchlistToggle } from "@/components/watchlist-toggle"
 import { WatchStatusToggle } from "@/components/watch-status-toggle"
-import { useLeaveNavigate } from "@/hooks/use-leave-navigate"
+import { usePageMotion } from "@/components/page-motion"
 import { GUEST_PREFERENCES, PRODUCT_COUNTRIES } from "@/lib/account/types"
-import { fetchTitle, peekTitle } from "@/lib/api"
+import { fetchTitle, peekTitle, warmHome } from "@/lib/api"
 import { MONETIZATION_LABEL, type Offer, type TitleDetails } from "@/lib/catalog/types"
 import { mediaFromTipo, mediaLabel } from "@/lib/media"
 import { atmosphereUrl, logoUrl, posterUrl, profileUrl } from "@/lib/tmdb/image"
@@ -32,7 +32,7 @@ export default function TitlePage() {
   const router = useRouter()
   const params = useParams<{ tipo: string; id: string }>()
   const { preferences } = useAccount()
-  const { leaving, leaveThen } = useLeaveNavigate()
+  const { leaveThen } = usePageMotion()
   const catalogPreferences = preferences ?? GUEST_PREFERENCES
   const [details, setDetails] = useState<TitleDetails | null>(() =>
     peekTitle(catalogPreferences, params.tipo, params.id),
@@ -120,13 +120,14 @@ export default function TitlePage() {
 
   const handleBack = () => {
     router.prefetch("/")
+    void warmHome(catalogPreferences, "/")
     leaveThen(() => {
       router.back()
     })
   }
 
   return (
-    <article className={leaving ? "d-leaving" : undefined}>
+    <article>
       <div className="d-back relative h-[44vh] min-h-[340px] overflow-hidden bg-[#15161c]">
         {still ? (
           <Image src={still} alt="" fill priority sizes="100vw" className="object-cover" />

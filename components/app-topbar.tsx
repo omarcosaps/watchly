@@ -6,7 +6,9 @@ import { Suspense } from "react"
 
 import { useAccount } from "@/components/account-provider"
 import { SearchIcon } from "@/components/icons"
+import { ScreenLink } from "@/components/screen-link"
 import { Wordmark } from "@/components/wordmark"
+import { useScreenNavigate } from "@/hooks/use-screen-navigate"
 import { loginHref } from "@/lib/account/pending-watchlist"
 import { cn } from "@/lib/cn"
 
@@ -23,6 +25,7 @@ const TopbarContent = () => {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const { session, preferences } = useAccount()
+  const { leaveTo } = useScreenNavigate()
   const media = searchParams.get("media")
   const homeActive = pathname === "/" && !media
   const moviesActive = pathname === "/" && media === "movie"
@@ -40,7 +43,8 @@ const TopbarContent = () => {
       router.push("/onboarding")
       return
     }
-    router.push("/watchlist")
+    if (watchlistActive) return
+    leaveTo("/watchlist")
   }
 
   return (
@@ -67,7 +71,7 @@ const TopbarContent = () => {
         </button>
       </nav>
 
-      <Link
+      <ScreenLink
         href="/busca"
         aria-label="Buscar"
         title="Buscar"
@@ -80,12 +84,12 @@ const TopbarContent = () => {
         )}
       >
         <SearchIcon className="h-[15px] w-[15px]" />
-      </Link>
+      </ScreenLink>
 
       <span className="mx-1.5 h-[18px] w-px bg-white/14" aria-hidden />
 
       {session ? (
-        <Link
+        <ScreenLink
           href="/preferencias"
           title="Sua conta e preferências"
           aria-current={prefsActive ? "page" : undefined}
@@ -105,7 +109,7 @@ const TopbarContent = () => {
             {initialsFromEmail(session.email)}
           </span>
           <span className="max-w-28 truncate">{shortNameFromEmail(session.email)}</span>
-        </Link>
+        </ScreenLink>
       ) : (
         <>
           <Link
@@ -146,9 +150,9 @@ const NavLink = ({
   children: React.ReactNode
 }) => {
   return (
-    <Link href={href} aria-current={active ? "page" : undefined} className={navClass(active)}>
+    <ScreenLink href={href} aria-current={active ? "page" : undefined} className={navClass(active)}>
       {children}
-    </Link>
+    </ScreenLink>
   )
 }
 
