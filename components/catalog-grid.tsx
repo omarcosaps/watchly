@@ -2,6 +2,9 @@ import { TitleCard } from "@/components/title-card"
 import type { CatalogItem } from "@/lib/catalog/types"
 import { cardEnterDelay } from "@/lib/motion"
 
+const CATALOG_GRID_CLASS =
+  "grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-3 lg:grid-cols-[repeat(auto-fill,minmax(176px,1fr))]"
+
 type CatalogGridProps = {
   items: CatalogItem[]
   showOffServiceHint?: boolean
@@ -18,7 +21,7 @@ export const CatalogGrid = ({
   onNavigate,
 }: CatalogGridProps) => {
   return (
-    <ul className="grid grid-cols-[repeat(auto-fill,minmax(176px,1fr))] gap-x-4 gap-y-5">
+    <ul className={CATALOG_GRID_CLASS}>
       {items.map((item, index) => (
         <li
           key={`${item.mediaType}-${item.tmdbId}`}
@@ -40,7 +43,7 @@ export const CatalogGrid = ({
 export const CatalogSkeleton = () => {
   return (
     <ul
-      className="grid grid-cols-[repeat(auto-fill,minmax(176px,1fr))] gap-x-4 gap-y-5"
+      className={CATALOG_GRID_CLASS}
       aria-hidden
     >
       {Array.from({ length: 10 }).map((_, index) => (
