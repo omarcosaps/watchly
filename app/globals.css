@@ -34,11 +34,15 @@ body {
   --chrome-pill: 110px;
   --chrome-top: calc(var(--safe-top) + var(--chrome-bar));
   --chrome-bottom: calc(70px + var(--safe-bottom));
+  --hero-height: 50dvh;
+  --hero-min-height: 0px;
 }
 
 @media (min-width: 640px) {
   :root {
     --chrome-top: var(--chrome-pill);
+    --hero-height: 64vh;
+    --hero-min-height: 520px;
   }
 }
 
@@ -48,6 +52,11 @@ body {
 
 @utility pb-chrome {
   padding-bottom: var(--chrome-bottom);
+}
+
+@utility hero-frame {
+  height: var(--hero-height);
+  min-height: var(--hero-min-height);
 }
 
 :focus-visible {
@@ -185,7 +194,8 @@ textarea:focus-visible {
   background-position: right 12px center;
   border: 1px solid transparent;
   border-radius: 999px;
-  padding: 8px 30px 8px 14px;
+  min-height: 44px;
+  padding: 11px 30px 11px 14px;
   color: #f2f3f5;
   font-size: 13px;
   cursor: pointer;
@@ -193,6 +203,11 @@ textarea:focus-visible {
 
   &:hover {
     background-color: rgb(255 255 255 / 0.12);
+  }
+
+  @media (min-width: 640px) {
+    min-height: 0;
+    padding: 8px 30px 8px 14px;
   }
 }
 
@@ -213,15 +228,25 @@ textarea:focus-visible {
 }
 
 @utility scrim-hero {
-  background:
-    linear-gradient(
-      100deg,
-      rgb(8 9 12 / 0.94) 0%,
-      rgb(8 9 12 / 0.8) 32%,
-      rgb(8 9 12 / 0.3) 62%,
-      rgb(8 9 12 / 0.15) 100%
-    ),
-    linear-gradient(to top, #0b0c10 0%, rgb(11 12 16 / 0.25) 34%, transparent 62%);
+  background: linear-gradient(
+    to top,
+    #0b0c10 0%,
+    rgb(11 12 16 / 0.78) 38%,
+    rgb(11 12 16 / 0.28) 68%,
+    transparent 88%
+  );
+
+  @media (min-width: 640px) {
+    background:
+      linear-gradient(
+        100deg,
+        rgb(8 9 12 / 0.94) 0%,
+        rgb(8 9 12 / 0.8) 32%,
+        rgb(8 9 12 / 0.3) 62%,
+        rgb(8 9 12 / 0.15) 100%
+      ),
+      linear-gradient(to top, #0b0c10 0%, rgb(11 12 16 / 0.25) 34%, transparent 62%);
+  }
 }
 
 @utility scrim-detail {

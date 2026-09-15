@@ -96,7 +96,7 @@ export const CatalogFilters = ({
           { value: "before-2010", label: "Antes de 2010" },
         ]}
       />
-      <div className="ml-auto flex flex-none items-center gap-2.5">
+      <div className="flex flex-wrap items-center gap-2.5 sm:ml-auto sm:flex-none">
         <span className="whitespace-nowrap text-xs text-mute">Ordenar por</span>
         <label htmlFor="filtro-ordem" className="sr-only">
           Ordenar por

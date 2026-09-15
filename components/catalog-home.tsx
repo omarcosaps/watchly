@@ -226,7 +226,7 @@ export const CatalogHome = () => {
   return (
     <div className={cn(needsNavOffset && "sm:pt-chrome")}>
       {heroLoading && featured.length === 0 ? (
-        <div className="h-[64vh] min-h-[520px] bg-white/4" aria-hidden />
+        <div className="hero-frame bg-white/4" aria-hidden />
       ) : null}
       {showHero ? (
         <HeroCarousel

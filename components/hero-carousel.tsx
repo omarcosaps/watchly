@@ -149,7 +149,7 @@ export const HeroCarousel = ({ items, onNavigate }: HeroCarouselProps) => {
 
   return (
     <section
-      className="relative h-[64vh] min-h-[520px] overflow-hidden bg-void"
+      className="hero-frame relative overflow-hidden bg-void"
       aria-roledescription="carrossel"
     >
       <div className="d-back absolute inset-0">
@@ -178,7 +178,7 @@ export const HeroCarousel = ({ items, onNavigate }: HeroCarouselProps) => {
       <div className="hatch-hero pointer-events-none absolute inset-0" />
       <div className="scrim-hero pointer-events-none absolute inset-0" />
 
-      <div className="absolute inset-x-0 bottom-0 mx-auto max-w-[1280px] px-5 pb-[60px] sm:px-12">
+      <div className="absolute inset-x-0 bottom-0 mx-auto max-w-[1280px] px-5 pb-6 sm:px-12 sm:pb-[60px]">
         <span
           className={cn(
             "inline-block rounded-full border border-white/12 bg-[rgba(18,20,26,0.85)] px-[13px] py-[7px] text-[11px] font-bold tracking-[0.06em] text-paper uppercase",
@@ -190,7 +190,7 @@ export const HeroCarousel = ({ items, onNavigate }: HeroCarouselProps) => {
         </span>
         <h1
           className={cn(
-            "mt-5 mb-4 text-[clamp(38px,4.6vw,60px)] font-extrabold leading-none tracking-[-0.035em] text-shadow-[0_2px_30px_rgba(0,0,0,0.55)]",
+            "mt-4 mb-3 text-[clamp(32px,8vw,38px)] font-extrabold leading-none tracking-[-0.035em] text-shadow-[0_2px_30px_rgba(0,0,0,0.55)] sm:mt-5 sm:mb-4 sm:text-[clamp(38px,4.6vw,60px)]",
             heroEnter && "d-in",
           )}
           style={heroEnter ? { animationDelay: "0.16s" } : undefined}
@@ -207,22 +207,26 @@ export const HeroCarousel = ({ items, onNavigate }: HeroCarouselProps) => {
         />
         {heroSynopsis ? (
           <p
-            className={cn(HERO_SYNOPSIS_CLASS, "mb-[26px] text-white/82", heroEnter && "d-in")}
+            className={cn(
+              HERO_SYNOPSIS_CLASS,
+              "mb-4 text-white/82 max-sm:line-clamp-2 sm:mb-[26px]",
+              heroEnter && "d-in",
+            )}
             style={heroEnter ? { animationDelay: "0.22s" } : undefined}
           >
             {heroSynopsis}
           </p>
         ) : (
-          <div className="mb-[26px]" />
+          <div className="mb-4 sm:mb-[26px]" />
         )}
         <div
-          className={cn("flex flex-wrap gap-3", heroEnter && "d-in")}
+          className={cn("flex flex-col gap-3 sm:flex-row sm:flex-wrap", heroEnter && "d-in")}
           style={heroEnter ? { animationDelay: "0.28s" } : undefined}
         >
           <Link
             href={href}
             onClick={handleDetailsClick}
-            className="cta-primary inline-flex items-center rounded-full px-[26px] py-3.5 text-[15px] font-bold"
+            className="cta-primary inline-flex w-full items-center justify-center rounded-full px-[26px] py-3.5 text-[15px] font-bold sm:w-auto"
           >
             ▶&nbsp; Ver Detalhes
           </Link>
@@ -233,12 +237,13 @@ export const HeroCarousel = ({ items, onNavigate }: HeroCarouselProps) => {
             posterPath={current.posterPath}
             year={current.year}
             variant="pill"
+            className="w-full justify-center sm:w-auto"
           />
         </div>
         {slides.length > 1 ? (
           <div
             className={cn(
-              "absolute right-5 bottom-[60px] flex items-center gap-[9px] sm:right-12",
+              "mt-4 flex items-center gap-[9px] sm:absolute sm:right-12 sm:bottom-[60px] sm:mt-0",
               heroEnter && "d-in",
             )}
             style={heroEnter ? { animationDelay: "0.36s" } : undefined}
@@ -266,7 +271,7 @@ export const HeroCarousel = ({ items, onNavigate }: HeroCarouselProps) => {
   )
 }
 
-const HERO_SYNOPSIS_CLASS = "max-w-[640px] text-pretty text-base leading-[1.55]"
+const HERO_SYNOPSIS_CLASS = "max-w-[640px] text-pretty text-sm leading-[1.55] sm:text-base"
 
 const heroKicker = (mediaType: MediaType, year: number | null) => {
   const isNew = (year ?? 0) >= 2024
