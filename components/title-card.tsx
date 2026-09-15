@@ -60,7 +60,7 @@ export const TitleCard = ({
               src={src}
               alt=""
               fill
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 176px"
+              sizes="(max-width: 639px) 50vw, (max-width: 1023px) 33vw, 176px"
               className="object-cover"
             />
           ) : (

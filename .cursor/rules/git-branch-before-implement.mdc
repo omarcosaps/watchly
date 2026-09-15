@@ -1,0 +1,29 @@
+---
+description: Nunca iniciar implementação sem uma branch Git criada
+alwaysApply: true
+---
+
+# Branch antes de implementar
+
+Antes de qualquer implementação (código, regra, correção, docs de feature):
+
+1. Conferir `git status` e a branch atual.
+2. Se estiver em `main`/`master` (ou na branch errada para a task), criar e fazer checkout de uma branch nova.
+3. Só então editar arquivos.
+
+Não começar a editar na `main`. Não misturar tasks de issues diferentes na mesma branch.
+
+Nomes no estilo do repositório: `feat/…`, `fix/…`, `style/…`, `chore/…`, `docs/…`.
+
+```bash
+# ❌ BAD — editar em main
+git checkout main
+# (altera components/catalog-grid.tsx)
+
+# ✅ GOOD — branch primeiro, depois o código
+git checkout main
+git checkout -b feat/compact-catalog-grid
+# (só então altera arquivos)
+```
+
+Exceção: resposta só de leitura ou pergunta, sem tocar no working tree.
