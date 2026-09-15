@@ -224,7 +224,7 @@ export const CatalogHome = () => {
   const needsNavOffset = !heroLoading && featured.length === 0
 
   return (
-    <div className={cn(needsNavOffset && "pt-[110px]")}>
+    <div className={cn(needsNavOffset && "sm:pt-chrome")}>
       {heroLoading && featured.length === 0 ? (
         <div className="h-[64vh] min-h-[520px] bg-white/4" aria-hidden />
       ) : null}

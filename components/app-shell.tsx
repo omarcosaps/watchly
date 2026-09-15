@@ -19,7 +19,7 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
         <div className="relative min-h-dvh bg-void">
           <a
             href="#conteudo"
-            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[70] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-void"
+            className="sr-only focus:not-sr-only focus:absolute focus:top-[max(1rem,var(--safe-top))] focus:left-4 focus:z-[70] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-void"
           >
             Ir para o conteúdo
           </a>
@@ -27,7 +27,7 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
           <AppTopbar />
           <main
             id="conteudo"
-            className={cn(isFlush ? "" : "px-5 pt-[110px] pb-[70px] sm:px-12")}
+            className={cn(isFlush ? "pt-chrome sm:pt-0" : "px-5 pt-chrome pb-chrome sm:px-12")}
           >
             <PageMotionFrame>{children}</PageMotionFrame>
           </main>

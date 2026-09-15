@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Geist } from "next/font/google"
 
 import { AccountProvider } from "@/components/account-provider"
@@ -17,6 +17,11 @@ export const metadata: Metadata = {
     template: "%s · Watchly",
   },
   description: "Veja o que dá para assistir nos streamings que você já usa.",
+}
+
+export const viewport: Viewport = {
+  viewportFit: "cover",
+  interactiveWidget: "resizes-content",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

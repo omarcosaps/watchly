@@ -83,7 +83,7 @@ export default function TitlePage() {
 
   if (!mediaType) {
     return (
-      <div className="px-5 pt-[110px] pb-[70px] sm:px-12">
+      <div className="px-5 pb-chrome sm:px-12 sm:pt-chrome">
         <StatusPanel title="Título não encontrado" message="Esse endereço não é de filme nem de série." />
       </div>
     )
@@ -91,7 +91,7 @@ export default function TitlePage() {
 
   if (error) {
     return (
-      <div className="px-5 pt-[110px] pb-[70px] sm:px-12">
+      <div className="px-5 pb-chrome sm:px-12 sm:pt-chrome">
         <StatusPanel title="Não deu para abrir" message={error} />
       </div>
     )
