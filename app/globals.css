@@ -27,6 +27,29 @@ body {
   font-family: var(--font-sans);
 }
 
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --chrome-bar: 93px;
+  --chrome-pill: 110px;
+  --chrome-top: calc(var(--safe-top) + var(--chrome-bar));
+  --chrome-bottom: calc(70px + var(--safe-bottom));
+}
+
+@media (min-width: 640px) {
+  :root {
+    --chrome-top: var(--chrome-pill);
+  }
+}
+
+@utility pt-chrome {
+  padding-top: var(--chrome-top);
+}
+
+@utility pb-chrome {
+  padding-bottom: var(--chrome-bottom);
+}
+
 :focus-visible {
   outline: 2px solid #ffffff;
   outline-offset: 2px;
