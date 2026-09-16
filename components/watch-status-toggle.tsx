@@ -27,14 +27,17 @@ export const WatchStatusToggle = ({
   const compact = variant === "compact"
 
   return (
-    <div className={compact ? undefined : "mb-[26px]"}>
+    <div className={compact ? "w-full sm:w-auto" : "mb-[26px]"}>
       {compact ? null : (
         <p className="mb-2.5 text-[11px] font-bold tracking-[0.09em] text-mute uppercase">
           Meu status
         </p>
       )}
       <div
-        className="inline-flex items-center gap-0.5 rounded-full bg-white/5 p-[3px]"
+        className={cn(
+          "items-center gap-0.5 rounded-full bg-white/5 p-[3px]",
+          compact ? "flex w-full sm:inline-flex sm:w-auto" : "inline-flex",
+        )}
         role="group"
         aria-label="Status de visualização"
       >
@@ -51,7 +54,9 @@ export const WatchStatusToggle = ({
               aria-pressed={active}
               className={cn(
                 "inline-flex items-center gap-1.5 rounded-full whitespace-nowrap transition-colors duration-[180ms]",
-                compact ? "px-3 py-1.5 text-xs" : "px-[15px] py-2 text-[13px]",
+                compact
+                  ? "flex-1 justify-center px-3 py-1.5 text-xs sm:flex-none"
+                  : "px-[15px] py-2 text-[13px]",
                 active
                   ? "cursor-default bg-white/13 font-semibold text-white"
                   : "cursor-pointer font-medium text-white/50 hover:text-white/80",
