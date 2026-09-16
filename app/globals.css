@@ -54,6 +54,18 @@ body {
   padding-bottom: var(--chrome-bottom);
 }
 
+@utility pt-safe {
+  padding-top: max(1.5rem, var(--safe-top));
+}
+
+@utility pb-safe {
+  padding-bottom: max(1.25rem, var(--safe-bottom));
+}
+
+@utility scroll-mb-safe {
+  scroll-margin-bottom: max(1.5rem, var(--safe-bottom));
+}
+
 @utility hero-frame {
   height: var(--hero-height);
   min-height: var(--hero-min-height);
@@ -126,7 +138,7 @@ textarea:focus-visible {
   border-radius: 13px;
   padding: 13px 15px;
   color: #f2f3f5;
-  font-size: 14.5px;
+  font-size: 16px;
   outline: none;
   transition: border-color 0.15s ease, background-color 0.15s ease;
 
@@ -137,6 +149,10 @@ textarea:focus-visible {
   &:focus {
     border-color: rgb(255 255 255 / 0.3);
     background: rgb(255 255 255 / 0.06);
+  }
+
+  @media (min-width: 640px) {
+    font-size: 14.5px;
   }
 }
 
@@ -175,13 +191,17 @@ textarea:focus-visible {
   border-radius: 13px;
   padding: 13px 40px 13px 15px;
   color: #f2f3f5;
-  font-size: 14.5px;
+  font-size: 16px;
   cursor: pointer;
   outline: none;
 
   &:focus {
     border-color: rgb(255 255 255 / 0.3);
     background-color: rgb(255 255 255 / 0.06);
+  }
+
+  @media (min-width: 640px) {
+    font-size: 14.5px;
   }
 }
 

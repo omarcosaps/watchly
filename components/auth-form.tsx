@@ -67,7 +67,7 @@ export const AuthForm = ({
   }
 
   return (
-    <div className="fade-up w-full max-w-[404px] rounded-[22px] border border-white/6 bg-[linear-gradient(158deg,#191c22_0%,#14161b_52%,#101216_100%)] px-[34px] pt-[34px] pb-7 shadow-[0_28px_70px_rgba(0,0,0,0.55)]">
+    <div className="fade-up w-full max-w-[404px] rounded-[22px] border border-white/6 bg-[linear-gradient(158deg,#191c22_0%,#14161b_52%,#101216_100%)] px-5 pt-7 pb-6 shadow-[0_28px_70px_rgba(0,0,0,0.55)] sm:px-[34px] sm:pt-[34px] sm:pb-7">
       <h1 className="text-[30px] font-black leading-none tracking-[-0.035em] text-paper">{title}</h1>
       {subtitle ? <p className="mt-[9px] text-[14.5px] text-white/48">{subtitle}</p> : null}
       {notice}
@@ -121,7 +121,7 @@ export const AuthForm = ({
           type="submit"
           disabled={submitting}
           aria-busy={submitting}
-          className="cta-primary mt-[3px] w-full rounded-full py-3.5 text-[15px] font-bold disabled:cursor-not-allowed disabled:opacity-55"
+          className="cta-primary mt-[3px] w-full scroll-mb-safe rounded-full py-3.5 text-[15px] font-bold disabled:cursor-not-allowed disabled:opacity-55"
         >
           {submitting ? "Aguarde…" : submitLabel}
         </button>
