@@ -15,6 +15,7 @@ import { cn } from "@/lib/cn"
 import { mediaLabel, tipoFromMedia } from "@/lib/media"
 import { cardEnterDelay } from "@/lib/motion"
 import { posterUrl } from "@/lib/tmdb/image"
+import { availabilityLine } from "@/lib/watchlist-availability"
 
 const toCatalogItem = (
   saved: {
@@ -188,23 +189,27 @@ export default function WatchlistPage() {
             <li
               key={`${item.mediaType}-${item.tmdbId}`}
               className={cn(
-                "flex flex-wrap items-center gap-[18px] rounded-[14px] bg-white/4 py-3 pr-4 pl-3 transition-colors duration-[150ms] hover:bg-white/7",
+                "relative flex flex-col gap-3 rounded-[14px] bg-white/4 py-3 pr-4 pl-3 transition-colors duration-[150ms] hover:bg-white/7 sm:flex-row sm:flex-wrap sm:items-center sm:gap-[18px]",
                 enter && "d-in",
               )}
               style={enter ? { animationDelay: cardEnterDelay(index) } : undefined}
             >
-              <ScreenLink href={href} className="relative aspect-[2/3] w-[62px] flex-none overflow-hidden rounded-[10px] bg-[#15161c]">
-                {src ? (
-                  <Image src={src} alt="" fill sizes="62px" className="object-cover" />
-                ) : (
-                  <div className="hatch absolute inset-0" />
-                )}
-              </ScreenLink>
-              <ScreenLink href={href} className="min-w-0 flex-1">
-                <p className="text-[15.5px] font-bold">{item.title}</p>
-                <p className="mt-[3px] text-xs text-mute">{meta}</p>
-                <p className={`mt-1.5 text-[12.5px] ${availability.color}`}>{availability.label}</p>
-              </ScreenLink>
+              <div className="flex min-w-0 flex-1 items-start gap-[18px] pr-10 sm:items-center sm:pr-0">
+                <ScreenLink href={href} className="relative aspect-[2/3] w-[62px] flex-none overflow-hidden rounded-[10px] bg-[#15161c]">
+                  {src ? (
+                    <Image src={src} alt="" fill sizes="62px" className="object-cover" />
+                  ) : (
+                    <div className="hatch absolute inset-0" />
+                  )}
+                </ScreenLink>
+                <ScreenLink href={href} className="min-w-0 flex-1">
+                  <p className="max-sm:line-clamp-2 text-[15.5px] font-bold">{item.title}</p>
+                  <p className="mt-[3px] text-xs text-mute">{meta}</p>
+                  <p className={cn("mt-1.5 max-sm:line-clamp-2 text-[12.5px]", availability.color)}>
+                    {availability.label}
+                  </p>
+                </ScreenLink>
+              </div>
               <WatchStatusToggle
                 mediaType={item.mediaType}
                 tmdbId={item.tmdbId}
@@ -217,7 +222,7 @@ export default function WatchlistPage() {
                 }}
                 title="Remover"
                 aria-label={`Remover ${item.title} da lista`}
-                className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-white/7 text-[15px] leading-none text-white/70 transition-colors duration-[150ms] hover:bg-[oklch(0.5_0.14_25/0.35)] hover:text-white"
+                className="absolute top-3 right-3 flex h-8 w-8 flex-none items-center justify-center rounded-full bg-white/7 text-[15px] leading-none text-white/70 transition-colors duration-[150ms] hover:bg-[oklch(0.5_0.14_25/0.35)] hover:text-white sm:static"
               >
                 ✕
               </button>
@@ -227,34 +232,4 @@ export default function WatchlistPage() {
       </ul>
     </div>
   )
-}
-
-const availabilityLine = (item: CatalogItem, countryName: string) => {
-  if (item.onOwnServices) {
-    const names = item.offers
-      .filter((offer) => offer.isOwn)
-      .map((offer) => offer.providerName)
-      .filter((name, index, names) => names.indexOf(name) === index)
-      .join(" · ")
-    return {
-      label: names ? `Disponível em ${names}` : "Disponível nos provedores do país",
-      color: "text-positive",
-    }
-  }
-
-  if (item.offers.length > 0) {
-    const names = item.offers
-      .map((offer) => offer.providerName)
-      .filter((name, index, names) => names.indexOf(name) === index)
-      .join(" · ")
-    return {
-      label: `Fora dos seus serviços — ${names}`,
-      color: "text-white/55",
-    }
-  }
-
-  return {
-    label: `Sem oferta em ${countryName} no momento`,
-    color: "text-alert",
-  }
 }
