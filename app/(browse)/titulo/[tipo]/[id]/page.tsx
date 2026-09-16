@@ -98,7 +98,7 @@ export default function TitlePage() {
   }
 
   if (!details) {
-    return <div className="h-[44vh] min-h-[340px] bg-white/4" aria-hidden />
+    return <div className="h-[32dvh] min-h-[200px] bg-white/4 sm:h-[44vh] sm:min-h-[340px]" aria-hidden />
   }
 
   const ownOffers = details.offers.filter((offer) => offer.isOwn)
@@ -128,7 +128,7 @@ export default function TitlePage() {
 
   return (
     <article>
-      <div className="d-back relative h-[44vh] min-h-[340px] overflow-hidden bg-[#15161c]">
+      <div className="d-back relative h-[32dvh] min-h-[200px] overflow-hidden bg-[#15161c] sm:h-[44vh] sm:min-h-[340px]">
         {still ? (
           <Image src={still} alt="" fill priority sizes="100vw" className="object-cover" />
         ) : null}
@@ -136,7 +136,7 @@ export default function TitlePage() {
         <div className="scrim-detail absolute inset-0" />
       </div>
 
-      <div className="relative mx-auto mt-[-170px] max-w-[1080px] px-5 pb-[70px] sm:px-12">
+      <div className="relative mx-auto mt-[-56px] max-w-[1080px] px-5 pb-[70px] sm:mt-[-170px] sm:px-12">
         <button
           type="button"
           onClick={handleBack}
@@ -146,13 +146,20 @@ export default function TitlePage() {
           ← Voltar
         </button>
 
-        <div className="flex flex-wrap items-start gap-9">
+        <div className="flex flex-col items-start gap-6 sm:flex-row sm:flex-wrap sm:gap-9">
           <div
-            className="d-in relative aspect-[2/3] w-[230px] flex-none overflow-hidden rounded-[14px] border border-white/12 bg-[#15161c] shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
+            className="d-in relative aspect-[2/3] w-[168px] flex-none overflow-hidden rounded-[14px] border border-white/12 bg-[#15161c] shadow-[0_20px_60px_rgba(0,0,0,0.5)] sm:w-[230px]"
             style={{ animationDelay: "0.10s" }}
           >
             {poster ? (
-              <Image src={poster} alt="" fill sizes="230px" className="object-cover" priority />
+              <Image
+                src={poster}
+                alt=""
+                fill
+                sizes="(max-width: 639px) 168px, 230px"
+                className="object-cover"
+                priority
+              />
             ) : (
               <>
                 <div className="hatch absolute inset-0" />
@@ -169,7 +176,7 @@ export default function TitlePage() {
             )}
           </div>
 
-          <div className="min-w-0 flex-1">
+          <div className="w-full sm:min-w-0 sm:flex-1">
             <h1
               className="d-in mt-1.5 mb-2.5 text-[42px] leading-[1.05] font-black tracking-[-0.03em]"
               style={{ animationDelay: "0.16s" }}
@@ -344,10 +351,12 @@ const OfferGroup = ({
                   {offer.providerName.slice(0, 2).toUpperCase()}
                 </span>
               )}
-              <span className="flex-1 text-sm font-semibold">{offer.providerName}</span>
+              <span className="min-w-0 flex-1 truncate text-sm font-semibold">
+                {offer.providerName}
+              </span>
               <span
                 className={cn(
-                  "rounded-[5px] px-[9px] py-1 text-[11px] font-bold",
+                  "shrink-0 rounded-[5px] px-[9px] py-1 text-[11px] font-bold",
                   emphasized
                     ? KIND_STYLE[offer.monetization]
                     : "bg-white/14 text-white/85",
