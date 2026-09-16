@@ -181,7 +181,7 @@ export const PreferencesForm = ({
       ) : null}
       <div
         className={cn(
-          "flex items-center gap-4",
+          "flex flex-col items-stretch gap-3 pb-safe sm:flex-row sm:items-center sm:gap-4 sm:pb-0",
           layout === "onboarding" ? "mt-7" : "mt-6",
           enter && "d-in",
         )}
@@ -192,7 +192,7 @@ export const PreferencesForm = ({
           disabled={selectedIds.length < 1 || loading || saving}
           aria-busy={saving}
           className={cn(
-            "rounded-full font-bold transition-colors duration-[150ms]",
+            "w-full scroll-mb-safe rounded-full font-bold transition-colors duration-[150ms] sm:w-auto",
             layout === "onboarding"
               ? selectedIds.length < 1 || loading || saving
                 ? "cursor-not-allowed bg-white/10 px-[26px] py-3.5 text-[15px] text-white/40 opacity-55"
@@ -206,7 +206,7 @@ export const PreferencesForm = ({
           <button
             type="button"
             onClick={handleSignOut}
-            className="cta-destructive rounded-full px-[22px] py-3 text-sm font-semibold"
+            className="cta-destructive w-full scroll-mb-safe rounded-full px-[22px] py-3 text-sm font-semibold sm:w-auto"
           >
             Sair da conta
           </button>
