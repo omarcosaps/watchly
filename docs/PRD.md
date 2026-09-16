@@ -1,6 +1,6 @@
 # PRD — Watchly
 
-Última atualização: 12 de setembro de 2026
+Última atualização: 15 de setembro de 2026
 
 Este arquivo é a fonte da verdade funcional do produto. Ele representa o **comportamento de produto aprovado e desejado**, ainda não totalmente implementado. Atualizar aqui quando o comportamento, o escopo ou uma regra de negócio mudar. A arquitetura vive em `docs/SSD.md`. Mudanças individuais ficam em `docs/features/`.
 
@@ -47,7 +47,7 @@ Login ou cadastro não bloqueiam a exploração. A conta passa a ser exigida qua
 
 ## Escopo desejado
 
-- App web, interface em português
+- App web, interface em português, usável no telefone (navegação, título, CTA e submit visíveis) e com linguagem cinema no desktop
 - Home, busca e detalhe acessíveis sem conta
 - Cadastro com e-mail, senha e origem de aquisição (“Onde conheceu o Watchly?”)
 - Login com e-mail e senha, com opção de voltar a explorar sem conta
@@ -123,7 +123,7 @@ Depois do login ou cadastro bem-sucedido, se havia um título pendente, o app gu
 
 ### Cadastro
 
-Título: **Criar sua conta**. Subtítulo: **Seja bem-vindo ao Watchly**. CTA: **Criar conta**.
+Título: **Criar sua conta**. Subtítulo: **Seja bem-vindo ao Watchly**. CTA: **Criar conta**. No telefone, o submit permanece alcançável com o teclado aberto.
 
 Campos:
 
@@ -156,7 +156,7 @@ A origem é informada só no cadastro. O perfil não oferece edição desse camp
 
 Título: **Login**. Subtítulo: **Acesse sua conta para continuar**. CTA: **Entrar**.
 
-Campos: e-mail e senha. Link: **Esqueci minha senha**. Rodapé: **Novo por aqui?** → **Criar conta**. Escape: **Explorar sem conta →**.
+Campos: e-mail e senha. Link: **Esqueci minha senha**. Rodapé: **Novo por aqui?** → **Criar conta**. Escape: **Explorar sem conta →**. No telefone, **Entrar** permanece alcançável com o teclado aberto.
 
 Erros visíveis:
 
@@ -166,7 +166,7 @@ Erros visíveis:
 
 ### Recuperação de senha
 
-A pessoa informa o e-mail e pede um link para criar uma senha nova.
+A pessoa informa o e-mail e pede um link para criar uma senha nova. No telefone, o submit permanece alcançável com o teclado aberto.
 
 O app responde de forma neutra, sem revelar se a conta existe: se existir uma conta para aquele e-mail, um link de redefinição é enviado.
 
@@ -181,7 +181,7 @@ Depois de criar a conta, se ainda não houver streamings configurados:
 3. exigir pelo menos um streaming
 4. continuar para a Home
 
-Título: **Onde você assiste?** Texto: dá para mudar depois, sem perder a watchlist. O botão **Continuar** só funciona com pelo menos um streaming. Não há “pular”.
+Título: **Onde você assiste?** Texto: dá para mudar depois, sem perder a watchlist. O botão **Continuar** só funciona com pelo menos um streaming. Não há “pular”. No telefone, **Continuar** permanece acima da barra do Safari.
 
 ### Home
 
@@ -191,11 +191,11 @@ O catálogo mistura filmes e séries. Entram só títulos com pelo menos uma ofe
 
 O visitante vê disponibilidade no Brasil. Quem está autenticado vê disponibilidade no país salvo.
 
-Hero: carrossel com as 5 tendências da semana no país de referência, consultadas na TMDB a cada carga. Entra só título com oferta no país e com backdrop ou pôster. A regra não acompanha tipo, gênero, ano, provedor nem a ordenação da grade. Quando a fonte muda o que está em evidência, o Hero muda. Avança a cada 7 segundos. Kicker **Novo filme** / **Filme** / **Nova série** / **Série** (ano ≥ 2024 usa “Novo/Nova”). Texto de apoio: sinopse em até 3 linhas. Se a original não couber, o Hero mostra um resumo que preserva a ideia principal, o contexto e o tom; a sinopse completa fica só no detalhe. Sem corte com reticências e sem reduzir fonte ou largura só para caber. CTAs: **Ver Detalhes** e adicionar/remover da lista (**Adicionar à minha lista** / **Na minha lista**).
+Hero: carrossel com as 5 tendências da semana no país de referência, consultadas na TMDB a cada carga. Entra só título com oferta no país e com backdrop ou pôster. A regra não acompanha tipo, gênero, ano, provedor nem a ordenação da grade. Quando a fonte muda o que está em evidência, o Hero muda. Avança a cada 7 segundos. Kicker **Novo filme** / **Filme** / **Nova série** / **Série** (ano ≥ 2024 usa “Novo/Nova”). Texto de apoio: sinopse em até 3 linhas. Se a original não couber, o Hero mostra um resumo que preserva a ideia principal, o contexto e o tom; a sinopse completa fica só no detalhe. Sem corte com reticências e sem reduzir fonte ou largura só para caber. CTAs: **Ver Detalhes** e adicionar/remover da lista (**Adicionar à minha lista** / **Na minha lista**). No telefone, kicker, título e CTAs ficam abaixo da nav, os botões empilham e os indicadores ficam abaixo dos CTAs. No desktop o hero cinema permanece.
 
 Na primeira visita, a Home entra em cascata: o fundo do hero em fade e o conteúdo subindo em sequência (kicker, título, sinopse, botões, filtros, indicadores, grade). Trocar de slide só faz crossfade no fundo; o texto não re-anima. Sair da Home para outra tela do shell (card, **Ver Detalhes** ou nav) faz a tela descer e desvanecer antes da troca. Trocar entre Início, Filmes e Séries (nav ou filtro Tipo) usa o mesmo gesto. Gênero, ano, provedor, ordenação e **Carregar mais** não re-animam a página.
 
-A navegação é uma pill flutuante: **Watchly**, **Início**, **Filmes**, **Séries**, **Watchlist**, busca e, se autenticada, o atalho de perfil (avatar + nome) para `/preferencias`. Filmes e Séries aplicam o filtro de tipo na Home. Logout fica só no Perfil.
+A navegação muda com a largura. No telefone, chrome em duas faixas: **Watchly**, busca e conta (avatar, sem e-mail) na primeira; **Início**, **Filmes**, **Séries** e **Watchlist** na segunda, em quatro itens iguais sempre visíveis. A partir de 640px a nav volta a ser a pílula flutuante; entre 640px e 1023px o e-mail some e fica o avatar; a partir de 1024px o atalho de perfil mostra avatar + nome. Filmes e Séries aplicam o filtro de tipo na Home. Logout fica só no Perfil.
 
 A troca entre Home, busca, detalhe, Watchlist e Perfil — inclusive pelos links da nav — usa a mesma linguagem de movimento: a tela atual desce e some; a seguinte entra com fundo em fade e conteúdo em cascata. Início, Filmes e Séries são telas distintas nesse gesto (`/`, `/?media=movie`, `/?media=tv`). Login, cadastro, senha e onboarding mantêm a entrada que já têm. Com `prefers-reduced-motion: reduce`, não há animação e a navegação é imediata.
 
@@ -208,7 +208,7 @@ Filtros:
 
 Ordenação (padrão: Popularidade): Popularidade, Nota, Data de lançamento.
 
-Cada card mostra pôster, nota, título, ano, tipo e uma linha de provedores. Com streamings configurados, o que não está nos serviços da pessoa aparece como **Fora dos seus serviços**. Sem streamings (visitante), a linha lista provedores do país.
+Cada card mostra pôster, nota, título, ano, tipo e uma linha de provedores. Com streamings configurados, o que não está nos serviços da pessoa aparece como **Fora dos seus serviços**. Sem streamings (visitante), a linha lista provedores do país. No telefone a grade mostra dois pôsteres por linha; em largura média, três; no desktop amplo, auto-fill.
 
 Estado vazio: “Nada por aqui com esses filtros. Tente afrouxar algum deles.”
 
@@ -218,7 +218,7 @@ Não há painel lateral nem filtro por forma de assistir.
 
 Campo: “Buscar filmes e séries por título…”. A busca é por título.
 
-A primeira chegada à busca entra em cascata (campo, estado, grade). Digitar ou resubmeter a query não re-anima a página. Abrir um título sai da busca antes de ir ao detalhe.
+A primeira chegada à busca entra em cascata (campo, estado, grade). Digitar ou resubmeter a query não re-anima a página. Abrir um título sai da busca antes de ir ao detalhe. A grade usa as mesmas colunas da Home.
 
 Sem query: “Digite um título para buscar no catálogo.”
 
@@ -235,7 +235,9 @@ Visitante, ou conta sem streamings: uma seção única **Resultados**. A busca n
 
 ### Detalhe do título
 
-Página pública. Mostra:
+Página pública. No telefone, o conteúdo empilha: **Voltar**, pôster, título, meta, sinopse, ações, ofertas e elenco. O título não divide a linha com o pôster. No desktop, pôster e texto continuam lado a lado.
+
+Mostra:
 
 - backdrop e pôster
 - título, tipo, ano, gêneros e nota
@@ -260,7 +262,7 @@ Título da página: **Minha lista**. Exclusiva de quem está autenticado. Filmes
 
 Subtítulo: quantidade de títulos salvos e disponibilidade no país atual.
 
-Por item: pôster, título, meta, linha de disponibilidade, toggle de status e remover.
+Por item: pôster, título, meta, linha de disponibilidade, toggle de status e remover. No telefone o item empilha: pôster e texto, status em largura cheia, remover no canto, todos tocáveis.
 
 Disponibilidade:
 
@@ -278,7 +280,7 @@ Tela **Perfil**. Mostra a conta atual (e-mail) e o mesmo par país + streamings 
 
 Texto: trocar país ou streamings não apaga a watchlist.
 
-Ações: **Salvar preferências** e **Sair da conta**.
+Ações: **Salvar preferências** e **Sair da conta**. No telefone, as duas permanecem acima da barra do Safari.
 
 Salvar sem streaming: “Escolha pelo menos um streaming disponível neste país para continuar.” Provedores inexistentes no novo país são desmarcados no formulário. Se a pessoa muda o país e sai sem salvar, as preferências anteriores permanecem.
 

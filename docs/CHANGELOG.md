@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-15
+
+### Changed
+
+- Layout compacto no telefone: chrome em duas faixas, hero em coluna, grade em 2 colunas, detalhe e Watchlist empilhados; auth e perfil com safe-area. Médio e amplo mantêm a pílula e a linguagem cinema.
+
 ## 2026-09-12
 
 ### Added
