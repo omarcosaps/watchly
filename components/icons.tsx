@@ -28,6 +28,53 @@ export const SearchIcon = ({ className = "h-4 w-4" }: IconProps) => {
   )
 }
 
+export const FilmIcon = ({ className = "h-5 w-5" }: IconProps) => {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <rect
+        x="3.5"
+        y="6"
+        width="17"
+        height="12"
+        rx="2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M7 6v12M17 6v12M3.5 10h3.5M3.5 14h3.5M17 10h3.5M17 14h3.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+    </svg>
+  )
+}
+
+export const TvIcon = ({ className = "h-5 w-5" }: IconProps) => {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <rect
+        x="3.5"
+        y="5.5"
+        width="17"
+        height="11.5"
+        rx="2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M8 20h8M12 17v3"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
 export const FilterIcon = ({ className = "h-4 w-4" }: IconProps) => {
   return (
     <svg viewBox="0 0 24 24" className={className} aria-hidden>

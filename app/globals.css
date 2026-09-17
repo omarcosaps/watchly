@@ -30,10 +30,11 @@ body {
 :root {
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --chrome-bar: 93px;
+  --chrome-bar: 49px;
   --chrome-pill: 110px;
+  --chrome-tab: 57px;
   --chrome-top: calc(var(--safe-top) + var(--chrome-bar));
-  --chrome-bottom: calc(70px + var(--safe-bottom));
+  --chrome-bottom: calc(var(--chrome-tab) + var(--safe-bottom));
   --hero-height: 50dvh;
   --hero-min-height: 0px;
 }
@@ -41,6 +42,7 @@ body {
 @media (min-width: 640px) {
   :root {
     --chrome-top: var(--chrome-pill);
+    --chrome-bottom: calc(70px + var(--safe-bottom));
     --hero-height: 64vh;
     --hero-min-height: 520px;
   }
