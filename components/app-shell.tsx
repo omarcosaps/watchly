@@ -27,7 +27,7 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
           <AppTopbar />
           <main
             id="conteudo"
-            className={cn(isFlush ? "pt-chrome sm:pt-0" : "px-5 pt-chrome pb-chrome sm:px-12")}
+            className={cn(isFlush ? "pt-chrome pb-chrome sm:pt-0 sm:pb-0" : "px-5 pt-chrome pb-chrome sm:px-12")}
           >
             <PageMotionFrame>{children}</PageMotionFrame>
           </main>
