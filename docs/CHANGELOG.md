@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-17
+
+### Changed
+
+- No compacto, a nav principal passa para uma tab bar no rodapé (Início, Filmes, Séries, Busca, Lista); o topo fica só com Watchly e conta. Médio e amplo mantêm a pílula.
+
 ## 2026-09-15
 
 ### Changed

@@ -1,6 +1,6 @@
 # PRD — Watchly
 
-Última atualização: 15 de setembro de 2026
+Última atualização: 17 de setembro de 2026
 
 Este arquivo é a fonte da verdade funcional do produto. Ele representa o **comportamento de produto aprovado e desejado**, ainda não totalmente implementado. Atualizar aqui quando o comportamento, o escopo ou uma regra de negócio mudar. A arquitetura vive em `docs/SSD.md`. Mudanças individuais ficam em `docs/features/`.
 
@@ -195,7 +195,7 @@ Hero: carrossel com as 5 tendências da semana no país de referência, consulta
 
 Na primeira visita, a Home entra em cascata: o fundo do hero em fade e o conteúdo subindo em sequência (kicker, título, sinopse, botões, filtros, indicadores, grade). Trocar de slide só faz crossfade no fundo; o texto não re-anima. Sair da Home para outra tela do shell (card, **Ver Detalhes** ou nav) faz a tela descer e desvanecer antes da troca. Trocar entre Início, Filmes e Séries (nav ou filtro Tipo) usa o mesmo gesto. Gênero, ano, provedor, ordenação e **Carregar mais** não re-animam a página.
 
-A navegação muda com a largura. No telefone, chrome em duas faixas: **Watchly**, busca e conta (avatar, sem e-mail) na primeira; **Início**, **Filmes**, **Séries** e **Watchlist** na segunda, em quatro itens iguais sempre visíveis. A partir de 640px a nav volta a ser a pílula flutuante; entre 640px e 1023px o e-mail some e fica o avatar; a partir de 1024px o atalho de perfil mostra avatar + nome. Filmes e Séries aplicam o filtro de tipo na Home. Logout fica só no Perfil.
+A navegação muda com a largura. No telefone, o topo tem uma linha: **Watchly** à esquerda; à direita, **Entrar** + **Criar conta** (visitante) ou chip de perfil com iniciais e nome truncado (logado). A nav principal é uma tab bar fixa no rodapé: **Início**, **Filmes**, **Séries**, **Busca** e **Lista** (ícone + rótulo). A busca não fica no topo. A partir de 640px a nav volta a ser a pílula flutuante, com busca por ícone e o item **Watchlist**; entre 640px e 1023px o nome some e fica o avatar; a partir de 1024px o atalho de perfil mostra avatar + nome. Filmes e Séries aplicam o filtro de tipo na Home. O clique em Lista/Watchlist segue o gate atual. Logout fica só no Perfil.
 
 A troca entre Home, busca, detalhe, Watchlist e Perfil — inclusive pelos links da nav — usa a mesma linguagem de movimento: a tela atual desce e some; a seguinte entra com fundo em fade e conteúdo em cascata. Início, Filmes e Séries são telas distintas nesse gesto (`/`, `/?media=movie`, `/?media=tv`). Login, cadastro, senha e onboarding mantêm a entrada que já têm. Com `prefers-reduced-motion: reduce`, não há animação e a navegação é imediata.
 

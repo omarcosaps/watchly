@@ -169,5 +169,5 @@ Concluída.
 
 ## Risks / Open Questions
 
-- Issues #30 (tab bar inferior) e #31 (filtro em sheet) são evolução futura. Esta spec descreve o chrome em duas faixas e os filtros em wrap, como no código.
+- O chrome compacto desta spec (duas faixas no topo) foi o estado do #23. A tab bar inferior está em [compact-tab-bar.md](compact-tab-bar.md). O recorte de filtro em sheet permanece no issue #31; os filtros em wrap continuam.
 - Nenhuma pergunta de produto bloqueia o recorte.
