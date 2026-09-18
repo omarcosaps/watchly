@@ -82,5 +82,5 @@ Concluída.
 
 ## Risks / Open Questions
 
-- O recorte de filtro em sheet permanece no issue #31.
+- O filtro compacto em sheet está em [compact-catalog-filters.md](compact-catalog-filters.md). O critério 7 desta spec descreve o estado da #30.
 - Nenhuma pergunta de produto bloqueia o recorte.

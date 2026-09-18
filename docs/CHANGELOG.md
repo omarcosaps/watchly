@@ -5,6 +5,7 @@
 ### Changed
 
 - No compacto, a nav principal passa para uma tab bar no rodapé (Início, Filmes, Séries, Busca, Lista); o topo fica só com Watchly e conta. Médio e amplo mantêm a pílula.
+- No compacto, a Home filtra por botão no topo e bottom sheet; a partir de 640px a faixa de selects permanece abaixo do hero.
 
 ## 2026-09-15
 
