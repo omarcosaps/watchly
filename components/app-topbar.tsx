@@ -6,10 +6,15 @@ import { Suspense, type ComponentType, type ReactNode } from "react"
 
 import { useAccount } from "@/components/account-provider"
 import {
+  CATALOG_FILTER_SHEET_ID,
+  useHomeFilterChrome,
+} from "@/components/home-filter-chrome"
+import {
   BookmarkIcon,
   FilmIcon,
   HomeIcon,
   SearchIcon,
+  SlidersIcon,
   TvIcon,
 } from "@/components/icons"
 import { ScreenLink } from "@/components/screen-link"
@@ -83,6 +88,7 @@ const TopbarContent = () => {
           <Wordmark href="/" />
           <div className="flex min-w-0 items-center gap-0.5">
             <AccountControls layout="compact" prefsActive={prefsActive} session={session} />
+            <CompactFilterButton pathname={pathname} searchParams={searchParams} />
           </div>
         </div>
       </CompactChrome>
@@ -125,6 +131,41 @@ const CompactChrome = ({ children }: { children: ReactNode }) => {
         {children}
       </div>
     </header>
+  )
+}
+
+const CompactFilterButton = ({
+  pathname,
+  searchParams,
+}: {
+  pathname: string
+  searchParams: URLSearchParams
+}) => {
+  const { open, toggleFilters } = useHomeFilterChrome()
+
+  if (pathname !== "/") return null
+
+  const extrasActive = Boolean(
+    searchParams.get("genre") ||
+      searchParams.get("yearRange") ||
+      searchParams.get("filterProviders") ||
+      searchParams.get("sort"),
+  )
+
+  return (
+    <button
+      type="button"
+      onClick={toggleFilters}
+      aria-expanded={open}
+      aria-controls={CATALOG_FILTER_SHEET_ID}
+      aria-label={extrasActive ? "Filtros ativos" : "Filtros"}
+      className="press-pill glass relative inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/8 text-paper hover:bg-white/16"
+    >
+      <SlidersIcon className="h-[18px] w-[18px]" />
+      {extrasActive ? (
+        <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-paper" aria-hidden />
+      ) : null}
+    </button>
   )
 }
 

@@ -1,10 +1,15 @@
 "use client"
 
 import { useRouter, useSearchParams } from "next/navigation"
+import { useEffect, useId, useRef } from "react"
 
+import { CATALOG_FILTER_SHEET_ID, useHomeFilterChrome } from "@/components/home-filter-chrome"
+import { CloseIcon } from "@/components/icons"
 import { useScreenNavigate } from "@/hooks/use-screen-navigate"
-import { cn } from "@/lib/cn"
 import type { MergedGenre, WatchProvider } from "@/lib/catalog/types"
+import { cn } from "@/lib/cn"
+
+type FilterLayout = "strip" | "stack"
 
 type CatalogFiltersProps = {
   genres: MergedGenre[]
@@ -12,6 +17,7 @@ type CatalogFiltersProps = {
   showProviderFilter?: boolean
   resultCount?: number
   enter?: boolean
+  layout?: FilterLayout
 }
 
 export const CatalogFilters = ({
@@ -20,10 +26,13 @@ export const CatalogFilters = ({
   showProviderFilter = false,
   resultCount,
   enter = false,
+  layout = "strip",
 }: CatalogFiltersProps) => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { leaveTo } = useScreenNavigate()
+  const isStack = layout === "stack"
+  const idSuffix = isStack ? "-sheet" : ""
 
   const handleChange = (name: string, value: string) => {
     const next = new URLSearchParams(searchParams.toString())
@@ -42,16 +51,20 @@ export const CatalogFilters = ({
 
   return (
     <form
-      className={cn("mb-[22px] flex flex-wrap items-center gap-2.5", enter && "d-in")}
+      className={cn(
+        isStack ? "flex flex-col gap-3" : "mb-[22px] hidden flex-wrap items-center gap-2.5 sm:flex",
+        enter && "d-in",
+      )}
       style={enter ? { animationDelay: "0.34s" } : undefined}
       aria-label="Filtros do catálogo"
       onSubmit={(event) => event.preventDefault()}
     >
       <FilterSelect
-        id="filtro-tipo"
+        id={`filtro-tipo${idSuffix}`}
         label="Tipo"
         value={searchParams.get("media") ?? ""}
         onChange={(value) => handleChange("media", value)}
+        fullWidth={isStack}
         options={[
           { value: "", label: "Filmes e séries" },
           { value: "movie", label: "Filmes" },
@@ -59,10 +72,11 @@ export const CatalogFilters = ({
         ]}
       />
       <FilterSelect
-        id="filtro-genero"
+        id={`filtro-genero${idSuffix}`}
         label="Gênero"
         value={searchParams.get("genre") ?? ""}
         onChange={(value) => handleChange("genre", value)}
+        fullWidth={isStack}
         options={[
           { value: "", label: "Todos os gêneros" },
           ...genres.map((genre) => ({ value: genre.name, label: genre.name })),
@@ -70,10 +84,11 @@ export const CatalogFilters = ({
       />
       {showProviderFilter ? (
         <FilterSelect
-          id="filtro-provedor"
+          id={`filtro-provedor${idSuffix}`}
           label="Provedor"
           value={searchParams.get("filterProviders") ?? ""}
           onChange={(value) => handleChange("filterProviders", value)}
+          fullWidth={isStack}
           options={[
             { value: "", label: "Todos os serviços" },
             ...providers.map((provider) => ({
@@ -84,10 +99,11 @@ export const CatalogFilters = ({
         />
       ) : null}
       <FilterSelect
-        id="filtro-ano"
+        id={`filtro-ano${idSuffix}`}
         label="Ano"
         value={searchParams.get("yearRange") ?? ""}
         onChange={(value) => handleChange("yearRange", value)}
+        fullWidth={isStack}
         options={[
           { value: "", label: "Todos os anos" },
           { value: "2024-2025", label: "2024–2025" },
@@ -96,18 +112,23 @@ export const CatalogFilters = ({
           { value: "before-2010", label: "Antes de 2010" },
         ]}
       />
-      <div className="flex flex-wrap items-center gap-2.5 sm:ml-auto sm:flex-none">
+      <div
+        className={cn(
+          "flex flex-wrap items-center gap-2.5",
+          isStack ? "flex-col items-stretch" : "sm:ml-auto sm:flex-none",
+        )}
+      >
         <span className="whitespace-nowrap text-xs text-mute">Ordenar por</span>
-        <label htmlFor="filtro-ordem" className="sr-only">
+        <label htmlFor={`filtro-ordem${idSuffix}`} className="sr-only">
           Ordenar por
         </label>
         <select
-          id="filtro-ordem"
+          id={`filtro-ordem${idSuffix}`}
           value={searchParams.get("sort") ?? "popularity"}
           onChange={(event) => {
             handleChange("sort", event.target.value === "popularity" ? "" : event.target.value)
           }}
-          className="filter-select"
+          className={cn("filter-select", isStack && "w-full")}
         >
           <option value="popularity" className="bg-panel text-paper">
             Popularidade
@@ -120,12 +141,84 @@ export const CatalogFilters = ({
           </option>
         </select>
         {resultCount !== undefined ? (
-          <span className="ml-1.5 whitespace-nowrap text-[12.5px] text-mute">
+          <span className="whitespace-nowrap text-[12.5px] text-mute">
             {resultCount} {resultCount === 1 ? "título" : "títulos"}
           </span>
         ) : null}
       </div>
     </form>
+  )
+}
+
+export const CatalogFilterSheet = () => {
+  const { open, closeFilters, slot } = useHomeFilterChrome()
+  const labelId = useId()
+  const closeRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    closeRef.current?.focus()
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeFilters()
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [open, closeFilters])
+
+  if (!open || !slot) return null
+
+  const handleBackdropClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (event.target === event.currentTarget) closeFilters()
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-[70] flex items-end bg-void/80 backdrop-blur-md sm:hidden"
+      onClick={handleBackdropClick}
+    >
+      <div
+        id={CATALOG_FILTER_SHEET_ID}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={labelId}
+        className="relative flex max-h-[min(92dvh,calc(100dvh-var(--safe-top)))] w-full flex-col overflow-hidden rounded-t-[20px] bg-panel pb-[var(--safe-bottom)] ring-1 ring-white/10 shadow-[0_-24px_80px_rgb(0_0_0/0.65)]"
+      >
+        <div className="flex items-center gap-3 px-5 py-4">
+          <h2
+            id={labelId}
+            className="min-w-0 flex-1 text-xl font-extrabold tracking-[-0.02em] text-paper"
+          >
+            Filtros
+          </h2>
+          <button
+            ref={closeRef}
+            type="button"
+            onClick={closeFilters}
+            aria-label="Fechar filtros"
+            className="press-pill glass inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-paper"
+          >
+            <CloseIcon />
+          </button>
+        </div>
+        <div className="overflow-y-auto px-5 pb-5">
+          <CatalogFilters
+            layout="stack"
+            genres={slot.genres}
+            providers={slot.providers}
+            showProviderFilter={slot.showProviderFilter}
+            resultCount={slot.resultCount}
+          />
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -135,21 +228,23 @@ const FilterSelect = ({
   value,
   onChange,
   options,
+  fullWidth = false,
 }: {
   id: string
   label: string
   value: string
   onChange: (value: string) => void
   options: { value: string; label: string }[]
+  fullWidth?: boolean
 }) => {
   return (
-    <label htmlFor={id}>
+    <label htmlFor={id} className={fullWidth ? "block w-full" : undefined}>
       <span className="sr-only">{label}</span>
       <select
         id={id}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="filter-select"
+        className={cn("filter-select", fullWidth && "w-full")}
       >
         {options.map((option) => (
           <option key={option.value} value={option.value} className="bg-panel text-paper">
