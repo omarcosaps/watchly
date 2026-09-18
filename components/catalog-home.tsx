@@ -1,10 +1,11 @@
 "use client"
 
 import { useSearchParams } from "next/navigation"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 
 import { useAccount } from "@/components/account-provider"
 import { CatalogFilters } from "@/components/catalog-filters"
+import { useHomeFilterChrome } from "@/components/home-filter-chrome"
 import { CatalogGrid, CatalogSkeleton } from "@/components/catalog-grid"
 import { HeroCarousel } from "@/components/hero-carousel"
 import { StatusPanel } from "@/components/status-panel"
@@ -43,6 +44,7 @@ export const CatalogHome = () => {
   const searchParams = useSearchParams()
   const { preferences } = useAccount()
   const { leaveTo } = useScreenNavigate()
+  const { setSlot } = useHomeFilterChrome()
   const catalogPreferences = preferences ?? GUEST_PREFERENCES
   const hasOwnServices = catalogPreferences.providerIds.length > 0
   const queryKey = searchParams.toString()
@@ -76,6 +78,17 @@ export const CatalogHome = () => {
     const allowed = new Set(catalogPreferences.providerIds)
     return providers.filter((provider) => allowed.has(provider.id))
   }, [catalogPreferences.providerIds, providers])
+
+  const resultCount = loading ? undefined : items.length
+
+  useLayoutEffect(() => {
+    setSlot({
+      genres,
+      providers: ownProviders,
+      showProviderFilter: hasOwnServices,
+      resultCount,
+    })
+  }, [genres, hasOwnServices, ownProviders, resultCount, setSlot])
 
   useEffect(() => {
     let cancelled = false
@@ -241,7 +254,7 @@ export const CatalogHome = () => {
           genres={genres}
           providers={ownProviders}
           showProviderFilter={hasOwnServices}
-          resultCount={loading ? undefined : items.length}
+          resultCount={resultCount}
           enter={stagger}
         />
         {loading ? <CatalogSkeleton /> : null}
