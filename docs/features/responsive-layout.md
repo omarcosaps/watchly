@@ -169,5 +169,5 @@ Concluída.
 
 ## Risks / Open Questions
 
-- O chrome compacto desta spec (duas faixas no topo) foi o estado do #23. A tab bar inferior está em [compact-tab-bar.md](compact-tab-bar.md). O recorte de filtro em sheet permanece no issue #31; os filtros em wrap continuam.
+- O chrome compacto desta spec (duas faixas no topo) foi o estado do #23. A tab bar inferior está em [compact-tab-bar.md](compact-tab-bar.md). O filtro compacto em sheet está em [compact-catalog-filters.md](compact-catalog-filters.md).
 - Nenhuma pergunta de produto bloqueia o recorte.
