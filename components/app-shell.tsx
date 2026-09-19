@@ -14,6 +14,7 @@ import { cn } from "@/lib/cn"
 export const AppShell = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname()
   const isFlush = pathname === "/" || pathname.startsWith("/titulo/")
+  const hasContentGap = pathname === "/watchlist" || pathname === "/busca"
 
   return (
     <Suspense>
@@ -30,7 +31,10 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
             <AppTopbar />
             <main
               id="conteudo"
-              className={cn(isFlush ? "pt-chrome pb-chrome sm:pt-0 sm:pb-0" : "px-5 pt-chrome pb-chrome sm:px-12")}
+              className={cn(
+                isFlush ? "pt-chrome pb-chrome sm:pt-0 sm:pb-0" : "px-5 pb-chrome sm:px-12",
+                !isFlush && (hasContentGap ? "pt-content" : "pt-chrome"),
+              )}
             >
               <PageMotionFrame>{children}</PageMotionFrame>
             </main>
