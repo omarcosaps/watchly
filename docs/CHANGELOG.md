@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-19
+
+### Changed
+
+- Em Watchlist e Busca, o conteúdo começa 32px abaixo do header, no telefone e no desktop. Home, detalhe e Perfil não mudam.
+
 ## 2026-09-17
 
 ### Changed

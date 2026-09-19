@@ -34,6 +34,8 @@ body {
   --chrome-pill: 110px;
   --chrome-tab: 57px;
   --chrome-top: calc(var(--safe-top) + var(--chrome-bar));
+  --chrome-header: calc(var(--safe-top) + var(--chrome-bar));
+  --content-gap: 32px;
   --chrome-bottom: calc(var(--chrome-tab) + var(--safe-bottom));
   --hero-height: 50dvh;
   --hero-min-height: 0px;
@@ -42,6 +44,7 @@ body {
 @media (min-width: 640px) {
   :root {
     --chrome-top: var(--chrome-pill);
+    --chrome-header: 68px;
     --chrome-bottom: calc(70px + var(--safe-bottom));
     --hero-height: 64vh;
     --hero-min-height: 520px;
@@ -50,6 +53,10 @@ body {
 
 @utility pt-chrome {
   padding-top: var(--chrome-top);
+}
+
+@utility pt-content {
+  padding-top: calc(var(--chrome-header) + var(--content-gap));
 }
 
 @utility pb-chrome {
