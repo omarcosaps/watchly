@@ -39,6 +39,7 @@ body {
   --chrome-bottom: calc(var(--chrome-tab) + var(--safe-bottom));
   --hero-height: 50dvh;
   --hero-min-height: 0px;
+  --hero-copy-anchor: 315px;
 }
 
 @media (min-width: 640px) {
@@ -76,8 +77,21 @@ body {
 }
 
 @utility hero-frame {
-  height: var(--hero-height);
-  min-height: var(--hero-min-height);
+  min-height: var(--hero-height);
+  height: auto;
+
+  @media (min-width: 640px) {
+    height: var(--hero-height);
+    min-height: var(--hero-min-height);
+  }
+}
+
+@utility hero-copy {
+  padding-top: max(0px, calc(var(--hero-height) - var(--hero-copy-anchor)));
+
+  @media (min-width: 640px) {
+    padding-top: 0;
+  }
 }
 
 :focus-visible {

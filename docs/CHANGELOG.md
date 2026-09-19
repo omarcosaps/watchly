@@ -4,6 +4,7 @@
 
 ### Changed
 
+- No compacto, o copy do Hero da Home cresce para baixo quando o título ou a sinopse quebram linha; o kicker mantém a distância do header. O desktop não muda.
 - Em Watchlist e Busca, o conteúdo começa 32px abaixo do header, no telefone e no desktop. Home, detalhe e Perfil não mudam.
 
 ## 2026-09-17
