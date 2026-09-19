@@ -178,7 +178,7 @@ export const HeroCarousel = ({ items, onNavigate }: HeroCarouselProps) => {
       <div className="hatch-hero pointer-events-none absolute inset-0" />
       <div className="scrim-hero pointer-events-none absolute inset-0" />
 
-      <div className="absolute inset-x-0 bottom-0 mx-auto max-w-[1280px] px-5 pb-6 sm:px-12 sm:pb-[60px]">
+      <div className="hero-copy relative mx-auto max-w-[1280px] px-5 pb-6 sm:absolute sm:inset-x-0 sm:bottom-0 sm:px-12 sm:pb-[60px]">
         <span
           className={cn(
             "inline-block rounded-full border border-white/12 bg-[rgba(18,20,26,0.85)] px-[13px] py-[7px] text-[11px] font-bold tracking-[0.06em] text-paper uppercase",
