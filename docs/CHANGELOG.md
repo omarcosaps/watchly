@@ -5,6 +5,7 @@
 ### Fixed
 
 - A Home pública, a busca, o detalhe e as APIs de catálogo não esperam mais a renovação de sessão do Supabase. O cookie só é renovado nas rotas de conta e do app autenticado.
+- Entrar, Criar conta e Watchlist abrem mesmo quando o Supabase não responde. A renovação do cookie desiste em 2s e, se falhar, fica pausada por 30s.
 
 ## 2026-09-19
 

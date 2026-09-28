@@ -4,6 +4,11 @@ import { NextResponse, type NextRequest } from "next/server"
 import type { Database } from "@/lib/supabase/database.types"
 import { getSupabaseKey, getSupabaseUrl } from "@/lib/supabase/env"
 
+const SESSION_REFRESH_BUDGET_MS = 2000
+const SESSION_REFRESH_COOLDOWN_MS = 30_000
+
+let sessionRefreshPausedUntil = 0
+
 export const updateSession = async (request: NextRequest) => {
   let supabaseResponse = NextResponse.next({
     request,
@@ -38,7 +43,32 @@ export const updateSession = async (request: NextRequest) => {
     },
   })
 
-  await supabase.auth.getUser()
+  if (Date.now() < sessionRefreshPausedUntil) {
+    return supabaseResponse
+  }
+
+  let settled = false
+  const refresh = (async () => {
+    try {
+      const { error } = await supabase.auth.getUser()
+      settled = true
+      if (error?.name === "AuthRetryableFetchError") {
+        sessionRefreshPausedUntil = Date.now() + SESSION_REFRESH_COOLDOWN_MS
+      }
+    } catch {
+      settled = true
+      sessionRefreshPausedUntil = Date.now() + SESSION_REFRESH_COOLDOWN_MS
+    }
+  })()
+
+  const budget = new Promise<"timeout">((resolve) => {
+    setTimeout(() => resolve("timeout"), SESSION_REFRESH_BUDGET_MS)
+  })
+  const winner = await Promise.race([refresh.then(() => "done" as const), budget])
+
+  if (winner === "timeout" && !settled) {
+    sessionRefreshPausedUntil = Date.now() + SESSION_REFRESH_COOLDOWN_MS
+  }
 
   return supabaseResponse
 }

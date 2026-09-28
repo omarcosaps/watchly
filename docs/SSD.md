@@ -220,7 +220,7 @@ Proteção de rotas no cliente:
 - Home, busca e detalhe sem sessão
 - Logout → `/`
 
-`proxy.ts` só renova o cookie nas rotas de conta e do app autenticado. Home, busca, detalhe e `/api/*` não passam por ele. As rotas `/api/*` **não** verificam sessão.
+`proxy.ts` só renova o cookie nas rotas de conta e do app autenticado. Se o Supabase não responder, essa renovação desiste em 2s e fica pausada por 30s, para a rota abrir. Home, busca, detalhe e `/api/*` não passam por ele. As rotas `/api/*` **não** verificam sessão.
 
 ## Integração com TMDB
 
