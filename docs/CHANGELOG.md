@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-27
+
+### Fixed
+
+- A Home pública, a busca, o detalhe e as APIs de catálogo não esperam mais a renovação de sessão do Supabase. O cookie só é renovado nas rotas de conta e do app autenticado.
+
 ## 2026-09-19
 
 ### Changed

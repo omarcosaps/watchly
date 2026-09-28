@@ -16,7 +16,7 @@ Usar Supabase Auth + Postgres com RLS.
 - Identidade física: `auth.users.id` (UUID). A watchlist é única por `user_id + media_type + tmdb_id` ([ADR-003](ADR-003-watchlist-identity.md)).
 - Tabelas `public.accounts`, `public.preferences` e `public.watchlist_items`. Sem `profiles`, sem catálogo persistido, sem ofertas.
 - Origem de aquisição entra na metadata do `signUp` e o trigger grava em `accounts`. Sem UPDATE nessa coluna.
-- Sessão em cookie via `@supabase/ssr`. `proxy.ts` só renova o cookie. `AuthGuard` e `GuestGuard` continuam protegendo as rotas no cliente.
+- Sessão em cookie via `@supabase/ssr`. `proxy.ts` só renova o cookie nas rotas de conta e do app autenticado (`/login`, `/cadastro`, `/recuperar-senha`, `/atualizar-senha`, `/verificar-email`, `/auth/callback`, `/watchlist`, `/preferencias`, `/onboarding`). Home, busca, detalhe e `/api/*` não passam por ele. `AuthGuard` e `GuestGuard` continuam protegendo as rotas no cliente.
 - `/auth/callback` troca o código PKCE. Recuperação redireciona para `/atualizar-senha`.
 - Sem `SERVICE_ROLE` no app. Login distingue conta inexistente e senha errada com a RPC `email_registered`. Recuperação permanece neutra.
 - Confirm email desligado no projeto. Sem verificação de e-mail no produto.
