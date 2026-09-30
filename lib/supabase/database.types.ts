@@ -40,6 +40,23 @@ export type Database = {
         }
         Relationships: []
       }
+      avatars: {
+        Row: {
+          user_id: string
+          object_path: string
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          object_path: string
+          updated_at?: string
+        }
+        Update: {
+          object_path?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       watchlist_items: {
         Row: {
           id: string

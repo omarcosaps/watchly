@@ -1,5 +1,10 @@
 import type { AcquisitionSource, Preferences, WatchlistItem } from "@/lib/account/types"
 
+type StoredAvatar = {
+  objectPath: string
+  updatedAt: string
+}
+
 type StoredUser = {
   id: string
   email: string
@@ -7,7 +12,10 @@ type StoredUser = {
   acquisitionSource: AcquisitionSource
   preferences: Preferences | null
   watchlist: WatchlistItem[]
+  avatar: StoredAvatar | null
 }
+
+export type AvatarFault = "storage-upload" | "storage-remove" | "avatar-write" | "avatar-delete"
 
 type QueryFilter = {
   column: string
@@ -20,6 +28,15 @@ export const createAccountTestDouble = () => {
   const users = new Map<string, StoredUser>()
   let currentUserId: string | null = null
   let nextId = 1
+  let failNext: AvatarFault | null = null
+  let avatarVersion = 0
+  const storageCalls: string[] = []
+
+  const takeFault = (fault: AvatarFault) => {
+    if (failNext !== fault) return false
+    failNext = null
+    return true
+  }
 
   const currentUser = () => {
     if (!currentUserId) return null
@@ -193,6 +210,51 @@ export const createAccountTestDouble = () => {
           }
         }
 
+        if (table === "avatars") {
+          if (!user) {
+            return { data: null, error: { message: "not authenticated" } }
+          }
+
+          if (op === "select") {
+            if (!user.avatar) return { data: null, error: null }
+            return {
+              data: {
+                user_id: user.id,
+                object_path: user.avatar.objectPath,
+                updated_at: user.avatar.updatedAt,
+              },
+              error: null,
+            }
+          }
+
+          if ((op === "upsert" || op === "insert") && payload) {
+            if (takeFault("avatar-write")) {
+              return { data: null, error: { message: "write failed" } }
+            }
+
+            avatarVersion += 1
+            const row = {
+              user_id: user.id,
+              object_path: String(payload.object_path),
+              updated_at: new Date(Date.UTC(2026, 0, 1, 0, 0, avatarVersion)).toISOString(),
+            }
+            user.avatar = {
+              objectPath: row.object_path,
+              updatedAt: row.updated_at,
+            }
+            return { data: wantSingle ? row : null, error: null }
+          }
+
+          if (op === "delete") {
+            if (takeFault("avatar-delete")) {
+              return { data: null, error: { message: "delete failed" } }
+            }
+
+            user.avatar = null
+            return { data: null, error: null }
+          }
+        }
+
         return { data: null, error: null }
       },
     }
@@ -223,6 +285,7 @@ export const createAccountTestDouble = () => {
           acquisitionSource: (options?.data?.acquisition_source ?? "amigo") as AcquisitionSource,
           preferences: null,
           watchlist: [],
+          avatar: null,
         }
         nextId += 1
         users.set(user.id, user)
@@ -280,6 +343,53 @@ export const createAccountTestDouble = () => {
       onAuthStateChange: () => {
         return { data: { subscription: { unsubscribe() {} } } }
       },
+    },
+    storage: {
+      from(bucket: string) {
+        return {
+          upload: async (path: string) => {
+            storageCalls.push("upload")
+            if (bucket !== "avatars") {
+              return { data: null, error: { message: "unknown bucket" } }
+            }
+            if (takeFault("storage-upload")) {
+              return { data: null, error: { message: "upload failed" } }
+            }
+            const user = currentUser()
+            if (!user) {
+              return { data: null, error: { message: "not authenticated" } }
+            }
+            return { data: { path }, error: null }
+          },
+          remove: async () => {
+            storageCalls.push("remove")
+            if (bucket !== "avatars") {
+              return { data: null, error: { message: "unknown bucket" } }
+            }
+            if (takeFault("storage-remove")) {
+              return { data: null, error: { message: "remove failed" } }
+            }
+            return { data: [], error: null }
+          },
+          getPublicUrl: (path: string) => {
+            storageCalls.push("getPublicUrl")
+            return { data: { publicUrl: `https://storage.test/${bucket}/${path}` } }
+          },
+        }
+      },
+    },
+    storageCalls,
+    failNextOperation: (fault: AvatarFault) => {
+      failNext = fault
+    },
+    avatarRow: () => {
+      const user = currentUser()
+      if (!user?.avatar) return null
+      return {
+        user_id: user.id,
+        object_path: user.avatar.objectPath,
+        updated_at: user.avatar.updatedAt,
+      }
     },
     rpc: async (fn: string, args: { p_email?: string }) => {
       if (fn !== "email_registered") {

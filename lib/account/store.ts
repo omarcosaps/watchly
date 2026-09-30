@@ -4,6 +4,7 @@ export type AccountSnapshot = {
   session: Session | null
   preferences: Preferences | null
   watchlist: WatchlistItem[]
+  avatarUrl: string | null
   ready: boolean
   accountReady: boolean
   loadError: string | null
@@ -16,6 +17,7 @@ const emptySnapshot = (): AccountSnapshot => {
     session: null,
     preferences: null,
     watchlist: [],
+    avatarUrl: null,
     ready: false,
     accountReady: false,
     loadError: null,
