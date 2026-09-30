@@ -70,6 +70,10 @@ export type AccountErrorCode =
   | "account_not_found"
   | "acquisition_required"
   | "providers_required"
+  | "invalid_avatar_type"
+  | "avatar_too_large"
+  | "avatar_save_failed"
+  | "avatar_remove_failed"
 
 export class AccountError extends Error {
   constructor(
@@ -89,4 +93,8 @@ export const ACCOUNT_ERROR_COPY: Record<AccountErrorCode, string> = {
   account_not_found: "Conta não encontrada. Crie uma conta primeiro.",
   acquisition_required: "Conte onde você conheceu o Watchly.",
   providers_required: "Escolha pelo menos um streaming disponível neste país para continuar.",
+  invalid_avatar_type: "Escolha uma foto em JPG, PNG ou WebP.",
+  avatar_too_large: "A foto precisa ter no máximo 2 MB.",
+  avatar_save_failed: "Não deu para salvar a foto.",
+  avatar_remove_failed: "Não deu para remover a foto.",
 }

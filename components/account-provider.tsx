@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react"
 
+import { removeAvatar, saveAvatar } from "@/lib/account/avatar"
 import { applyCountryChange, savePreferences } from "@/lib/account/preferences"
 import {
   confirmEmail,
@@ -42,6 +43,7 @@ type AccountContextValue = {
   session: Session | null
   preferences: Preferences | null
   watchlist: WatchlistItem[]
+  avatarUrl: string | null
   retryAccount: () => Promise<void>
   signUp: typeof signUp
   signIn: typeof signIn
@@ -51,6 +53,8 @@ type AccountContextValue = {
   updatePassword: typeof updatePassword
   savePreferences: typeof savePreferences
   applyCountryChange: typeof applyCountryChange
+  saveAvatar: typeof saveAvatar
+  removeAvatar: typeof removeAvatar
   addToWatchlist: typeof addToWatchlist
   removeFromWatchlist: typeof removeFromWatchlist
   setWatchlistWatched: typeof setWatchlistWatched
@@ -81,6 +85,7 @@ export const AccountProvider = ({ children }: { children: ReactNode }) => {
           session: null,
           preferences: null,
           watchlist: [],
+          avatarUrl: null,
           ready: true,
           accountReady: true,
           loadError: error instanceof Error ? error.message : "Supabase não configurado",
@@ -108,6 +113,7 @@ export const AccountProvider = ({ children }: { children: ReactNode }) => {
       session: account.session,
       preferences: account.preferences,
       watchlist: account.watchlist,
+      avatarUrl: account.avatarUrl,
       retryAccount,
       signUp,
       signIn,
@@ -117,6 +123,8 @@ export const AccountProvider = ({ children }: { children: ReactNode }) => {
       updatePassword,
       savePreferences,
       applyCountryChange,
+      saveAvatar,
+      removeAvatar,
       addToWatchlist,
       removeFromWatchlist,
       setWatchlistWatched,
