@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-02
+
+### Added
+
+- Foto de perfil no Perfil e no chip da navegação. Sem foto, a inicial de duas letras permanece. A foto fica na conta e volta ao entrar de novo.
+
 ## 2026-09-27
 
 ### Fixed

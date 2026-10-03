@@ -1,6 +1,6 @@
 # SSD — Watchly
 
-Última atualização: 19 de setembro de 2026
+Última atualização: 2 de outubro de 2026
 
 Este arquivo é a fonte da verdade técnica do sistema. Comportamento e regras de negócio vivem em `docs/PRD.md`. Decisões arquiteturais relevantes ficam em `docs/decisions/`.
 
@@ -10,11 +10,11 @@ O PRD descreve o comportamento aprovado e desejado. Este SSD descreve o sistema 
 
 ### Current architecture
 
-O Watchly é um app Next.js (App Router). O browser renderiza a UI e chama route handlers do próprio Next para o catálogo. Conta, preferências e watchlist passam pelo contrato `lib/account` e persistem no Supabase (Auth + Postgres + RLS). Os route handlers de catálogo consultam a TMDB no servidor.
+O Watchly é um app Next.js (App Router). O browser renderiza a UI e chama route handlers do próprio Next para o catálogo. Conta, preferências, watchlist e a foto passam pelo contrato `lib/account` e persistem no Supabase (Auth + Postgres + Storage + RLS). Os route handlers de catálogo consultam a TMDB no servidor.
 
 ```text
 Browser (Client Components)
-  ├── AccountProvider → lib/account → Supabase Auth + RLS
+  ├── AccountProvider → lib/account → Supabase Auth + Postgres + Storage
   ├── Rotas públicas: home, busca, detalhe
   ├── AuthGuard: watchlist, onboarding, perfil
   └── fetch → /api/*
@@ -91,12 +91,15 @@ Contrato público atual:
 - `lib/account/session.ts` — cadastro, login, logout, confirmar email, reset e atualizar senha
 - `lib/account/preferences.ts` — país + `providerIds` (≥1)
 - `lib/account/watchlist.ts` — add, remove, list, isSaved, setWatchlistWatched
+- `lib/account/avatar.ts` — `saveAvatar` e `removeAvatar`
 - `lib/account/types.ts` — `Session`, `Preferences`, `WatchlistItem`, `AcquisitionSource`
 - `lib/account/watch-status.ts` — rótulos **Ainda não assistido** / **Já assistido**
 
 Implementação atual: `lib/account/supabase/*`. Funções públicas são assíncronas. Ver [ADR-002](decisions/ADR-002-account-abstraction.md) e [ADR-005](decisions/ADR-005-supabase-account.md).
 
-`AccountProvider` usa `useSyncExternalStore` sobre o store em memória e hidrata sessão, preferências e watchlist no cliente.
+`AccountProvider` usa `useSyncExternalStore` sobre o store em memória e hidrata sessão, preferências, watchlist e `avatarUrl` no cliente.
+
+O snapshot inclui `avatarUrl: string | null`. `hydrateAccount` lê `public.avatars` e monta a URL pública. `signOut` limpa o snapshot, então o chip perde a foto sem apagar o objeto. Arquivo inválido não chama o Storage. Falha de gravação ou de remoção mantém o `avatarUrl` anterior. Remoção concluída deixa `avatarUrl` nulo.
 
 Cadastro exige origem de aquisição. Sessão só tem status `authenticated`.
 
@@ -123,11 +126,12 @@ Cliente único em `lib/tmdb/client.ts`. Queries em `lib/tmdb/queries.ts`. URLs d
 
 ## Modelo de domínio
 
-Entidades de negócio do Watchly. **Profile** não é entidade persistida: a tela Perfil é UI sobre User e Preferences.
+Entidades de negócio do Watchly. A tela Perfil é UI sobre User, Preferences e a foto. A foto é dado persistido da conta. Não existe tabela `profiles`.
 
 | Conceito | Responsabilidade | Existe hoje? |
 | --- | --- | --- |
 | User | Identidade da sessão (e-mail). Hoje: `Session` sobre `auth.users`. | Sim |
+| Avatar | Caminho da foto da conta. O arquivo fica no Storage. | Sim, em `avatars` |
 | Acquisition source | Origem informada no cadastro. Lista fechada. Não é editável depois. | Sim, em `accounts` |
 | Preferences | País de referência + streamings escolhidos (≥1). | Sim |
 | Country | Conjunto de produto: `BR`, `US`, `PT`. A TMDB continua sendo a fonte de provedores da região. | Sim, na UI |
@@ -143,6 +147,7 @@ Domínio do produto, independente da estrutura física.
 ```mermaid
 erDiagram
     USER ||--o| PREFERENCES : configura
+    USER ||--o| AVATAR : possui
     USER ||--o{ WATCHLIST_ITEM : adiciona
     USER ||--|| ACQUISITION_SOURCE : informa_no_cadastro
     COUNTRY ||--o| PREFERENCES : referencia
@@ -154,11 +159,12 @@ erDiagram
 
 ## Diagrama de relacionamento de entidades
 
-Schema em `supabase/migrations`. Identidade física: `auth.users.id`. A UI continua lendo `{ session, preferences, watchlist }`.
+Schema em `supabase/migrations`. Identidade física: `auth.users.id`. A UI continua lendo `{ session, preferences, watchlist, avatarUrl }`.
 
 ```text
 auth.users          { id, email, senha }
 public.accounts     { id FK, email, acquisition_source }
+public.avatars      { user_id PK, object_path, updated_at }
 public.preferences  { user_id PK, country, provider_ids[], updated_at }
 public.watchlist_items { id, user_id, tmdb_id, media_type, title, poster_path, year, watched, created_at }
 ```
@@ -166,6 +172,7 @@ public.watchlist_items { id, user_id, tmdb_id, media_type, title, poster_path, y
 ```mermaid
 erDiagram
     auth_users ||--|| accounts : "1:1"
+    auth_users ||--o| avatars : "0..1"
     auth_users ||--o| preferences : "0..1"
     auth_users ||--o{ watchlist_items : "0..n"
 
@@ -173,6 +180,12 @@ erDiagram
         uuid id PK
         text email UK
         text acquisition_source
+    }
+
+    avatars {
+        uuid user_id PK
+        text object_path
+        timestamptz updated_at
     }
 
     preferences {
@@ -202,6 +215,8 @@ Catálogo em runtime (`lib/catalog/types.ts`): `CatalogItem`, `TitleDetails`, `O
 ## Persistência
 
 Postgres no Supabase. RLS: cada usuário só lê e escreve as próprias linhas. `accounts` não tem UPDATE (origem só no cadastro). Trigger em `auth.users` cria a linha de `accounts`.
+
+A foto fica em `public.avatars` (caminho) e no bucket `avatars` (arquivo). A pessoa só lê e escreve a própria linha. O bucket tem leitura pública; escrita e exclusão só no objeto `{user_id}/avatar`. Trocar a foto sobrescreve o mesmo objeto. Remover apaga o objeto e a linha. Apagar o usuário remove a linha. Ver [ADR-006](decisions/ADR-006-profile-avatar-storage.md).
 
 Na watchlist, `title`, `poster_path` e `year` são snapshot de UI. Disponibilidade **não** é gravada. `watched` nasce `false`.
 
@@ -330,7 +345,7 @@ Mensagens de origem de aquisição e de gate de visitante estão na UI.
 
 ## Limitações técnicas
 
-- Depende do projeto Supabase (Auth, Postgres e e-mail de recovery)
+- Depende do projeto Supabase (Auth, Postgres, Storage da foto e e-mail de recovery)
 - APIs de catálogo públicas (qualquer cliente com `region`)
 - Páginas majoritariamente Client Components; pouco SSR de dados TMDB
 - `applyCountryChange()` existe no contrato de preferências, mas a UI salva só via `savePreferences()` no submit do formulário
