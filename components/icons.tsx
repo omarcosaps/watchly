@@ -257,6 +257,28 @@ export const StarIcon = ({
   )
 }
 
+export const PencilIcon = ({ className = "h-4 w-4" }: IconProps) => {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path
+        d="M4 20h4L18.5 9.5a2.12 2.12 0 0 0-3-3L5 17v3z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="m13.5 6.5 3 3"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
 export const PlayIcon = ({ className = "h-4 w-4" }: IconProps) => {
   return (
     <svg viewBox="0 0 24 24" className={className} aria-hidden>
