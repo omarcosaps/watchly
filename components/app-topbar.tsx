@@ -49,7 +49,7 @@ const TopbarContent = () => {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const { session, preferences } = useAccount()
+  const { session, preferences, avatarUrl } = useAccount()
   const { leaveTo } = useScreenNavigate()
   const media = searchParams.get("media")
   const homeActive = pathname === "/" && !media
@@ -87,7 +87,12 @@ const TopbarContent = () => {
         <div className="flex h-12 items-center justify-between gap-1 px-2">
           <Wordmark href="/" />
           <div className="flex min-w-0 items-center gap-0.5">
-            <AccountControls layout="compact" prefsActive={prefsActive} session={session} />
+            <AccountControls
+              layout="compact"
+              prefsActive={prefsActive}
+              session={session}
+              avatarUrl={avatarUrl}
+            />
             <CompactFilterButton pathname={pathname} searchParams={searchParams} />
           </div>
         </div>
@@ -99,7 +104,12 @@ const TopbarContent = () => {
         <PrincipalNav {...navState} />
         <SearchControl active={searchActive} />
         <span className="mx-1.5 h-[18px] w-px bg-white/14" aria-hidden />
-        <AccountControls layout="pill" prefsActive={prefsActive} session={session} />
+        <AccountControls
+          layout="pill"
+          prefsActive={prefsActive}
+          session={session}
+          avatarUrl={avatarUrl}
+        />
       </PillChrome>
     </>
   )
@@ -261,10 +271,12 @@ const AccountControls = ({
   layout,
   session,
   prefsActive,
+  avatarUrl,
 }: {
   layout: AccountLayout
   session: Session | null
   prefsActive: boolean
+  avatarUrl: string | null
 }) => {
   if (session) {
     return (
@@ -284,11 +296,15 @@ const AccountControls = ({
       >
         <span
           className={cn(
-            "flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full text-[11px] font-extrabold",
+            "flex h-[26px] w-[26px] shrink-0 items-center justify-center overflow-hidden rounded-full text-[11px] font-extrabold",
             prefsActive ? "bg-void text-paper" : "bg-white/18 text-white",
           )}
         >
-          {initialsFromEmail(session.email)}
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
+          ) : (
+            initialsFromEmail(session.email)
+          )}
         </span>
         {layout === "compact" ? (
           <span className="max-w-[5.5rem] truncate">{shortNameFromEmail(session.email)}</span>
