@@ -1,6 +1,6 @@
 # PRD — Watchly
 
-Última atualização: 17 de setembro de 2026
+Última atualização: 2 de outubro de 2026
 
 Este arquivo é a fonte da verdade funcional do produto. Ele representa o **comportamento de produto aprovado e desejado**, ainda não totalmente implementado. Atualizar aqui quando o comportamento, o escopo ou uma regra de negócio mudar. A arquitetura vive em `docs/SSD.md`. Mudanças individuais ficam em `docs/features/`.
 
@@ -60,7 +60,7 @@ Login ou cadastro não bloqueiam a exploração. A conta passa a ser exigida qua
 - Busca por título, com distinção entre resultados nos streamings da pessoa e fora deles
 - Página de detalhe com sinopse, elenco, onde assistir e ações de watchlist
 - Watchlist por conta: adicionar, remover, listar e alternar status **Ainda não assistido** / **Já assistido**
-- Perfil com conta atual, país, streamings e logout
+- Perfil com conta atual, foto, país, streamings e logout
 - Atribuição visível a TMDB e JustWatch
 - Conteúdo adulto desligado, sem controle para ligar
 
@@ -195,7 +195,7 @@ Hero: carrossel com as 5 tendências da semana no país de referência, consulta
 
 Na primeira visita, a Home entra em cascata: o fundo do hero em fade e o conteúdo subindo em sequência (kicker, título, sinopse, botões, filtros, indicadores, grade). Trocar de slide só faz crossfade no fundo; o texto não re-anima. Sair da Home para outra tela do shell (card, **Ver Detalhes** ou nav) faz a tela descer e desvanecer antes da troca. Trocar entre Início, Filmes e Séries (nav ou filtro Tipo) usa o mesmo gesto. Gênero, ano, provedor, ordenação e **Carregar mais** não re-animam a página.
 
-A navegação muda com a largura. No telefone, o topo tem uma linha: **Watchly** à esquerda; à direita, **Entrar** + **Criar conta** (visitante) ou chip de perfil com iniciais e nome truncado (logado). Na Home (`/` com ou sem `?media=`), um botão circular de filtros fica depois da conta. Busca, detalhe, Watchlist e Perfil não têm esse botão. A nav principal é uma tab bar fixa no rodapé: **Início**, **Filmes**, **Séries**, **Busca** e **Lista** (ícone + rótulo). A busca não fica no topo. A partir de 640px a nav volta a ser a pílula flutuante, com busca por ícone e o item **Watchlist**; entre 640px e 1023px o nome some e fica o avatar; a partir de 1024px o atalho de perfil mostra avatar + nome. Filmes e Séries aplicam o filtro de tipo na Home. O clique em Lista/Watchlist segue o gate atual. Logout fica só no Perfil. Em Watchlist e Busca, o conteúdo começa 32px abaixo do header no telefone e no desktop. No Perfil, o conteúdo começa 32px abaixo do header só no telefone; a partir de 640px o espaçamento permanece o atual. Home e detalhe mantêm o espaçamento atual. O header não muda de altura nem de posição.
+A navegação muda com a largura. No telefone, o topo tem uma linha: **Watchly** à esquerda; à direita, **Entrar** + **Criar conta** (visitante) ou chip de perfil com a foto da conta e nome truncado (logado). Sem foto, o chip mostra as duas letras do e-mail. Na Home (`/` com ou sem `?media=`), um botão circular de filtros fica depois da conta. Busca, detalhe, Watchlist e Perfil não têm esse botão. A nav principal é uma tab bar fixa no rodapé: **Início**, **Filmes**, **Séries**, **Busca** e **Lista** (ícone + rótulo). A busca não fica no topo. A partir de 640px a nav volta a ser a pílula flutuante, com busca por ícone e o item **Watchlist**; entre 640px e 1023px o nome some e fica o círculo; a partir de 1024px o atalho de perfil mostra círculo + nome. Com foto, o círculo mostra a mesma foto no compacto, no médio e no amplo, inclusive quando o chip está ativo em `/preferencias`. Filmes e Séries aplicam o filtro de tipo na Home. O clique em Lista/Watchlist segue o gate atual. Logout fica só no Perfil. Em Watchlist e Busca, o conteúdo começa 32px abaixo do header no telefone e no desktop. No Perfil, o conteúdo começa 32px abaixo do header só no telefone; a partir de 640px o espaçamento permanece o atual. Home e detalhe mantêm o espaçamento atual. O header não muda de altura nem de posição.
 
 A troca entre Home, busca, detalhe, Watchlist e Perfil — inclusive pelos links da nav — usa a mesma linguagem de movimento: a tela atual desce e some; a seguinte entra com fundo em fade e conteúdo em cascata. Início, Filmes e Séries são telas distintas nesse gesto (`/`, `/?media=movie`, `/?media=tv`). Login, cadastro, senha e onboarding mantêm a entrada que já têm. Com `prefers-reduced-motion: reduce`, não há animação e a navegação é imediata.
 
@@ -278,7 +278,11 @@ Não há filtro, ordenação extra nem agrupamento por status. O título permane
 
 ### Perfil e preferências
 
-Tela **Perfil**. Mostra a conta atual (e-mail) e o mesmo par país + streamings do onboarding. A primeira chegada entra em cascata. Trocar país no formulário ou mostrar sucesso/erro não re-anima. Sair da conta usa o mesmo leave antes de voltar à Home.
+Tela **Perfil**. Mostra a conta atual (e-mail), a foto e o mesmo par país + streamings do onboarding. O onboarding não mostra o bloco da foto. A primeira chegada entra em cascata. Trocar país no formulário ou mostrar sucesso/erro não re-anima. Sair da conta usa o mesmo leave antes de voltar à Home.
+
+Sem foto, o círculo mostra a inicial de duas letras do e-mail e a ação **Enviar foto**. Escolher JPG, PNG ou WebP de até 2 MB mostra a foto na hora no círculo e no chip e grava na conta. Não há **Salvar** nem **Cancelar** para a foto. Com foto, **Trocar foto** substitui. **Remover** volta à inicial no círculo e no chip e apaga a foto da conta.
+
+Sucesso depois de enviar ou trocar: “Foto do perfil atualizada.” A frase fica no bloco até a próxima ação de foto ou até sair da página. Remover não mostra essa frase. Arquivo de outro tipo: “Escolha uma foto em JPG, PNG ou WebP.” Arquivo acima de 2 MB: “A foto precisa ter no máximo 2 MB.” Falha ao gravar: “Não deu para salvar a foto.” Falha ao remover: “Não deu para remover a foto.” Em qualquer falha, a foto anterior permanece. A mensagem da foto não substitui a de preferências, nem o contrário.
 
 Texto: trocar país ou streamings não apaga a watchlist.
 
@@ -288,7 +292,7 @@ Salvar sem streaming: “Escolha pelo menos um streaming disponível neste país
 
 Sucesso: “Preferências salvas. Sua watchlist continua intacta.”
 
-Logout encerra a sessão e volta à Home como visitante. Preferências e watchlist permanecem associadas à conta.
+Logout encerra a sessão e volta à Home como visitante. A foto sai do chip. Preferências, watchlist e a foto permanecem na conta e voltam ao entrar de novo.
 
 ## Fluxos principais
 
